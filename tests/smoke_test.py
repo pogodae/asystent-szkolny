@@ -2,7 +2,7 @@
 
 Testy tworzą zadania z tytułem „SMOKE …” i na końcu je usuwają (razem ze zdarzeniami).
 Maili nie wysyłają (przypomnienia idą tylko rano dzień przed terminem).
-Koszt: około 50 operacji Make – darmowy plan ma ~1000 miesięcznie, więc uruchamiaj z rozwagą.
+Koszt: około 30 operacji Make – darmowy plan ma ~1000 miesięcznie, więc uruchamiaj z rozwagą.
 Ręcznie zostają: 1 („dodaj” w Claude), przypomnienia na prawdziwym harmonogramie, 15 (telefon).
 
 Użycie:  python tests/smoke_test.py
@@ -64,10 +64,12 @@ def main():
         tid2, _ = nowe_zadanie("SMOKE dashboard")
         j = dashboard(akcja="lista").json()
         check(14.1, "dashboard: lista", j.get("ok") and any(z["id"] == tid2 for z in j["zadania"]))
-        z = dashboard(akcja="take", id=tid2).json()["zadanie"]["fields"]
+        dashboard(akcja="take", id=tid2)
+        z = at.get_record("Zadania", tid2)["fields"]
         check(12, "dashboard: „Biorę to” → moje", z.get("Status") == "Przypisane", z.get("Status"))
         at.update_record("Zadania", tid2, {"Liczba przypomnień": 3})
-        z = dashboard(akcja="release", id=tid2).json()["zadanie"]["fields"]
+        dashboard(akcja="release", id=tid2)
+        z = at.get_record("Zadania", tid2)["fields"]
         check(13, "dashboard: „Oddaj” → Wolne, licznik 0",
               z.get("Status") == "Nowe" and not z.get("Liczba przypomnień"), z)
         r = requests.post(URL, params={"cel": "api"}, data={"u": U, "s": "zly-klucz-0000000000", "akcja": "lista"})
