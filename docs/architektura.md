@@ -36,7 +36,7 @@ Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, wi�
 | Kliknięcia z maili | `S2_WEBHOOK_URL?t=…&a=take&p=…&k=…` |
 | S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key`; JSON: `tytul`, `termin`, `rodzaj` (Do dnia / W dniu / Wydarzenie), `opis`, `kwota`, `id_zrodla` |
 | Dashboard | `S2_WEBHOOK_URL?cel=api` (pola formularza `u`, `s`, `akcja`, `id`) |
-| S3 | `S2_WEBHOOK_URL?cel=przypomnienia` + `X-Api-Key` (opcjonalnie `odstep=0`, `wieczor=1` do testów) |
+| S3 | `S2_WEBHOOK_URL?cel=przypomnienia` + `X-Api-Key` (raz dziennie rano z GitHub Actions) |
 
 ## Budżet operacji
 
@@ -44,9 +44,9 @@ Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Ma
 
 | Co | Operacje | Jak często |
 | --- | --- | --- |
-| Przypomnienia (S3) | ok. 4 + 2–3 na każdą sprawę na jutro | raz dziennie wieczorem (GitHub Actions) |
+| Przypomnienia (S3) | ok. 4 + 2–3 na każdą sprawę na jutro | raz dziennie rano (GitHub Actions) |
 | Lista na dashboardzie | 4 | przy otwarciu, gdy lista w telefonie jest starsza niż 15 min, albo „Odśwież” |
 | Akcja z dashboardu (biorę, zrobione, …) | ok. 8 (API + Silnik) | na kliknięcie |
 | Dodanie sprawy | ok. 7 | na sprawę |
 
-Maile wychodzą tylko wieczorem dzień przed terminem (do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”) oraz od razu przy przypisaniu sprawy osobie z ustawieniem „Tylko przypisane”. Dostęp do API dashboardu sprawdzają filtry z parami klucz + klucz dostępu, bez zapytania do Airtable.
+Maile wychodzą tylko rano dzień przed terminem (do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”) oraz od razu przy przypisaniu sprawy osobie z ustawieniem „Tylko przypisane”. Dostęp do API dashboardu sprawdzają filtry z parami klucz + klucz dostępu, bez zapytania do Airtable.

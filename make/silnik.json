@@ -270,7 +270,7 @@
              "ok": true,
              "kto": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
              "powod": "",
-             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} – termin {{2.body.fields.fldeO5RW1DJwB8NX3}}. Przypomnę wieczór przed terminem.",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} – termin {{2.body.fields.fldeO5RW1DJwB8NX3}}. Przypomnę rano dzień przed terminem.",
              "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
              "status": "Przypisane",
              "naglowek": "Gotowe, to Twoje"

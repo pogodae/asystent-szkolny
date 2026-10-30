@@ -285,7 +285,7 @@ def status_routes():
                        flt("Biorę: wolne", [ok_a, eq(akcja, "take"), eq(st, "Nowe")])),
              zdarzenie(21, "Przypisano", f"{a['Imię']} bierze: {z['Tytuł']}", z.id, a.id),
              wynik(22, True, "", "Gotowe, to Twoje",
-                   f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę wieczór przed terminem.",
+                   f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę rano dzień przed terminem.",
                    kto=a["Imię"], status="Przypisane")],
             [wynik(30, True, "juz_masz", "Już to masz", f"{z['Tytuł']} jest przypisane do Ciebie.",
                    kto=a["Imię"],
@@ -438,7 +438,7 @@ def po_zmianie(z, kto_id, akcja, mid=30):
                         flt=flt(naglowek[:40], *groups))]
 
     return [
-        page(0, "Gotowe, to Twoje", f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę wieczór przed terminem.",
+        page(0, "Gotowe, to Twoje", f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę rano dzień przed terminem.",
              [eq(akcja, "take"), eq(st, "Przypisane"), eq(z.osoba, kto_id)]),
         page(1, f"Już przejęte przez {z['Osoba imię']}", "Nic nie musisz robić.",
              [eq(akcja, "take"), eq(st, "Przypisane"), ne(z.osoba, kto_id)]),
@@ -619,7 +619,7 @@ def s5_routes(cel_eq):
 
 
 def s3_routes(cel_eq):
-    """S3 – przypomnienie dzień przed terminem. GitHub Actions wywołuje je raz dziennie wieczorem
+    """S3 – przypomnienie dzień przed terminem. GitHub Actions wywołuje je raz dziennie rano
     (POST ?cel=przypomnienia z X-Api-Key), bo darmowy plan Make pozwala tylko na 2 aktywne scenariusze.
 
     Sprawa przypisana → mail do przypisanej osoby (przycisk Zrobione).
