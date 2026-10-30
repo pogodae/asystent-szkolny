@@ -1,0 +1,67 @@
+{
+ "Rodzice": {
+  "id": "tblDFvDbDjwhHYJkV",
+  "fields": {
+   "Imię": "fldNY2MTdN0GPOVdx",
+   "Klucz": "fld0U6X7hMhOxLv4a",
+   "Email": "fld7fIY9UIo72dIrT",
+   "Aktywny": "fldAQSIkCXVroik2Q",
+   "Klucz dostępu": "fldmWfdSSZJoqjeHG",
+   "Zadania": "fldQueKjjaPCHdCSu",
+   "Zdarzenia": "fldyaTBreDSZN2bdv"
+  },
+  "views": {
+   "Grid view": "viwwL1Hka3FV1r20b"
+  }
+ },
+ "Zadania": {
+  "id": "tblrnPwEGqiGYxSbd",
+  "fields": {
+   "Tytuł": "fldbqEXa4YxsfbBun",
+   "Opis": "fldaNenMnWwuRivka",
+   "Termin": "fldxwYvIR2e1Kx14D",
+   "Kwota": "fldbIWPFOkkWU2ned",
+   "Status": "fldB3iQHvOIUgYn1I",
+   "Osoba": "fldKNoba8yEYeFS17",
+   "Przypisano": "fld0r2CTQAV8kjHQL",
+   "Zrobiono": "fldS2iH28sZy2mgd4",
+   "Token": "fldKAZSVzA0x1ynuN",
+   "Źródło": "fldrzdtN10bDZTdX1",
+   "ID źródła": "fldo6qbBMUzIbqqMr",
+   "Liczba przypomnień": "fld0QJqw2alYIYa7r",
+   "Ostatnie przypomnienie": "fldOIYTKituV1TBjR",
+   "Przypomnienie przed terminem": "fldEaRdxdBntiaWV7",
+   "Po terminie": "fldRH1fD200OHmSqy",
+   "Zdarzenia": "fldME4ON6TOCOFhEU",
+   "Godzin do terminu": "fldipHpudpbCyAyY4",
+   "Utworzono": "fldMe6owt4YJHcoRT",
+   "Czas do przypisania (h)": "fld9SwMxpNA5Fi0Nu",
+   "Osoba imię": "fldy9rjTgd8OpBuWt",
+   "Termin tekst": "fldKsFnx31RYDCmGz",
+   "Termin krótko": "fldK2ENz7ZwrJLo28",
+   "Kwota tekst": "fldRuDmg7Km13RRyj",
+   "Kwota linia": "fldKKVlpmXuVza9c9",
+   "Dopisek pilne": "fldy2D2ty28uZDEBB"
+  },
+  "views": {
+   "Grid view": "viwFShn5wahTrQl0T",
+   "Otwarte": "viwQs4kHnw4h6qpTd",
+   "Po terminie": "viwSH2lvmpuffNiqR",
+   "Nieprzypisane": "viwCm6tYm6lsTzIYy",
+   "Zrobione w tym tyodniu": "viwi2UmWxigF0xPRS"
+  }
+ },
+ "Zdarzenia": {
+  "id": "tbl6hsMK7nuHuO3hS",
+  "fields": {
+   "Opis": "fldXk11pEacYX8Waq",
+   "Zadanie": "fld3gFPcPMANbP3NH",
+   "Typ": "fldyY0Iv9loL9L34q",
+   "Kto": "fld2krcNBe6Wi76hy",
+   "Kiedy": "flddtFJfLyWHOyhsa"
+  },
+  "views": {
+   "Grid view": "viw3v8HXD9a4WcvkE"
+  }
+ }
+}

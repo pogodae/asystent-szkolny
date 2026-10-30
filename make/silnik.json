@@ -1,0 +1,1552 @@
+{
+ "flow": [
+  {
+   "id": 1,
+   "mapper": {},
+   "module": "scenario-service:StartSubscenario",
+   "version": 2,
+   "metadata": {
+    "designer": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "parameters": {}
+  },
+  {
+   "id": 100,
+   "mapper": null,
+   "module": "builtin:BasicRouter",
+   "routes": [
+    {
+     "flow": [
+      {
+       "id": 2,
+       "filter": {
+        "name": "Zmiana statusu",
+        "conditions": [
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "take",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "done",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "release",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "przejmij",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "qs": [
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd/{{1.id}}",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 0
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 3,
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND({Aktywny}, {Klucz}='{{1.klucz}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 0
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 4,
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND({Aktywny}, {Klucz}!='{{1.klucz}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 1200,
+         "y": 0
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 5,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 10,
+           "filter": {
+            "name": "Nieznany rodzic",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "",
+             "powod": "brak_dostepu",
+             "tresc": "Nie rozpoznaję tego rodzica.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Brak dostępu"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 0
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 20,
+           "filter": {
+            "name": "Biorę: wolne",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "id": "{{2.body.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0r2CTQAV8kjHQL": "{{now}}",
+             "fldB3iQHvOIUgYn1I": "Przypisane",
+             "fldKNoba8yEYeFS17": [
+              "{{3.body.records[1].id}}"
+             ]
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 21,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Przypisano"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 23,
+           "mapper": {
+            "to": [
+             "{{4.body.records[1].fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze tę sprawę – nic nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          },
+          {
+           "id": 22,
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
+             "powod": "",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} – termin {{2.body.fields.fldKsFnx31RYDCmGz}}. Przypomnę wieczór przed terminem.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "Przypisane",
+             "naglowek": "Gotowe, to Twoje"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 30,
+           "filter": {
+            "name": "Biorę: już moje",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
+             "powod": "juz_masz",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} jest przypisane do Ciebie.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Już to masz"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 40,
+           "filter": {
+            "name": "Biorę: już cudze",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} chciał(a) wziąć: {{2.body.fields.fldbqEXa4YxsfbBun}} (ma {{2.body.fields.fldy9rjTgd8OpBuWt}})",
+             "fldyY0Iv9loL9L34q": "Odrzucone kliknięcie"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 41,
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "{{2.body.fields.fldy9rjTgd8OpBuWt}}",
+             "powod": "przejete",
+             "tresc": "Nic nie musisz robić.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Już przejęte przez {{2.body.fields.fldy9rjTgd8OpBuWt}}"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 50,
+           "filter": {
+            "name": "Zamknięte (take/release/przejmij)",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Zrobione",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Anulowane",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "",
+             "powod": "zamkniete",
+             "tresc": "Ta sprawa jest już zamknięta.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Zadanie zamknięte"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 60,
+           "filter": {
+            "name": "Zrobione: już",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Zrobione",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{2.body.fields.fldy9rjTgd8OpBuWt}}",
+             "powod": "juz_oznaczone",
+             "tresc": "Ta sprawa jest już oznaczona jako zrobiona.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Już oznaczone"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 65,
+           "filter": {
+            "name": "Zrobione: anulowane",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Anulowane",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "",
+             "powod": "zamkniete",
+             "tresc": "Ta sprawa została anulowana.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Zadanie zamknięte"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 70,
+           "filter": {
+            "name": "Zrobione: otwarte",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "id": "{{2.body.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fldB3iQHvOIUgYn1I": "Zrobione",
+             "fldKNoba8yEYeFS17": [
+              "{{ifempty(2.body.fields.fldKNoba8yEYeFS17[1]; 3.body.records[1].id)}}"
+             ],
+             "fldS2iH28sZy2mgd4": "{{now}}"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 71,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} – zrobione: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Zrobione"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 1750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 72,
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
+             "powod": "",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} – zamknięte.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "Zrobione",
+             "naglowek": "Zrobione, dzięki"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 1750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 80,
+           "filter": {
+            "name": "Oddaj: moje",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "release",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "id": "{{2.body.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0QJqw2alYIYa7r": 0,
+             "fldB3iQHvOIUgYn1I": "Nowe",
+             "fldKNoba8yEYeFS17": [],
+             "fldOIYTKituV1TBjR": "{{now}}"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 81,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} oddaje: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Oddano"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 83,
+           "mapper": {
+            "to": [
+             "{{4.body.records[1].fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} oddał(a) sprawę – jest znowu wolna</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=take&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=done&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          },
+          {
+           "id": 82,
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "",
+             "powod": "",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} jest znowu wolne.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "Nowe",
+             "naglowek": "Oddane"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 2000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 85,
+           "filter": {
+            "name": "Oddaj: nie moje",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "release",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "release",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "{{2.body.fields.fldy9rjTgd8OpBuWt}}",
+             "powod": "nie_twoje",
+             "tresc": "Oddać może tylko osoba przypisana.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "To nie Twoje zadanie"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 90,
+           "filter": {
+            "name": "Przejmij: cudze",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przejmij",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "qs": [
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV/{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 91,
+           "mapper": {
+            "id": "{{2.body.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0r2CTQAV8kjHQL": "{{now}}",
+             "fldKNoba8yEYeFS17": [
+              "{{3.body.records[1].id}}"
+             ]
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 92,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje od {{2.body.fields.fldy9rjTgd8OpBuWt}}: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Przypisano"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 94,
+           "mapper": {
+            "to": [
+             "{{90.body.fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje Twoją sprawę – nic już nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          },
+          {
+           "id": 93,
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
+             "powod": "",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} jest teraz Twoje.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "Przypisane",
+             "naglowek": "Przejęte"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 3000,
+             "y": 2500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 95,
+           "filter": {
+            "name": "Przejmij: nie da się",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przejmij",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przejmij",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "{{2.body.fields.fldy9rjTgd8OpBuWt}}",
+             "powod": "stan_zmieniony",
+             "tresc": "To zadanie nie jest przypisane do drugiej osoby.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Nie da się przejąć"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 1500,
+         "y": 0
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 201,
+       "filter": {
+        "name": "Dodaj: błąd danych",
+        "conditions": [
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.termin}}",
+           "b": "{{now}}",
+           "o": "date:lessorequal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "data": {
+         "ok": false,
+         "powod": "blad",
+         "tresc": "Brak tytułu albo termin nie jest w przyszłości.",
+         "tytul": "{{1.tytul}}",
+         "status": "blad",
+         "naglowek": "Nie dodano"
+        }
+       },
+       "module": "scenario-service:ReturnData",
+       "version": 2,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 250
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 210,
+       "filter": {
+        "name": "Dodaj: dane OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.termin}}",
+           "b": "{{now}}",
+           "o": "date:greater"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND('{{1.id_zrodla}}' != '', {ID źródła} = '{{1.id_zrodla}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 500
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 211,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 212,
+           "filter": {
+            "name": "Duplikat",
+            "conditions": [
+             [
+              {
+               "a": "{{210.body.records[1].id}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "powod": "duplikat",
+             "tresc": "{{210.body.records[1].id}}",
+             "tytul": "{{1.tytul}}",
+             "status": "duplikat",
+             "naglowek": "Duplikat"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 220,
+           "filter": {
+            "name": "Nowe zadanie",
+            "conditions": [
+             [
+              {
+               "a": "{{210.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0QJqw2alYIYa7r": 0,
+             "fldB3iQHvOIUgYn1I": "Nowe",
+             "fldKAZSVzA0x1ynuN": "{{uuid}}",
+             "fldaNenMnWwuRivka": "{{1.opis}}",
+             "fldbIWPFOkkWU2ned": "{{1.kwota}}",
+             "fldbqEXa4YxsfbBun": "{{1.tytul}}",
+             "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
+             "fldrzdtN10bDZTdX1": "{{ifempty(1.zrodlo; \"Claude\")}}",
+             "fldxwYvIR2e1Kx14D": "{{1.termin}}"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 221,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld3gFPcPMANbP3NH": [
+              "{{220.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "Nowe: {{1.tytul}}",
+             "fldyY0Iv9loL9L34q": "Utworzono"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 222,
+           "mapper": {
+            "qs": [
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd/{{220.id}}",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 223,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "{Aktywny}"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 225,
+           "mapper": {
+            "array": "{{223.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 750
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 226,
+           "mapper": {
+            "to": [
+             "{{225.fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – do {{222.body.fields.fldK2ENz7ZwrJLo28}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nowa sprawa ze szkoły</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{222.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{222.body.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{222.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{222.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=take&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=done&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – do {{222.body.fields.fldK2ENz7ZwrJLo28}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 500
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    }
+   ],
+   "version": 1,
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   },
+   "parameters": {}
+  }
+ ],
+ "name": "Asystent – Silnik (dodaj i zmień status)",
+ "metadata": {
+  "instant": false,
+  "version": 1,
+  "designer": {
+   "orphans": []
+  },
+  "scenario": {
+   "dlq": true,
+   "dataloss": false,
+   "maxErrors": 3,
+   "autoCommit": true,
+   "roundtrips": 1,
+   "sequential": true,
+   "confidential": false,
+   "freshVariables": false,
+   "autoCommitTriggerLast": true
+  }
+ }
+}
