@@ -8,7 +8,8 @@
    "Aktywny": "fldAQSIkCXVroik2Q",
    "Klucz dostępu": "fldmWfdSSZJoqjeHG",
    "Zadania": "fldQueKjjaPCHdCSu",
-   "Zdarzenia": "fldyaTBreDSZN2bdv"
+   "Zdarzenia": "fldyaTBreDSZN2bdv",
+   "Powiadomienia": "fldCoxoqHYQ48oijo"
   },
   "views": {
    "Grid view": "viwwL1Hka3FV1r20b"
@@ -45,7 +46,9 @@
    "Rodzaj": "fld3kIWBzleIZ7K7P",
    "Termin tekst (stare 2)": "fldS8qpAEl0DhlUET",
    "Termin krótko": "fldbNvim8WRqbd2yT",
-   "Termin tekst": "fldeO5RW1DJwB8NX3"
+   "Termin tekst": "fldeO5RW1DJwB8NX3",
+   "Kategoria": "fld8vsAsghJeur5pA",
+   "Kategoria dopisek": "fldxSYFWbjmQVQPtE"
   },
   "views": {
    "Grid view": "viwFShn5wahTrQl0T",
