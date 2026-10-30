@@ -186,14 +186,10 @@ def template(name, **vars_):
     vars_.setdefault("DASHBOARD_URL", env("DASHBOARD_URL"))
     for k, v in vars_.items():
         html = html.replace("{{" + k + "}}", str(v))
-    left = [p for p in ("{{tytul}}", "{{opis}}", "{{link_take}}", "{{link_done}}", "{{stopka_kto}}") if p in html]
+    left = [p for p in ("{{tytul}}", "{{opis}}", "{{stopka_kto}}", "{{DASHBOARD_URL}}") if p in html]
     if left:
         raise ValueError(f"{name}: niepodstawione {left}")
     return html
-
-
-def link(base_url, rec, akcja, klucz, token):
-    return f"{base_url}?t={rec}&amp;a={akcja}&amp;p={klucz}&amp;k={token}"
 
 
 class Zadanie:
@@ -255,7 +251,6 @@ RODZAJ = '{{ifempty(1.rodzaj; "Wydarzenie")}}'
 
 def status_routes():
     """Trasy zmian statusu (take/done/release/przejmij). „Return output” kończy trasę, więc maile idą przed nim."""
-    s2 = env("S2_WEBHOOK_URL")
     z = Zadanie(2)
     a = Rodzic(3)          # kto klika
     akcja = "{{1.akcja}}"
@@ -269,7 +264,7 @@ def status_routes():
 
     t = Rodzic(110)        # komu przypisujemy (akcja przypisz)
     mail_przypisane = template("przypisane.html", imie=a["Imię"], stopka_kto="Sprawa jest teraz Twoja.",
-                               link_done=link(s2, z.id, "done", t["Klucz"], z["Token"]), **z.mail_vars())
+                               **z.mail_vars())
 
     return [
         at_get(2, "Zadania", "{{1.id}}",
@@ -352,7 +347,6 @@ def status_routes():
 
 def dodaj_routes():
     """S1 – Dodaj zadanie: walidacja, deduplikacja, rekord, zdarzenie. Bez maili – przypomni S3 dzień przed."""
-    s2 = env("S2_WEBHOOK_URL")
     i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj", "kategoria")}
     jest = eq("{{1.akcja}}", "dodaj")
     w_przyszlosci = {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}
@@ -425,91 +419,12 @@ SILNIK_INTERFACE = {
 }
 
 
-def po_zmianie(z, kto_id, akcja, mid=30):
-    """Trasy strony wyniku S2 dobrane do stanu zadania po wywołaniu Silnika.
-
-    Scenariusz utworzony przez API nie zwraca wyjść do modułu „Call a scenario”
-    (Make synchronizuje je tylko w edytorze), więc wynik czytamy z Airtable.
-    """
-    st = z["Status"]
-
-    def page(i, naglowek, tresc, *groups):
-        return [respond(mid + i, 200, template("strony/wynik.html", naglowek=naglowek, tresc=tresc),
-                        flt=flt(naglowek[:40], *groups))]
-
-    return [
-        page(0, "Gotowe, to Twoje", f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę rano dzień przed terminem.",
-             [eq(akcja, "take"), eq(st, "Przypisane"), eq(z.osoba, kto_id)]),
-        page(1, f"Już przejęte przez {z['Osoba imię']}", "Nic nie musisz robić.",
-             [eq(akcja, "take"), eq(st, "Przypisane"), ne(z.osoba, kto_id)]),
-        page(2, "Zadanie zamknięte", "Ta sprawa jest już zamknięta.",
-             [eq(akcja, "take"), eq(st, "Zrobione")], [eq(akcja, "take"), eq(st, "Anulowane")],
-             [eq(akcja, "done"), eq(st, "Anulowane")]),
-        page(3, "Zrobione, dzięki", f"{z['Tytuł']} – zamknięte.", [eq(akcja, "done"), eq(st, "Zrobione")]),
-        page(4, "Coś poszło nie tak", "Spróbuj jeszcze raz za chwilę albo otwórz listę spraw.",
-             [eq(akcja, "take"), eq(st, "Nowe")], [eq(akcja, "done"), eq(st, "Nowe")],
-             [eq(akcja, "done"), eq(st, "Przypisane")]),
-    ]
-
-
-def klikniecia_routes(bez_celu):
-    """S2 – kliknięcia z maili: GET pokazuje potwierdzenie, POST (ok=1) zmienia stan przez Silnik."""
-    s2 = env("S2_WEBHOOK_URL")
-    z = Zadanie(4, prefix="body.records[1].fields")
-    z_id = "{{4.body.records[1].id}}"
-    r = Rodzic(5)
-    q = {k: "{{1." + k + "}}" for k in ("t", "a", "p", "k", "ok")}
-    PAT = {"t": "^rec[A-Za-z0-9]{14}$", "a": "^(take|done)$", "p": "^[a-z0-9_-]{1,30}$",
-           "k": "^[A-Za-z0-9-]{8,64}$"}
-    valid = [match(q[k], p) for k, p in PAT.items()]
-    found = [exists(z_id), exists(r.id)]
-    get = missing(q["ok"])
-    st = z["Status"]
-
-    page_bad = template("strony/wynik.html", naglowek="Link nieważny",
-                        tresc="Ten link jest nieprawidłowy albo wygasł. Otwórz najnowszy mail ze szkoły.")
-
-    def potwierdzenie(przycisk):
-        return template("strony/potwierdzenie.html", tytul=z["Tytuł"], termin_dlugi=z["Termin tekst"],
-                        opis=z["Opis"], kwota_html=f"<p>{z['Kwota linia']}</p>", przycisk_html=przycisk)
-
-    def form(akcja, etykieta, klasa):
-        return template("strony/formularz.html", S2_WEBHOOK_URL=s2, t=q["t"], a=akcja, p=q["p"], k=q["k"],
-                        klasa=klasa, etykieta=etykieta)
-
-    info = '<p style="font-size:18px;font-weight:600">{}</p>'
-    return [
-        [respond(3, 403, page_bad,
-                 flt=flt("Kliknięcie: złe parametry", *[[bez_celu, nomatch(q[k], p)] for k, p in PAT.items()]))],
-        [at_find(4, "Zadania", f"AND(RECORD_ID()='{q['t']}', {{Token}}='{q['k']}')",
-                 flt=flt("Kliknięcie: parametry OK", [bez_celu, *valid])),
-         at_find(5, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}='{q['p']}')"),
-         router(
-             6,
-             [zdarzenie(7, "Odrzucone kliknięcie", f"Nieważny link: t={q['t']} p={q['p']}",
-                        flt=flt("Nie znaleziono", [missing(z_id)], [missing(r.id)])),
-              respond(8, 403, page_bad)],
-             [respond(10, 200, potwierdzenie(info.format("Zadanie zamknięte")),
-                      flt=flt("GET: zamknięte", [*found, get, eq(st, "Zrobione")],
-                              [*found, get, eq(st, "Anulowane")]))],
-             [respond(11, 200, potwierdzenie(info.format(f"Już przejęte przez {z['Osoba imię']}")),
-                      flt=flt("GET: take, ma ktoś inny", [*found, get, eq(q["a"], "take"), eq(st, "Przypisane"),
-                                                          ne(z.osoba, r.id)]))],
-             [respond(14, 200, potwierdzenie(info.format("To już Twoje")),
-                      flt=flt("GET: take, już moje", [*found, get, eq(q["a"], "take"), eq(st, "Przypisane"),
-                                                      eq(z.osoba, r.id)]))],
-             [respond(12, 200, potwierdzenie(form("take", "Biorę to", "")),
-                      flt=flt("GET: take, wolne", [*found, get, eq(q["a"], "take"), eq(st, "Nowe")]))],
-             [respond(13, 200, potwierdzenie(form("done", "Zrobione", "done")),
-                      flt=flt("GET: done, otwarte", [*found, get, eq(q["a"], "done"), eq(st, "Nowe")],
-                              [*found, get, eq(q["a"], "done"), eq(st, "Przypisane")]))],
-             [call(20, "MAKE_ID_SILNIK", {"akcja": q["a"], "id": z_id, "klucz": q["p"]},
-                   flt=flt("POST: potwierdzone", [*found, eq(q["ok"], "1")])),
-              # stan po zmianie: strona wyniku wynika z tego, co jest teraz w Airtable
-              at_find(22, "Zadania", f"RECORD_ID()='{q['t']}'"),
-              router(23, *po_zmianie(Zadanie(22, prefix="body.records[1].fields"), r.id, q["a"]))],
-         )],
-    ]
+def stare_linki_routes(bez_celu):
+    """Maile nie mają już przycisków akcji (wszystko robi się na dashboardzie).
+    Link z dawnego maila pokazuje tylko stronę z odnośnikiem do listy spraw."""
+    strona = template("strony/wynik.html", naglowek="Sprawy są na liście",
+                      tresc="Przyciski w mailach już nie działają – wszystko zrobisz na liście spraw.")
+    return [[respond(3, 200, strona, flt=flt("Stary link z maila", [bez_celu]))]]
 
 
 def json_headers():
@@ -622,22 +537,19 @@ def s3_routes(cel_eq):
     """S3 – przypomnienie dzień przed terminem. GitHub Actions wywołuje je raz dziennie rano
     (POST ?cel=przypomnienia z X-Api-Key), bo darmowy plan Make pozwala tylko na 2 aktywne scenariusze.
 
-    Sprawa przypisana → mail do przypisanej osoby (przycisk Zrobione).
-    Sprawa wolna → mail do rodziców z powiadomieniami „Wszystkie” (przyciski Biorę to, Zrobione).
+    Sprawa przypisana → mail do przypisanej osoby; sprawa wolna → mail do rodziców z powiadomieniami
+    „Wszystkie”. W mailu jest tylko przycisk do listy spraw – akcje robi się na dashboardzie.
     """
-    s2 = env("S2_WEBHOOK_URL")
     cel = cel_eq("przypomnienia")
     z = Zadanie(521, prefix="fields")
     z_id = "{{521.id}}"
     osoba = "{{521.fields." + F("Zadania", "Osoba") + "[1]}}"
     rp = Rodzic(524, single=True)          # przypisana osoba
-    mail_jutro = template("jutro.html", stopka_kto=f"Sprawę masz Ty – {rp['Imię']}",
-                          link_done=link(s2, z_id, "done", rp["Klucz"], z["Token"]), **z.mail_vars())
+    mail_jutro = template("jutro.html", stopka_kto=f"Sprawę masz Ty – {rp['Imię']}", **z.mail_vars())
     rw = Rodzic(527, single=True)          # rodzic z pełnymi powiadomieniami (sprawa wolna)
     rw.base = "527"
     mail_wolne = template("przypomnienie.html", stopka_kto="Nikt jeszcze nie wziął tej sprawy.", dopisek_pilne="",
-                          link_take=link(s2, z_id, "take", rw["Klucz"], z["Token"]),
-                          link_done=link(s2, z_id, "done", rw["Klucz"], z["Token"]), **z.mail_vars())
+                          **z.mail_vars())
     formula = ("AND(OR({Status}='Nowe', {Status}='Przypisane'), {Termin jutro}, "
                "NOT({Przypomnienie przed terminem}))")
     klucz_ok = eq(API_KEY, env("S1W_API_KEY"))
@@ -663,13 +575,14 @@ def s3_routes(cel_eq):
 
 def scenariusz_api():
     """Jeden webhook dla wszystkiego, co przychodzi z zewnątrz (?cel=…):
-    brak celu – kliknięcia z maili (S2), dodaj – S1-W, api – dashboard (S5), przypomnienia – S3."""
+    brak celu – stary link z maila (strona z odnośnikiem), dodaj – S1-W, api – dashboard (S5),
+    przypomnienia – S3."""
     def cel_eq(c):
         return eq("{{1.cel}}", c)
 
     return {"name": "Asystent – API (maile, webhook, dashboard, przypomnienia)",
             "flow": [webhook(1, "S2_HOOK_ID"),
-                     router(2, *klikniecia_routes(missing("{{1.cel}}")), *s1w_routes(cel_eq),
+                     router(2, *stare_linki_routes(missing("{{1.cel}}")), *s1w_routes(cel_eq),
                             *s5_routes(cel_eq), *s3_routes(cel_eq))],
             "metadata": metadata(sequential=False)}
 
