@@ -28,58 +28,7 @@
          [
           {
            "a": "{{1.akcja}}",
-           "b": "take",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kto}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.akcja}}",
            "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kto}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.akcja}}",
-           "b": "release",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kto}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.akcja}}",
-           "b": "przejmij",
            "o": "text:equal"
           },
           {
@@ -143,78 +92,6 @@
         {
          "flow": [
           {
-           "id": 20,
-           "filter": {
-            "name": "Biorę: wolne",
-            "conditions": [
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "take",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Nowe",
-               "o": "text:equal"
-              }
-             ]
-            ]
-           },
-           "mapper": {
-            "id": "{{2.body.id}}",
-            "base": "appBSubdL1R6lgjY8",
-            "table": "tblrnPwEGqiGYxSbd",
-            "record": {
-             "fld0r2CTQAV8kjHQL": "{{now}}",
-             "fldB3iQHvOIUgYn1I": "Przypisane",
-             "fldKNoba8yEYeFS17": [
-              "{{1.kto}}"
-             ]
-            },
-            "typecast": false,
-            "useColumnId": false
-           },
-           "module": "airtable:ActionUpdateRecords",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1200,
-             "y": 0
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
-           }
-          },
-          {
-           "id": 22,
-           "mapper": {
-            "data": {
-             "ok": true,
-             "kto": "{{1.kto_imie}}",
-             "powod": "",
-             "tresc": "",
-             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
-             "status": "Przypisane",
-             "naglowek": ""
-            }
-           },
-           "module": "scenario-service:ReturnData",
-           "version": 2,
-           "metadata": {
-            "designer": {
-             "x": 1500,
-             "y": 0
-            }
-           },
-           "parameters": {}
-          }
-         ]
-        },
-        {
-         "flow": [
-          {
            "id": 70,
            "filter": {
             "name": "Zrobione: otwarte",
@@ -264,7 +141,7 @@
            "metadata": {
             "designer": {
              "x": 1200,
-             "y": 250
+             "y": 0
             }
            },
            "parameters": {
@@ -289,160 +166,7 @@
            "metadata": {
             "designer": {
              "x": 1500,
-             "y": 250
-            }
-           },
-           "parameters": {}
-          }
-         ]
-        },
-        {
-         "flow": [
-          {
-           "id": 80,
-           "filter": {
-            "name": "Oddaj: moje",
-            "conditions": [
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "release",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Przypisane",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
-               "b": "{{1.kto}}",
-               "o": "text:equal"
-              }
-             ]
-            ]
-           },
-           "mapper": {
-            "id": "{{2.body.id}}",
-            "base": "appBSubdL1R6lgjY8",
-            "table": "tblrnPwEGqiGYxSbd",
-            "record": {
-             "fld0QJqw2alYIYa7r": 0,
-             "fldB3iQHvOIUgYn1I": "Nowe",
-             "fldEaRdxdBntiaWV7": false,
-             "fldKNoba8yEYeFS17": [],
-             "fldOIYTKituV1TBjR": "{{now}}"
-            },
-            "typecast": false,
-            "useColumnId": false
-           },
-           "module": "airtable:ActionUpdateRecords",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1200,
-             "y": 500
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
-           }
-          },
-          {
-           "id": 82,
-           "mapper": {
-            "data": {
-             "ok": true,
-             "kto": "{{1.kto_imie}}",
-             "powod": "",
-             "tresc": "",
-             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
-             "status": "Nowe",
-             "naglowek": ""
-            }
-           },
-           "module": "scenario-service:ReturnData",
-           "version": 2,
-           "metadata": {
-            "designer": {
-             "x": 1500,
-             "y": 500
-            }
-           },
-           "parameters": {}
-          }
-         ]
-        },
-        {
-         "flow": [
-          {
-           "id": 91,
-           "filter": {
-            "name": "Przejmij: cudze",
-            "conditions": [
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "przejmij",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Przypisane",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
-               "b": "{{1.kto}}",
-               "o": "text:notequal"
-              }
-             ]
-            ]
-           },
-           "mapper": {
-            "id": "{{2.body.id}}",
-            "base": "appBSubdL1R6lgjY8",
-            "table": "tblrnPwEGqiGYxSbd",
-            "record": {
-             "fld0r2CTQAV8kjHQL": "{{now}}",
-             "fldKNoba8yEYeFS17": [
-              "{{1.kto}}"
-             ]
-            },
-            "typecast": false,
-            "useColumnId": false
-           },
-           "module": "airtable:ActionUpdateRecords",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1200,
-             "y": 750
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
-           }
-          },
-          {
-           "id": 93,
-           "mapper": {
-            "data": {
-             "ok": true,
-             "kto": "{{1.kto_imie}}",
-             "powod": "",
-             "tresc": "",
-             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
-             "status": "Przypisane",
-             "naglowek": ""
-            }
-           },
-           "module": "scenario-service:ReturnData",
-           "version": 2,
-           "metadata": {
-            "designer": {
-             "x": 1500,
-             "y": 750
+             "y": 0
             }
            },
            "parameters": {}
@@ -507,7 +231,7 @@
            "metadata": {
             "designer": {
              "x": 1200,
-             "y": 1000
+             "y": 250
             }
            },
            "parameters": {
@@ -546,7 +270,7 @@
            "metadata": {
             "designer": {
              "x": 1500,
-             "y": 1000
+             "y": 250
             }
            },
            "parameters": {
@@ -585,7 +309,7 @@
            "metadata": {
             "designer": {
              "x": 1800,
-             "y": 1000
+             "y": 250
             }
            },
            "parameters": {
@@ -610,7 +334,7 @@
            "metadata": {
             "designer": {
              "x": 2100,
-             "y": 1000
+             "y": 250
             }
            },
            "parameters": {}
@@ -762,9 +486,13 @@
         "table": "tblrnPwEGqiGYxSbd",
         "record": {
          "fld0QJqw2alYIYa7r": 0,
+         "fld0r2CTQAV8kjHQL": "{{now}}",
          "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
          "fld8vsAsghJeur5pA": "{{1.kategoria}}",
-         "fldB3iQHvOIUgYn1I": "Nowe",
+         "fldB3iQHvOIUgYn1I": "Przypisane",
+         "fldKNoba8yEYeFS17": [
+          "recebgsSkREMJn62G"
+         ],
          "fldaNenMnWwuRivka": "{{1.opis}}",
          "fldbIWPFOkkWU2ned": "{{1.kwota}}",
          "fldbqEXa4YxsfbBun": "{{1.tytul}}",
@@ -873,9 +601,13 @@
         "table": "tblrnPwEGqiGYxSbd",
         "record": {
          "fld0QJqw2alYIYa7r": 0,
+         "fld0r2CTQAV8kjHQL": "{{now}}",
          "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
          "fld8vsAsghJeur5pA": "{{1.kategoria}}",
-         "fldB3iQHvOIUgYn1I": "Nowe",
+         "fldB3iQHvOIUgYn1I": "Przypisane",
+         "fldKNoba8yEYeFS17": [
+          "recebgsSkREMJn62G"
+         ],
          "fldaNenMnWwuRivka": "{{1.opis}}",
          "fldbIWPFOkkWU2ned": "{{1.kwota}}",
          "fldbqEXa4YxsfbBun": "{{1.tytul}}",

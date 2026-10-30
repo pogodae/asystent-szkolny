@@ -1,13 +1,13 @@
 # Kto to ogarnia – domowe sprawy z właścicielem
 
-Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki, wizyty) giną między dwojgiem rodziców, bo każde zakłada, że drugie się tym zajmie. Asystent zamienia każdą sprawę w **zadanie z właścicielem**: mail trafia do obojga, jedno klika **Biorę to**, a system przypomina, dopóki sprawa nie jest przypisana i zrobiona. To ten sam mechanizm co w procesie rekrutacyjnym: zgłoszenie, przypisanie osoby, przypomnienie, status.
+Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki, wizyty) giną między dwojgiem rodziców, bo każde zakłada, że drugie się tym zajmie. Asystent zamienia każdą sprawę w **zadanie z właścicielem**: każda nowa sprawa należy do Ewy, która może ją oznaczyć jako zrobioną albo przekazać Dawidowi (dostaje wtedy maila), a dzień przed terminem właściciel dostaje przypomnienie. To ten sam mechanizm co w procesie rekrutacyjnym: zgłoszenie, przypisanie osoby, przypomnienie, status.
 
 ## Jak to działa
 
 1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
-2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”. Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. W mailu jest tylko przycisk **Otwórz listę spraw** – wszystkie akcje (Biorę to, Zrobione, Oddaj, Przejmij, → Dawid) robi się na dashboardzie.
+2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem do właściciela sprawy. Dawid dostaje też maila od razu, gdy Ewa przekaże mu sprawę (**→ Dawid**). W mailu jest tylko przycisk **Otwórz listę spraw** – akcje (Zrobione, → Dawid) robi się na dashboardzie.
 3. Bez innych maili – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
-4. Dashboard **„Kto to ogarnia”** pokazuje wolne i przypisane sprawy oraz liczniki, a tabela `Zdarzenia` pozwala policzyć czas do przypisania.
+4. Dashboard **„Kto to ogarnia”** pokazuje sprawy Ewy, sprawy Dawida i ostatnio zrobione, z filtrem kategorii.
 
 Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decyzje.md](docs/decyzje.md) · specyfikacja: [SPEC.md](SPEC.md)
 
@@ -44,7 +44,7 @@ python tests/smoke_test.py
 
 ## Dodawanie zadań
 
-- **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły). Dla osób, które nie używają Claude. Przycisk **→ Dawid** na karcie przypisuje sprawę drugiej osobie (dostaje maila).
+- **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły). Dla osób, które nie używają Claude. Każda nowa sprawa należy do Ewy; przycisk **→ Dawid** przekazuje ją Dawidowi (dostaje maila).
 
 Każda sprawa ma **kategorię**: *Dominik*, *Mateusz* albo *Dom* (kolorowy znacznik i filtr na dashboardzie, dopisek w temacie maila) oraz **rodzaj**: *Do dnia* (np. zgoda – „do 14 listopada”), *W dniu* (np. przynieść 20 zł – „sobota, 14 listopada”) albo *Wydarzenie* (np. zebranie – „sobota, 14 listopada, 17:00”). Godzina jest ustalana i wyświetlana tylko dla wydarzeń; dla pozostałych system używa stałej godziny wyłącznie do przypomnień (W dniu: 7:30, Do dnia: 20:00).
 

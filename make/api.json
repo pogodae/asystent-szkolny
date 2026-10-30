@@ -676,103 +676,7 @@
           },
           {
            "a": "{{1.akcja}}",
-           "b": "take",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
            "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "release",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przejmij",
            "o": "text:equal"
           },
           {
@@ -836,103 +740,7 @@
           },
           {
            "a": "{{1.akcja}}",
-           "b": "take",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "dawid",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
            "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "dawid",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "release",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "dawid",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przejmij",
            "o": "text:equal"
           },
           {
@@ -1439,9 +1247,13 @@
         "table": "tblrnPwEGqiGYxSbd",
         "record": {
          "fld0QJqw2alYIYa7r": 0,
+         "fld0r2CTQAV8kjHQL": "{{now}}",
          "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
          "fld8vsAsghJeur5pA": "{{1.kategoria}}",
-         "fldB3iQHvOIUgYn1I": "Nowe",
+         "fldB3iQHvOIUgYn1I": "Przypisane",
+         "fldKNoba8yEYeFS17": [
+          "recebgsSkREMJn62G"
+         ],
          "fldaNenMnWwuRivka": "{{1.opis}}",
          "fldbIWPFOkkWU2ned": "{{1.kwota}}",
          "fldbqEXa4YxsfbBun": "{{1.tytul}}",
@@ -1527,22 +1339,7 @@
           },
           {
            "a": "{{1.akcja}}",
-           "b": "take",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
            "b": "done",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "release",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przejmij",
            "o": "text:notequal"
           },
           {
@@ -1579,22 +1376,7 @@
           },
           {
            "a": "{{1.akcja}}",
-           "b": "take",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
            "b": "done",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "release",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przejmij",
            "o": "text:notequal"
           },
           {

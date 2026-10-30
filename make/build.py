@@ -239,7 +239,8 @@ def metadata(sequential=False, interface=None):
     return md
 
 
-STATUS_AKCJE = ("take", "done", "release", "przejmij", "przypisz")
+# każda sprawa ma właściciela (domyślnie RODZIC1 – Ewa); można ją tylko zamknąć albo przekazać
+STATUS_AKCJE = ("done", "przypisz")
 # kategoria: czego dotyczy sprawa (pusta = bez kategorii)
 KATEGORIA_PAT = "^(Dominik|Mateusz|Dom)?$"
 # rodzice z powiadomieniami „Tylko przypisane” nie dostają maili o sprawach, które ich nie dotyczą
@@ -250,17 +251,18 @@ RODZAJ = '{{ifempty(1.rodzaj; "Wydarzenie")}}'
 
 
 def rekord_zadania(i, zrodlo):
-    """Pola nowego zadania (wspólne dla Silnika i dodawania z dashboardu)."""
+    """Pola nowego zadania (wspólne dla Silnika i dodawania z dashboardu). Nowa sprawa należy do RODZIC1."""
     return {
         F("Zadania", "Tytuł"): i["tytul"], F("Zadania", "Opis"): i["opis"],
         F("Zadania", "Termin"): i["termin"], F("Zadania", "Kwota"): i["kwota"],
-        F("Zadania", "Status"): "Nowe", F("Zadania", "Źródło"): zrodlo, F("Zadania", "ID źródła"): i["id_zrodla"],
+        F("Zadania", "Status"): "Przypisane", F("Zadania", "Osoba"): [env("RODZIC1_REC")], F("Zadania", "Przypisano"): "{{now}}",
+        F("Zadania", "Źródło"): zrodlo, F("Zadania", "ID źródła"): i["id_zrodla"],
         F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Rodzaj"): RODZAJ,
         F("Zadania", "Kategoria"): i["kategoria"]}
 
 
 def status_routes():
-    """Zmiany statusu (take/done/release/przejmij/przypisz). Każda trasa to odczyt + zapis – 2 operacje.
+    """Zmiany statusu: done (zamknij) i przypisz (przekaż drugiej osobie). Każda trasa to odczyt + zapis.
 
     Kto klika, przekazuje wywołujący (kto = ID rekordu w Rodzice, kto_imie), więc Silnik nie szuka
     rodzica w Airtable. Odmowy (np. zadanie już przejęte) po prostu nic nie zmieniają – dashboard
@@ -286,25 +288,12 @@ def status_routes():
                                         match(kto, "^rec[A-Za-z0-9]{14}$")] for x in STATUS_AKCJE])),
         router(
             5,
-            [at_update(20, "Zadania", z.id, {F("Zadania", "Status"): "Przypisane", F("Zadania", "Osoba"): [kto],
-                                            F("Zadania", "Przypisano"): now},
-                       flt("Biorę: wolne", [eq(akcja, "take"), eq(st, "Nowe")])),
-             ok(22, "Przypisane")],
             [at_update(70, "Zadania", z.id,
                        {F("Zadania", "Status"): "Zrobione", F("Zadania", "Zrobiono"): now,
                         F("Zadania", "Osoba"): ["{{ifempty(" + f"2.body.fields.{F('Zadania', 'Osoba')}[1]; 1.kto" + ")}}"]},
                        flt("Zrobione: otwarte", [eq(akcja, "done"), eq(st, "Nowe")],
                            [eq(akcja, "done"), eq(st, "Przypisane")])),
              ok(72, "Zrobione")],
-            [at_update(80, "Zadania", z.id,
-                       {F("Zadania", "Status"): "Nowe", F("Zadania", "Osoba"): [],
-                        F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Ostatnie przypomnienie"): now,
-                        F("Zadania", "Przypomnienie przed terminem"): False},
-                       flt("Oddaj: moje", [eq(akcja, "release"), eq(st, "Przypisane"), eq(z.osoba, kto)])),
-             ok(82, "Nowe")],
-            [at_update(91, "Zadania", z.id, {F("Zadania", "Osoba"): [kto], F("Zadania", "Przypisano"): now},
-                       flt("Przejmij: cudze", [eq(akcja, "przejmij"), eq(st, "Przypisane"), ne(z.osoba, kto)])),
-             ok(93, "Przypisane")],
             # --- przypisz: wolne albo własne zadanie dostaje wskazana osoba (dla = jej klucz)
             [at_find(110, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}='{{{{1.dla}}}}')",
                      flt("Przypisz: można", [eq(akcja, "przypisz"), eq(st, "Nowe")],
@@ -357,7 +346,7 @@ def silnik():
 SILNIK_INTERFACE = {
     "input": [
         {"name": "akcja", "type": "text", "required": True,
-         "label": "dodaj – nowa sprawa (dzieci albo dom); take / done / release / przejmij / przypisz – zmiana statusu"},
+         "label": "dodaj – nowa sprawa (dzieci albo dom); done / przypisz – zmiana statusu"},
         {"name": "tytul", "type": "text", "required": False, "label": "Krótka nazwa sprawy, maks. 100 znaków"},
         {"name": "termin", "type": "text", "required": False,
          "label": "Data i godzina w Europe/Warsaw (ISO 8601), np. 2026-11-14T08:00:00+01:00"},

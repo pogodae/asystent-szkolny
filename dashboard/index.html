@@ -247,7 +247,7 @@ textarea.input { resize: vertical; min-height: 72px; }
   .top { padding-top: 26px; }
   .hello h1 { font-size: 26px; }
   .tabs, .fab { display: none; }
-  .board { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: start; }
+  .board { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
   .col[hidden] { display: block; }
   .col-head { display: flex; }
   .col.zrobione { opacity: .92; }
@@ -336,11 +336,10 @@ const CONFIG = {
   // imię jak w Airtable + klucz rodzica (do przypisywania zadań)
   rodzice: [{ imie: "Ewa", klucz: "ewa", kolor: "#6d5efc" }, { imie: "Dawid", klucz: "dawid", kolor: "#d4467e" }],
   kategorie: [{ nazwa: "Dominik", kolor: "#2f7fd6" }, { nazwa: "Mateusz", kolor: "#16a34a" }, { nazwa: "Dom", kolor: "#e07b24" }],
-  wisiPoGodzinach: 4,
 };
 
 const H = 3600e3;
-const state = { ja: "", zadania: [], tab: "wolne", busy: new Set(), loaded: false, showDone: false, filtr: "" };
+const state = { ja: "", zadania: [], tab: "moje", busy: new Set(), loaded: false, showDone: false, filtr: "" };
 const $ = (id) => document.getElementById(id);
 
 // ---- ikony ----
@@ -430,25 +429,24 @@ function view(z) {
     kategoria: f["Kategoria"] || "",
     late: termin < now && f["Status"] !== "Zrobione",
     soon: termin >= now && termin - now < 24 * H,
-    wisi: f["Status"] === "Nowe" && now - new Date(f["Utworzono"]) > CONFIG.wisiPoGodzinach * H,
     zrobiono: f["Zrobiono"] ? new Date(f["Zrobiono"]) : null,
   };
 }
 function columns() {
   const inny = drugi().imie;
+  // sprawa bez osoby (starsze dane) należy do domyślnego właściciela – pierwszego rodzica z CONFIG
+  const wlasciciel = (z) => z.osoba || CONFIG.rodzice[0].imie;
   const all = widoczne();
   const byTermin = (a, b) => a.termin - b.termin;
   return [
-    { key: "wolne", label: "Wolne", items: all.filter((z) => z.status === "Nowe").sort(byTermin) },
-    { key: "moje", label: state.ja ? `${state.ja} (Ty)` : "Moje", short: state.ja || "Moje", items: all.filter((z) => z.status === "Przypisane" && z.osoba === state.ja).sort(byTermin) },
-    { key: "inne", label: inny, items: all.filter((z) => z.status === "Przypisane" && z.osoba !== state.ja).sort(byTermin) },
+    { key: "moje", label: state.ja ? `${state.ja} (Ty)` : "Moje", short: "Moje", items: all.filter((z) => z.status !== "Zrobione" && wlasciciel(z) === state.ja).sort(byTermin) },
+    { key: "inne", label: inny, items: all.filter((z) => z.status !== "Zrobione" && wlasciciel(z) !== state.ja).sort(byTermin) },
     { key: "zrobione", label: "Zrobione", items: all.filter((z) => z.status === "Zrobione").sort((a, b) => (b.zrobiono || 0) - (a.zrobiono || 0)) },
   ];
 }
 
 // ---- widok ----
 const PUSTE = {
-  wolne: "Nic nie czeka na chętnych.",
   moje: "Nic na Twojej głowie.",
   inne: "Tu nic nie ma.",
   zrobione: "Jeszcze nic w tym tygodniu.",
@@ -461,9 +459,8 @@ function card(z, col) {
   const kiedyCls = z.late ? "late" : z.soon ? "soon" : "";
   const ikona = z.late ? I.alert : z.rodzaj === "Wydarzenie" ? I.clock : z.rodzaj === "Do dnia" ? I.flag : I.cal;
   const btns = {
-    wolne: [["take", "Biorę to", "primary"], ["done", "Zrobione", "done"]],
-    moje: [["done", "Zrobione", "done"], ["release", "Oddaj", "quiet"]],
-    inne: [["done", "Zrobione", "done"], ["przejmij", "Przejmij", "quiet"]],
+    moje: [["done", "Zrobione", "done"]],
+    inne: [["done", "Zrobione", "done"]],
   }[col];
   return `<article class="card ${z.late ? "late" : ""} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
     <div class="card-top"><p class="title">${esc(z.tytul)}</p>${col === "inne" ? avatar(z.osoba) : ""}</div>
@@ -471,12 +468,11 @@ function card(z, col) {
       ${z.kategoria ? `<span class="chip kat" style="--kat:${katKolor(z.kategoria)}"><span class="dot"></span>${esc(z.kategoria)}</span>` : ""}
       <span class="chip ${kiedyCls}">${ikona}${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
       ${z.kwota ? `<span class="chip">${I.coin}${esc(zl.format(z.kwota))}</span>` : ""}
-      ${z.wisi ? `<span class="chip idle">${I.hour}czeka</span>` : ""}
     </div>
     ${z.opis ? `<details class="more"><summary>${I.chev}Szczegóły</summary><p>${esc(z.opis)}</p></details>` : ""}
     <div class="actions">${btns.map(([a, l, c]) =>
       `<button class="btn ${c}" data-akcja="${a}" data-id="${z.id}" type="button">${l}</button>`).join("")}
-      ${col !== "inne" ? `<button class="btn assign" data-akcja="przypisz" data-id="${z.id}" type="button"
+      ${col === "moje" ? `<button class="btn assign" data-akcja="przypisz" data-id="${z.id}" type="button"
         title="Przypisz: ${esc(drugi().imie)} (dostanie maila)">${I.arrow}${esc(drugi().imie)}</button>` : ""}</div>
   </article>`;
 }
@@ -488,8 +484,8 @@ function render() {
     `${v ? `<span class="dot" style="--kat:${katKolor(v)}"></span>` : ""}${esc(l)}</button>`).join("");
   $("hello").textContent = state.ja ? `Cześć, ${state.ja}` : "Kto to ogarnia";
   $("summary").innerHTML =
-    `<span class="pill ${cols[0].items.length ? "" : "zero"}"><b>${cols[0].items.length}</b>wolne</span>` +
-    `<span class="pill ${cols[1].items.length ? "" : "zero"}"><b>${cols[1].items.length}</b>Twoje</span>` +
+    `<span class="pill ${cols[0].items.length ? "" : "zero"}"><b>${cols[0].items.length}</b>Twoje</span>` +
+    `<span class="pill ${cols[1].items.length ? "" : "zero"}"><b>${cols[1].items.length}</b>${esc(cols[1].label)}</span>` +
     (late ? `<span class="pill bad"><b>${late}</b>po terminie</span>` : "");
   $("tabs").innerHTML = cols.map((c) =>
     `<button class="tab" role="tab" type="button" data-tab="${c.key}" aria-selected="${state.tab === c.key}">${esc(c.short || c.label)} <span class="n">${c.items.length}</span></button>`).join("");
@@ -564,9 +560,8 @@ async function load(wymus = false) {
     $("refresh").classList.remove("spin");
   }
 }
-const OCZEKIWANE = { take: "Przypisane", done: "Zrobione", release: "Nowe", przejmij: "Przypisane", przypisz: "Przypisane" };
-const POTWIERDZENIA = { take: "To Twoje", done: "Zrobione – dzięki!", release: "Oddane – znowu wolne", przejmij: "Przejęte",
-  przypisz: () => `Przypisane: ${drugi().imie} – dostanie maila` };
+const OCZEKIWANE = { done: "Zrobione", przypisz: "Przypisane" };
+const POTWIERDZENIA = { done: "Zrobione – dzięki!", przypisz: () => `Przekazane: ${drugi().imie} – dostanie maila` };
 async function act(akcja, id) {
   const idx = state.zadania.findIndex((z) => z.id === id);
   if (idx < 0) return;
@@ -574,9 +569,7 @@ async function act(akcja, id) {
   // optymistycznie: karta od razu przechodzi do nowej kolumny
   const f = state.zadania[idx].fields;
   f["Status"] = OCZEKIWANE[akcja];
-  if (akcja === "take" || akcja === "przejmij") f["Osoba imię"] = state.ja;
   if (akcja === "przypisz") f["Osoba imię"] = drugi().imie;
-  if (akcja === "release") f["Osoba imię"] = "";
   if (akcja === "done") { f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= state.ja; }
   state.busy.add(id); render();
   try {
@@ -635,8 +628,9 @@ async function add(e) {
     // serwer zwraca tylko ID nowego rekordu – kartę budujemy z danych formularza
     state.zadania.push({ id: j.id, fields: {
       "Tytuł": dane.tytul, "Opis": dane.opis, "Termin": dane.termin, "Rodzaj": rodzaj, "Kategoria": dane.kategoria,
-      "Kwota": dane.kwota ? Number(dane.kwota) : undefined, "Status": "Nowe", "Utworzono": new Date().toISOString() } });
-    state.tab = "wolne"; zapiszCache();
+      "Kwota": dane.kwota ? Number(dane.kwota) : undefined, "Status": "Przypisane", "Osoba imię": CONFIG.rodzice[0].imie,
+      "Utworzono": new Date().toISOString() } });
+    state.tab = "moje"; zapiszCache();
     $("dlg").close(); render(); toast("Dodane");
   } catch (err) {
     toast(err.powod === "blad_danych" ? "Sprawdź tytuł i termin." : "Nie udało się dodać. Spróbuj jeszcze raz.");
@@ -670,29 +664,26 @@ $("today").textContent = fmtToday.format(new Date()).replace(/^./, (c) => c.toUp
 function demoCall(akcja, id, extra = {}) {
   const now = Date.now(), iso = (h) => new Date(now + h * H).toISOString();
   if (akcja === "dodaj") {
-    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj, "Kategoria": extra.kategoria,
-      "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Nowe", "Utworzono": iso(0) } };
+    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj, "Kategoria": extra.kategoria, "Osoba imię": "Ewa",
+      "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Przypisane", "Utworzono": iso(0) } };
     demoCall.data.push(z);
     return new Promise((r) => setTimeout(() => r({ ok: true, id: z.id }), 500));
   }
   if (akcja === "lista") {
     demoCall.data ||= [
-      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Kategoria": "Dominik", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Rodzaj": "W dniu", "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
-      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Kategoria": "Dominik", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Nowe", "Utworzono": iso(-1) } },
+      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Kategoria": "Dominik", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Rodzaj": "W dniu", "Kwota": 40, "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-6) } },
+      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Kategoria": "Dominik", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-1) } },
       { id: "d3", fields: { "Tytuł": "Strój na WF", "Kategoria": "Dominik", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Rodzaj": "W dniu", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
       { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Kategoria": "Mateusz", "Termin": iso(100), "Rodzaj": "Do dnia", "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
       { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Kategoria": "Mateusz", "Termin": iso(-48), "Rodzaj": "W dniu", "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
-      { id: "d7", fields: { "Tytuł": "Rachunek za prąd", "Termin": iso(70), "Rodzaj": "Do dnia", "Kwota": 214.3, "Kategoria": "Dom", "Status": "Nowe", "Utworzono": iso(-2) } },
+      { id: "d7", fields: { "Tytuł": "Rachunek za prąd", "Termin": iso(70), "Rodzaj": "Do dnia", "Kwota": 214.3, "Kategoria": "Dom", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-2) } },
       { id: "d6", fields: { "Tytuł": "Zgoda na basen", "Kategoria": "Dominik", "Termin": iso(-30), "Rodzaj": "Do dnia", "Status": "Zrobione", "Osoba imię": "Ewa", "Zrobiono": iso(-32), "Utworzono": iso(-90) } },
     ];
     return new Promise((r) => setTimeout(() => r({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) }), 300));
   }
   const z = structuredClone(demoCall.data.find((x) => x.id === id));
   const f = z.fields;
-  if (akcja === "take" && f["Status"] === "Nowe") { f["Status"] = "Przypisane"; f["Osoba imię"] = "Ewa"; }
-  else if (akcja === "done") { f["Status"] = "Zrobione"; f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= "Ewa"; }
-  else if (akcja === "release") { f["Status"] = "Nowe"; f["Osoba imię"] = ""; }
-  else if (akcja === "przejmij") { f["Osoba imię"] = "Ewa"; }
+  if (akcja === "done") { f["Status"] = "Zrobione"; f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= "Ewa"; }
   else if (akcja === "przypisz") { f["Status"] = "Przypisane"; f["Osoba imię"] = "Dawid"; }
   demoCall.data[demoCall.data.findIndex((x) => x.id === id)] = z;
   return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));

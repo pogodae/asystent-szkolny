@@ -24,7 +24,7 @@ Darmowy plan Make pozwala na 2 aktywne scenariusze. Role ze SPEC (S1, S1-W, S2, 
 
 | Scenariusz | Wyzwalacz | Odpowiada za |
 | --- | --- | --- |
-| **Asystent – Silnik** | na żądanie (Claude, Call a scenario), kolejka | S1 dodaj zadanie; „Zmień status”: take, done, release, przejmij |
+| **Asystent – Silnik** | na żądanie (Claude, Call a scenario), kolejka | S1 dodaj zadanie (właściciel: Ewa); zmiany: done, przypisz (→ Dawid) |
 | **Asystent – API** | jeden Custom webhook, trasa po `?cel=` | S1-W, S5 API dashboardu, S3 przypomnienia (dawne S2 – kliknięcia z maili – usunięte) |
 
 Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, więc mail i dashboard stosują te same reguły. S3 aktualizuje tylko pola przypomnień, dlatego działa bezpośrednio w API.
@@ -46,8 +46,8 @@ Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Ma
 | --- | --- | --- |
 | Przypomnienia (S3) | 3 + 2–3 na każdą sprawę na jutro | raz dziennie rano (GitHub Actions) |
 | Lista na dashboardzie | 4 | przy otwarciu, gdy lista w telefonie jest starsza niż 30 min, albo „Odśwież” |
-| Akcja z dashboardu (biorę, zrobione, oddaj, przejmij) | 4 (API 2 + Silnik 2) | na kliknięcie |
-| Przypisanie Dawidowi | 6 (z mailem) | na kliknięcie |
+| Zrobione | 4 (API 2 + Silnik 2) | na kliknięcie |
+| → Dawid (przekazanie z mailem) | 6 | na kliknięcie |
 | Dodanie sprawy z dashboardu | 3 | na sprawę |
 | Dodanie sprawy przez Claude | 1–2 | na sprawę |
 
