@@ -133,6 +133,15 @@ main { padding-top: 4px; padding-bottom: 110px; }
 .col.zrobione .card.closed { background: color-mix(in srgb, var(--col) 6%, transparent); }
 .col-head .dot, .tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--col); flex: none; }
 .col-head { color: color-mix(in srgb, var(--col, var(--fg-2)) 70%, var(--fg)); }
+/* moje: podgrupy Wydarzenia (złote) i Zadania (kolor kolumny) */
+.sub { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sub + .sub { margin-top: 14px; }
+.sub-head { display: flex; align-items: center; gap: 7px; margin: 0 2px; font-size: 12.5px; font-weight: 600;
+  color: color-mix(in srgb, var(--col) 75%, var(--fg)); }
+.sub-head svg { width: 14px; height: 14px; }
+.sub-head .n { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--muted); }
+.sub .empty { padding: 14px 12px; font-size: 13px; }
+@media (min-width: 900px) { .sub + .sub { margin-top: 0; } }
 .card-top { display: flex; align-items: flex-start; gap: 10px; }
 .title { flex: 1; min-width: 0; margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; letter-spacing: -.005em; overflow-wrap: anywhere; }
 .avatar {
@@ -274,9 +283,9 @@ textarea.input { resize: vertical; min-height: 72px; }
   .col.inne .card { padding: 12px; }
   .col.inne .title { font-size: 14.5px; }
 }
-@media (min-width: 1100px) {
-  .col.moje .list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-  .col.moje .list > .empty { grid-column: 1 / -1; }
+@media (min-width: 900px) {
+  /* moje: wydarzenia i zadania w dwóch równych kolumnach */
+  .col.moje .list.split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
@@ -456,6 +465,8 @@ function avatar(imie) {
   return `<span class="avatar" style="--av:${r ? r.kolor : "#8a8a92"}" title="${esc(imie)}">${esc(imie[0].toUpperCase())}</span>`;
 }
 const katKolor = (k) => (CONFIG.kategorie.find((x) => x.nazwa === k) || {}).kolor;
+// wydarzenia (sprawy z godziną) w mojej kolumnie
+const KOLOR_WYDARZEN = "#ca8a04";
 // kolor kolumny: moje = kolor mojego awatara, druga osoba = jej kolor, zrobione = zielony
 const kolorKolumny = (key) => key === "zrobione" ? "#16a34a"
   : ((CONFIG.rodzice.find((r) => (key === "moje" ? r.imie === state.ja : r.imie !== state.ja)) || {}).kolor || "#8a8a92");
@@ -533,12 +544,23 @@ function render() {
     `<button class="tab" role="tab" type="button" data-tab="${c.key}" aria-selected="${state.tab === c.key}" style="--col:${kolorKolumny(c.key)}"><span class="dot"></span>${esc(c.short || c.label)} <span class="n">${c.items.length}</span></button>`).join("");
   $("main").innerHTML = `<div class="board">${cols.map((c) => {
     let list = c.items.map((z) => card(z, c.key)).join("") || `<div class="empty">${PUSTE[c.key]}</div>`;
+    let listCls = "list";
+    if (c.key === "moje") {
+      // tylko u mnie: wydarzenia (z godziną) osobno od zadań, każda grupa w swoim kolorze
+      const wyd = c.items.filter((z) => z.rodzaj === "Wydarzenie"), zad = c.items.filter((z) => z.rodzaj !== "Wydarzenie");
+      const grupa = (nazwa, ikona, kolor, items, pusto) => `<div class="sub" style="--col:${kolor}">
+        <div class="sub-head">${ikona}${nazwa}<span class="n">${items.length}</span></div>
+        ${items.map((z) => card(z, c.key)).join("") || `<div class="empty">${pusto}</div>`}</div>`;
+      list = grupa("Wydarzenia", I.clock, KOLOR_WYDARZEN, wyd, "Brak wydarzeń.") +
+             grupa("Zadania", I.cal, kolorKolumny("moje"), zad, "Brak zadań.");
+      listCls = "list split";
+    }
     if (c.key === "zrobione" && c.items.length && !state.showDone && innerWidth >= 900) {
       list = `<button class="btn done-toggle" type="button" id="show-done">Ostatnie 7 dni <span>${c.items.length}</span></button>`;
     }
     return `<section class="col ${c.key}" style="--col:${kolorKolumny(c.key)}" ${state.tab === c.key ? "" : "hidden"}>
       <div class="col-head"><span class="dot"></span>${esc(c.label)}<span class="n">${c.items.length}</span></div>
-      <div class="list">${list}</div></section>`;
+      <div class="${listCls}">${list}</div></section>`;
   }).join("")}</div>`;
 }
 function widoczne() {
