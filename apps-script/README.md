@@ -12,7 +12,7 @@
 5. **Create token** i skopiuj go (pokazuje się raz).
 
 ### 2. Projekt Apps Script
-1. Wejdź na **script.google.com** (konto pogodae@gmail.com) → **Nowy projekt**.
+1. Wejdź na **script.google.com** (Twoje konto Google) → **Nowy projekt**.
 2. Nazwij go `Kto to ogarnia – lista`.
 3. Usuń zawartość pliku `Kod.gs` i wklej całą zawartość pliku `apps-script/lista.gs` z repozytorium.
 4. Zapisz (Ctrl+S).
