@@ -1,5 +1,9 @@
 # Decyzje projektowe
 
+## Oszczędzanie operacji Make
+
+Darmowy plan ma około 1000 operacji miesięcznie, a po ich wyczerpaniu Make wstrzymuje scenariusze. Dlatego akcje z dashboardu kosztują 4 operacje: Silnik dostaje gotowe ID rodzica, nie pisze do `Zdarzeń` i nie ma ponownego odczytu. Dodanie sprawy z dashboardu to 3 operacje, bo zapis idzie od razu w API. Przypomnienia działają raz dziennie, a lista na dashboardzie jest trzymana w telefonie przez 30 minut. Ceną jest to, że konflikt (dwie osoby klikną to samo prawie naraz) widać dopiero przy następnym pobraniu listy, a dziennik `Zdarzenia` nie dostaje już nowych wpisów (statystyki liczą się z pól zadania).
+
 ## Maile bez przycisków akcji
 
 Po przejściu na jedno przypomnienie dzień przed terminem maile mają tylko przycisk **Otwórz listę spraw**. Wszystkie akcje robi się na dashboardzie, więc z Make zniknęła obsługa kliknięć (S2): strony potwierdzenia, token w linku i wywołania Silnika z maila. Scenariusz API zmniejszył się mniej więcej o połowę. Link z dawnego maila pokazuje stronę z odnośnikiem do listy. Dwie sekcje poniżej opisują wcześniejsze rozwiązanie.

@@ -530,7 +530,7 @@ function noAccess() {
 // ---- dane i akcje ----
 // Każde pobranie listy to operacje Make (limit darmowego planu), więc lista jest trzymana w telefonie
 // i pobierana z serwera dopiero, gdy jest starsza niż ŚWIEŻOŚĆ – albo po kliknięciu „Odśwież”.
-const SWIEZOSC = 15 * 60e3;
+const SWIEZOSC = 30 * 60e3;
 const CACHE = `lista:${auth.demo ? "demo" : auth.u}`;
 let pobrano = 0;
 function zapiszCache() {
@@ -580,13 +580,11 @@ async function act(akcja, id) {
   if (akcja === "done") { f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= state.ja; }
   state.busy.add(id); render();
   try {
-    const j = await call(akcja, id, akcja === "przypisz" ? { dla: drugi().klucz } : {});
-    const nf = j.zadanie.fields, kto = (nf["Osoba imię"] || "").trim();
-    state.zadania[idx] = j.zadanie; zapiszCache();
-    if (akcja === "take" && nf["Status"] === "Przypisane" && kto !== state.ja) toast(`Już przejęte przez ${kto}`);
-    else if (nf["Status"] !== OCZEKIWANE[akcja]) toast("Ktoś zmienił to zadanie w międzyczasie.");
-    else if (akcja === "przypisz" && kto !== drugi().imie) toast("Nie udało się przypisać – odśwież listę.");
-    else toast(typeof POTWIERDZENIA[akcja] === "function" ? POTWIERDZENIA[akcja]() : POTWIERDZENIA[akcja]);
+    // serwer odpowiada tylko {ok:true} (bez ponownego odczytu – oszczędność operacji Make);
+    // gdyby druga osoba zmieniła zadanie w międzyczasie, prawdziwy stan pokaże najbliższe pobranie listy
+    await call(akcja, id, akcja === "przypisz" ? { dla: drugi().klucz } : {});
+    zapiszCache();
+    toast(typeof POTWIERDZENIA[akcja] === "function" ? POTWIERDZENIA[akcja]() : POTWIERDZENIA[akcja]);
   } catch (e) {
     state.zadania[idx] = before;
     toast(e.powod === "brak_dostepu" ? "Brak dostępu" : "Nie udało się. Spróbuj jeszcze raz.");
@@ -634,7 +632,11 @@ async function add(e) {
   $("save").disabled = true; $("save").textContent = "Dodaję…";
   try {
     const j = await call("dodaj", null, dane);
-    state.zadania.push(j.zadanie); state.tab = "wolne"; zapiszCache();
+    // serwer zwraca tylko ID nowego rekordu – kartę budujemy z danych formularza
+    state.zadania.push({ id: j.id, fields: {
+      "Tytuł": dane.tytul, "Opis": dane.opis, "Termin": dane.termin, "Rodzaj": rodzaj, "Kategoria": dane.kategoria,
+      "Kwota": dane.kwota ? Number(dane.kwota) : undefined, "Status": "Nowe", "Utworzono": new Date().toISOString() } });
+    state.tab = "wolne"; zapiszCache();
     $("dlg").close(); render(); toast("Dodane");
   } catch (err) {
     toast(err.powod === "blad_danych" ? "Sprawdź tytuł i termin." : "Nie udało się dodać. Spróbuj jeszcze raz.");
@@ -671,7 +673,7 @@ function demoCall(akcja, id, extra = {}) {
     const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj, "Kategoria": extra.kategoria,
       "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Nowe", "Utworzono": iso(0) } };
     demoCall.data.push(z);
-    return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
+    return new Promise((r) => setTimeout(() => r({ ok: true, id: z.id }), 500));
   }
   if (akcja === "lista") {
     demoCall.data ||= [

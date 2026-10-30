@@ -44,9 +44,11 @@ Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Ma
 
 | Co | Operacje | Jak często |
 | --- | --- | --- |
-| Przypomnienia (S3) | ok. 4 + 2–3 na każdą sprawę na jutro | raz dziennie rano (GitHub Actions) |
-| Lista na dashboardzie | 4 | przy otwarciu, gdy lista w telefonie jest starsza niż 15 min, albo „Odśwież” |
-| Akcja z dashboardu (biorę, zrobione, …) | ok. 8 (API + Silnik) | na kliknięcie |
-| Dodanie sprawy | ok. 7 | na sprawę |
+| Przypomnienia (S3) | 3 + 2–3 na każdą sprawę na jutro | raz dziennie rano (GitHub Actions) |
+| Lista na dashboardzie | 4 | przy otwarciu, gdy lista w telefonie jest starsza niż 30 min, albo „Odśwież” |
+| Akcja z dashboardu (biorę, zrobione, oddaj, przejmij) | 4 (API 2 + Silnik 2) | na kliknięcie |
+| Przypisanie Dawidowi | 6 (z mailem) | na kliknięcie |
+| Dodanie sprawy z dashboardu | 3 | na sprawę |
+| Dodanie sprawy przez Claude | 1–2 | na sprawę |
 
-Maile wychodzą tylko rano dzień przed terminem (do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”) oraz od razu przy przypisaniu sprawy osobie z ustawieniem „Tylko przypisane”. Dostęp do API dashboardu sprawdzają filtry z parami klucz + klucz dostępu, bez zapytania do Airtable.
+Maile wychodzą tylko rano dzień przed terminem (do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”) oraz od razu przy przypisaniu sprawy osobie z ustawieniem „Tylko przypisane”. Dostęp do API dashboardu sprawdzają filtry z parami klucz + klucz dostępu, bez zapytania do Airtable. Silnik dostaje ID i imię rodzica od wywołującego (nie szuka go w Airtable), nie zapisuje wpisów do tabeli `Zdarzenia` i nie odczytuje zadania drugi raz po zmianie – dashboard sam przesuwa kartę, a prawdziwy stan pokazuje najbliższe pobranie listy. Filtry i routery w Make są darmowe, więc jeden duży scenariusz z trasami nie kosztuje więcej niż kilka małych.
