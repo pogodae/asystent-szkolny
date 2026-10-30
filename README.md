@@ -5,8 +5,8 @@ Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki,
 ## Jak to działa
 
 1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
-2. Rodzice z pełnymi powiadomieniami dostają mail z przyciskami **Biorę to** i **Zrobione** (osoba z ustawieniem „Tylko przypisane” dostaje maile tylko o sprawach przypisanych do niej). Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
-3. Nieprzypisane zadanie wraca co 4 h (z dopiskiem PILNE), osoba przypisana dostaje przypomnienie wieczór przed terminem, a po terminie przychodzi eskalacja.
+2. Wieczorem dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej (przycisk **Zrobione**), a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie” (przyciski **Biorę to** i **Zrobione**). Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
+3. Bez innych maili – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
 4. Dashboard **„Kto to ogarnia”** pokazuje wolne i przypisane sprawy oraz liczniki, a tabela `Zdarzenia` pozwala policzyć czas do przypisania.
 
 Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decyzje.md](docs/decyzje.md) · specyfikacja: [SPEC.md](SPEC.md)
@@ -48,7 +48,7 @@ python tests/smoke_test.py
 
 Każda sprawa ma **kategorię**: *Dominik*, *Mateusz* albo *Dom* (kolorowy znacznik i filtr na dashboardzie, dopisek w temacie maila) oraz **rodzaj**: *Do dnia* (np. zgoda – „do 14 listopada”), *W dniu* (np. przynieść 20 zł – „sobota, 14 listopada”) albo *Wydarzenie* (np. zebranie – „sobota, 14 listopada, 17:00”). Godzina jest ustalana i wyświetlana tylko dla wydarzeń; dla pozostałych system używa stałej godziny wyłącznie do przypomnień (W dniu: 7:30, Do dnia: 20:00).
 
-**Powiadomienia** (pole w tabeli `Rodzice`): *Wszystkie* – każdy mail; *Tylko przypisane* – tylko maile o sprawach przypisanych do tej osoby (przypisanie, „jutro”, po terminie).
+**Powiadomienia** (pole w tabeli `Rodzice`): *Wszystkie* – przypomnienia dzień przed o swoich i wolnych sprawach; *Tylko przypisane* – przypomnienia o swoich sprawach i mail od razu, gdy ktoś przypisze sprawę.
 - **Claude:** zdanie „dodaj …” w projekcie „Kto to ogarnia” z włączonym konektorem Make.
 - **Webhook S1-W:** `POST ?cel=dodaj` z nagłówkiem `X-Api-Key` (np. przyszły scraper MobiDziennika).
 

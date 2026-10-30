@@ -1,11 +1,10 @@
-# S3 – przypomnienia. Darmowy plan Make pozwala na 2 aktywne scenariusze, więc harmonogram
-# trzyma GitHub Actions: 3 razy dziennie wywołuje webhook API z ?cel=przypomnienia.
-# Godziny w UTC: 6:00 i 12:00 (rano, po południu) oraz 17:30 (wieczór przed terminem, ≥18:00 w Polsce).
+# S3 – przypomnienie dzień przed terminem. Darmowy plan Make pozwala na 2 aktywne scenariusze, więc harmonogram
+# trzyma GitHub Actions: raz dziennie wieczorem wywołuje webhook API z ?cel=przypomnienia.
+# 17:30 UTC = 18:30 zimą / 19:30 latem w Polsce.
 name: Przypomnienia
 
 on:
   schedule:
-    - cron: "0 6,12 * * *"
     - cron: "30 17 * * *"
   workflow_dispatch:
 
