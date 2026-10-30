@@ -7,7 +7,7 @@ Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki,
 1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
 2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem do właściciela sprawy. Adam dostaje też maila od razu, gdy Ewa przekaże mu sprawę (**→ Adam**). W mailu jest tylko przycisk **Otwórz listę spraw** – akcje (Zrobione, → Adam) robi się na dashboardzie.
 3. Bez innych maili – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
-4. Dashboard **„Kto to ogarnia”** pokazuje sprawy Ewy, sprawy Adama i ostatnio zrobione, z filtrem kategorii.
+4. Dashboard **„Kto to ogarnia”** pokazuje sprawy Ewy (osobno wydarzenia z godziną i zadania), sprawy Adama i ostatnio zrobione, z filtrem kategorii. Strona główna to wizytówka z opisem, **wersją demo** (`?demo=1`, przykładowe dane) i logowaniem hasłem dla domowników.
 
 Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decyzje.md](docs/decyzje.md) · specyfikacja: [SPEC.md](SPEC.md)
 

@@ -290,6 +290,41 @@ textarea.input { resize: vertical; min-height: 72px; }
   /* moje: wydarzenia i zadania w dwóch równych kolumnach */
   .col.moje .list.split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 }
+
+/* elementy z atrybutem hidden mają zniknąć mimo własnego display */
+.demo-bar[hidden], .btn[hidden], .fab[hidden] { display: none; }
+/* ---------- strona startowa (bez logowania) ---------- */
+body.landing-mode .summary, body.landing-mode .filters, body.landing-mode .tabs,
+body.landing-mode #refresh, body.landing-mode #add, body.landing-mode .fab { display: none !important; }
+.landing { display: grid; gap: 28px; padding: 18px 0 40px; align-items: start; }
+.hero .logo { width: 52px; height: 52px; border-radius: 16px; background: var(--accent); color: var(--accent-fg);
+  display: grid; place-items: center; margin-bottom: 18px; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent); }
+.hero .logo svg { width: 26px; height: 26px; }
+.hero h2 { margin: 0 0 10px; font-size: clamp(26px, 5vw, 38px); line-height: 1.12; letter-spacing: -.025em; }
+.hero .lead { margin: 0 0 22px; font-size: 16.5px; color: var(--fg-2); max-width: 560px; }
+.features { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 12px; max-width: 560px; }
+.features li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: var(--fg-2); }
+.features li b { color: var(--fg); font-weight: 600; }
+.features .f-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none;
+  background: color-mix(in srgb, var(--fi) 14%, var(--surface)); color: var(--fi); }
+.features .f-ico svg { width: 17px; height: 17px; }
+.cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn.big { height: 46px; padding: 0 20px; font-size: 15.5px; border-radius: 12px; text-decoration: none; }
+.stack { margin: 18px 0 0; font-size: 13px; color: var(--muted); }
+.login-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: var(--shadow-lift); }
+.login-card h3 { margin: 0 0 4px; font-size: 18px; }
+.login-card .sub-l { margin: 0 0 16px; font-size: 13.5px; color: var(--muted); }
+.login-card .btn { width: 100%; }
+.login-card .err { margin: -4px 0 12px; font-size: 13.5px; color: var(--bad); min-height: 1em; }
+select.input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 34px; }
+.demo-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 10px; padding: 8px 12px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent-ink); font-size: 13.5px; }
+.demo-bar a { color: inherit; font-weight: 600; margin-left: auto; }
+@media (min-width: 900px) {
+  .landing { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 48px; padding-top: 36px; }
+  .login-card { margin-top: 70px; }
+}
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -308,7 +343,11 @@ textarea.input { resize: vertical; min-height: 72px; }
       <button class="btn icon" id="refresh" type="button" title="Odśwież" aria-label="Odśwież">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
       </button>
+      <button class="btn icon" id="logout" type="button" title="Wyloguj" aria-label="Wyloguj" hidden>
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg>
+      </button>
     </div>
+    <div class="demo-bar" id="demo-bar" hidden>Tryb demo – przykładowe dane, zmiany nie są nigdzie zapisywane.<a href="./">Wyjdź z demo</a></div>
     <div class="summary" id="summary"></div>
     <div class="filters" id="filters" role="toolbar" aria-label="Filtr kategorii"></div>
     <div class="tabs" id="tabs" role="tablist"></div>
@@ -586,10 +625,43 @@ function niedostepne() {
     <p>Serwer z zadaniami (Make) nie odpowiada – najczęściej dlatego, że skończył się miesięczny limit operacji.
     Spróbuj później przyciskiem odświeżania u góry.</p></div>`;
 }
-function noAccess() {
-  $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("filters").innerHTML = ""; $("fab").hidden = true; $("add").hidden = true;
-  $("main").innerHTML = `<div class="notice"><div class="ico">${I.lock}</div><h2>Brak dostępu</h2>
-    <p>Otwórz swój osobisty link do tablicy (z parametrami <code>u</code> i <code>s</code>). Wystarczy raz – potem strona Cię zapamięta.</p></div>`;
+// strona startowa: opis aplikacji (portfolio), demo i logowanie hasłem
+function noAccess(blad = "") {
+  document.body.classList.add("landing-mode");
+  $("logout").hidden = true;
+  $("hello").textContent = "Kto to ogarnia";
+  $("today").textContent = "Domowe sprawy z właścicielem";
+  const f = (kolor, ikona, tytul, opis) =>
+    `<li><span class="f-ico" style="--fi:${kolor}">${ikona}</span><span><b>${tytul}</b> – ${opis}</span></li>`;
+  $("main").innerHTML = `<section class="landing">
+    <div class="hero">
+      <div class="logo">${I.check}</div>
+      <h2>Każda sprawa ma właściciela</h2>
+      <p class="lead">Zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki – w jednym miejscu, z jasnym
+        „kto to ogarnia” i przypomnieniem mailem rano dzień przed terminem.</p>
+      <ul class="features">
+        ${f("#6d5efc", I.arrow, "Dodawanie zdaniem", "„dodaj: zebranie w czwartek 17:00” w Claude albo krótkim formularzem.")}
+        ${f("#d4467e", I.flag, "Jedna sprawa, jedna osoba", "przekazanie drugiemu rodzicowi jednym kliknięciem, z mailem.")}
+        ${f("#ca8a04", I.clock, "Przypomnienie dzień przed", "tylko do właściciela sprawy, bez zasypywania skrzynki.")}
+      </ul>
+      <div class="cta">
+        <a class="btn primary big" href="?demo=1">Zobacz demo</a>
+        <a class="btn big" href="https://github.com/pogodae/asystent-szkolny" target="_blank" rel="noopener">Kod na GitHubie</a>
+      </div>
+      <p class="stack">Airtable · Make · Google Apps Script · Gmail · GitHub Pages</p>
+    </div>
+    <form class="login-card" id="login" autocomplete="on">
+      <h3>Zaloguj się</h3>
+      <p class="sub-l">Dla domowników. Pozostałych zapraszam do wersji demo.</p>
+      <label class="field"><span>Kto</span>
+        <select class="input" name="u" id="login-u">${CONFIG.rodzice.map((r) =>
+          `<option value="${esc(r.klucz)}">${esc(r.imie)}</option>`).join("")}</select></label>
+      <label class="field"><span>Hasło</span>
+        <input class="input" name="s" id="login-s" type="password" autocomplete="current-password" required></label>
+      <p class="err" id="login-err">${esc(blad)}</p>
+      <button class="btn primary big" type="submit" id="login-btn">Zaloguj</button>
+    </form>
+  </section>`;
 }
 
 // ---- dane i akcje ----
@@ -597,15 +669,15 @@ function noAccess() {
 // i pobierana z serwera dopiero, gdy jest starsza niż ŚWIEŻOŚĆ – albo po kliknięciu „Odśwież”.
 // z Apps Script lista jest darmowa, więc może być świeża; z Make – oszczędnie
 const SWIEZOSC = CONFIG.lista ? 60e3 : 30 * 60e3;
-const CACHE = `lista:${auth.demo ? "demo" : auth.u}`;
+const cacheKey = () => `lista:${auth.demo ? "demo" : auth.u}`;
 let pobrano = 0;
 function zapiszCache() {
   pobrano = pobrano || Date.now();
-  if (!auth.demo) store(CACHE, JSON.stringify({ t: pobrano, ja: state.ja, zadania: state.zadania }));
+  if (!auth.demo) store(cacheKey(), JSON.stringify({ t: pobrano, ja: state.ja, zadania: state.zadania }));
 }
 function zCache() {
   try {
-    const c = JSON.parse(store(CACHE) || "null");
+    const c = JSON.parse(store(cacheKey()) || "null");
     if (!c || !Array.isArray(c.zadania)) return false;
     state.ja = c.ja; state.zadania = c.zadania; state.loaded = true; pobrano = c.t;
     render();
@@ -623,7 +695,12 @@ async function load(wymus = false) {
     pobrano = Date.now(); zapiszCache();
     render();
   } catch (e) {
-    if (e.powod === "brak_dostepu") return noAccess();
+    if (e.powod === "brak_dostepu") {
+      // zapamiętane hasło przestało pasować (np. po zmianie haseł) – zapomnij je i pokaż logowanie
+      try { localStorage.removeItem("u"); localStorage.removeItem("s"); } catch (err) {}
+      auth.u = null; auth.s = null;
+      return noAccess("Hasło się zmieniło – zaloguj się ponownie.");
+    }
     if (!state.loaded) return niedostepne();
     toast(pobrano ? `Brak połączenia – lista z ${fmtTime.format(new Date(pobrano))}` : "Nie udało się pobrać listy.");
   } finally {
@@ -729,6 +806,35 @@ $("form").addEventListener("submit", add);
 $("form").addEventListener("change", (e) => { if (e.target.name === "rodzaj") syncRodzaj(); });
 $("dlg").addEventListener("click", (e) => { if (e.target === $("dlg")) $("dlg").close(); });
 
+// ---- logowanie hasłem (sprawdzane tym samym zapytaniem co lista) i wylogowanie ----
+function pokazAplikacje() {
+  document.body.classList.remove("landing-mode");
+  $("add").hidden = false; $("fab").hidden = false; $("logout").hidden = auth.demo;
+  $("today").textContent = fmtToday.format(new Date()).replace(/^./, (c) => c.toUpperCase());
+}
+async function zaloguj(u, s) {
+  $("login-btn").disabled = true; $("login-btn").textContent = "Loguję…"; $("login-err").textContent = "";
+  auth.u = u; auth.s = s.trim();
+  try {
+    const j = await call("lista");
+    store("u", auth.u); store("s", auth.s);
+    state.ja = j.ja; state.zadania = j.zadania || []; state.loaded = true; pobrano = Date.now(); zapiszCache();
+    pokazAplikacje(); render();
+  } catch (e) {
+    auth.u = null; auth.s = null;
+    noAccess(e.powod === "brak_dostepu" ? "Nieprawidłowe hasło." : "Nie udało się połączyć. Spróbuj za chwilę.");
+  }
+}
+function wyloguj() {
+  try { Object.keys(localStorage).filter((k) => k === "u" || k === "s" || k.startsWith("lista:")).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+  location.href = location.pathname;
+}
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "login") return;
+  e.preventDefault();
+  zaloguj($("login-u").value, $("login-s").value);
+});
+
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
@@ -736,6 +842,7 @@ document.addEventListener("click", (e) => {
   else if (b.dataset.usun) usun(b.dataset.usun);
   else if (b.dataset.tab) { state.tab = b.dataset.tab; render(); scrollTo({ top: 0 }); }
   else if (b.id === "refresh") load(true);
+  else if (b.id === "logout") wyloguj();
   else if (b.id === "add" || b.id === "fab") openAdd();
   else if (b.id === "cancel" || b.id === "cancel-x") $("dlg").close();
   else if (b.id === "show-done") { state.showDone = true; render(); }
@@ -782,6 +889,8 @@ function demoCall(akcja, id, extra = {}) {
   return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
 }
 
+$("demo-bar").hidden = !auth.demo;
+if (auth.demo || (auth.u && auth.s)) pokazAplikacje();
 if (!auth.demo && auth.u && auth.s) zCache();
 load();
 </script>
