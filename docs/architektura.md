@@ -34,7 +34,7 @@ Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, wi�
 | Wejście | Adres |
 | --- | --- |
 | Kliknięcia z maili | `S2_WEBHOOK_URL?t=…&a=take&p=…&k=…` |
-| S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key` |
+| S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key`; JSON: `tytul`, `termin`, `rodzaj` (Do dnia / W dniu / Wydarzenie), `opis`, `kwota`, `id_zrodla` |
 | Dashboard | `S2_WEBHOOK_URL?cel=api` (pola formularza `u`, `s`, `akcja`, `id`) |
 | S3 | `S2_WEBHOOK_URL?cel=przypomnienia` + `X-Api-Key` (opcjonalnie `odstep=0`, `wieczor=1` do testów) |
 

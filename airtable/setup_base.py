@@ -28,6 +28,9 @@ def link(table_id):
 
 STATUSY = ("Nowe", "Przypisane", "Zrobione", "Anulowane")
 ZRODLA = ("Claude", "Webhook", "Scraper", "Dashboard")
+# Do dnia – zrobić najpóźniej tego dnia; W dniu – tego konkretnego dnia (np. przynieść 20 zł);
+# Wydarzenie – o konkretnej godzinie (np. zebranie). Godzina wyświetla się tylko dla wydarzeń.
+RODZAJE = ("Do dnia", "W dniu", "Wydarzenie")
 TYPY_ZDARZEN = ("Utworzono", "Przypisano", "Zrobione", "Przypomnienie", "Eskalacja",
                 "Odrzucone kliknięcie", "Błąd", "Oddano")
 
@@ -46,7 +49,8 @@ def zadania_fields(rodzice_id):
     return [
         {"name": "Tytuł", "type": "singleLineText"},
         {"name": "Opis", "type": "multilineText"},
-        {"name": "Termin", **DATETIME},
+        {"name": "Termin", **DATETIME, "description": "Do dnia: 20:00 tego dnia, W dniu: 7:30 – godzina tylko do przypomnień"},
+        {"name": "Rodzaj", **select(*RODZAJE)},
         {"name": "Kwota", "type": "currency", "options": {"precision": 2, "symbol": "zł"}},
         {"name": "Status", **select(*STATUSY)},
         {"name": "Osoba", **link(rodzice_id), "description": "max 1 osoba"},
@@ -80,6 +84,14 @@ def formula(expr):
     return {"type": "formula", "options": {"formula": expr}}
 
 
+def termin_fmt(data, godzina, data_do=None):
+    """Termin po polsku: „do …” dla Do dnia (bez dnia tygodnia, bo „do sobota” jest niegramatyczne),
+    sama data dla W dniu, data z godziną dla wydarzeń (i pustego rodzaju)."""
+    lokalnie = "SET_LOCALE(SET_TIMEZONE({Termin}, 'Europe/Warsaw'), 'pl')"
+    return (f"IF({{Termin}}, IF({{Rodzaj}}='Do dnia', 'do ' & DATETIME_FORMAT({lokalnie}, '{data_do or data}'), "
+            f"DATETIME_FORMAT({lokalnie}, IF({{Rodzaj}}='W dniu', '{data}', '{data}{godzina}'))))")
+
+
 WYLICZANE = {
     "Zadania": [
         {"name": "Utworzono", **CREATED},
@@ -88,10 +100,9 @@ WYLICZANE = {
          **formula("IF({Przypisano}, DATETIME_DIFF({Przypisano}, {Utworzono}, 'minutes')/60)")},
         # pomocnicze dla Make: gotowe teksty do maili i stron
         {"name": "Osoba imię", **formula("{Osoba} & ''")},
-        {"name": "Termin tekst", **formula(
-            "DATETIME_FORMAT(SET_LOCALE(SET_TIMEZONE({Termin}, 'Europe/Warsaw'), 'pl'), 'D MMMM YYYY, HH:mm')")},
-        {"name": "Termin krótko", **formula(
-            "DATETIME_FORMAT(SET_LOCALE(SET_TIMEZONE({Termin}, 'Europe/Warsaw'), 'pl'), 'D.MM HH:mm')")},
+        # godzina tylko dla wydarzeń; „Do dnia” dostaje przedrostek „do”
+        {"name": "Termin tekst", **formula(termin_fmt("dddd, D MMMM YYYY", ", HH:mm", "D MMMM YYYY"))},
+        {"name": "Termin krótko", **formula(termin_fmt("D.MM", " HH:mm"))},
         {"name": "Kwota tekst", **formula("IF({Kwota}, {Kwota} & ' zł', '')")},
         {"name": "Kwota linia", **formula("IF({Kwota}, 'Kwota: ' & {Kwota} & ' zł', '')")},
         {"name": "Dopisek pilne", **formula(

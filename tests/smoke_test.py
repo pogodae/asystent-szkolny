@@ -88,10 +88,16 @@ def main():
         check(14, "dashboard ze złym kluczem → brak danych", r.status_code == 403 and "zadania" not in r.text, r.text)
     finally:
         time.sleep(2)
-        for z in at.list_records("Zadania", "FIND('SMOKE', {Tytuł})"):
+        smoke = at.list_records("Zadania", "FIND('SMOKE', {Tytuł})")
+        ids = {z["id"] for z in smoke}
+        for z in smoke:
             for e in z["fields"].get("Zdarzenia", []):
                 at.delete_record("Zdarzenia", e)
             at.delete_record("Zadania", z["id"])
+        # „Nieważny link” z testu 8 nie jest podpięty do zadania – rozpoznajemy go po ID w opisie
+        for e in at.list_records("Zdarzenia", "FIND('Nieważny link', {Opis})"):
+            if any(i in e["fields"].get("Opis", "") for i in ids):
+                at.delete_record("Zdarzenia", e["id"])
     print(f"\n{sum(wyniki)}/{len(wyniki)} OK")
     return 0 if all(wyniki) else 1
 

@@ -44,7 +44,9 @@ python tests/smoke_test.py
 
 ## Dodawanie zadań
 
-- **Dashboard:** przycisk **+ Dodaj** (tytuł, termin, kwota, szczegóły). Dla osób, które nie używają Claude.
+- **Dashboard:** przycisk **+ Dodaj** (tytuł, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły). Dla osób, które nie używają Claude.
+
+Każda sprawa ma **rodzaj**: *Do dnia* (np. zgoda – „do 14 listopada”), *W dniu* (np. przynieść 20 zł – „sobota, 14 listopada”) albo *Wydarzenie* (np. zebranie – „sobota, 14 listopada, 17:00”). Godzina jest ustalana i wyświetlana tylko dla wydarzeń; dla pozostałych system używa stałej godziny wyłącznie do przypomnień (W dniu: 7:30, Do dnia: 20:00).
 - **Claude:** zdanie „dodaj …” w projekcie „Asystent szkolny” z włączonym konektorem Make.
 - **Webhook S1-W:** `POST ?cel=dodaj` z nagłówkiem `X-Api-Key` (np. przyszły scraper MobiDziennika).
 
@@ -57,14 +59,22 @@ Wklej do instrukcji projektu w claude.ai (konektor Make musi być włączony):
 ```markdown
 Gdy piszę „dodaj …”, dodajesz sprawę szkolną w Make: uruchom scenariusz
 „Asystent – Silnik (dodaj i zmień status)” (ID 10071371) narzędziem do uruchamiania scenariuszy,
-z danymi: akcja = "dodaj", tytul, termin, opis, kwota, zrodlo = "Claude".
-- Strefa czasowa: Europe/Warsaw. termin w ISO 8601 z przesunięciem, np. 2026-11-14T07:30:00+01:00
-  (zimą +01:00, latem +02:00). Daty względne („w czwartek”, „jutro”) liczysz od dzisiejszej daty.
-- Brak godziny: wycieczki i przyniesienie czegoś = 07:30, zebrania bez godziny = zapytaj.
-- Data niejednoznaczna: zapytaj jednym krótkim pytaniem, zanim uruchomisz scenariusz.
+z danymi: akcja = "dodaj", tytul, rodzaj, termin, opis, kwota, zrodlo = "Claude".
+
+Rodzaj i termin (strefa Europe/Warsaw, ISO 8601 z przesunięciem: zimą +01:00, latem +02:00):
+- "Do dnia" – trzeba zrobić najpóźniej tego dnia (oddać zgodę, zapłacić, „do piątku”). Godziny nie ustalasz,
+  termin = ten dzień o 20:00, np. 2026-11-14T20:00:00+01:00.
+- "W dniu" – dotyczy konkretnego dnia (przynieść 20 zł, strój na WF, wycieczka). Godziny nie ustalasz,
+  termin = ten dzień o 07:30.
+- "Wydarzenie" – coś o konkretnej godzinie (zebranie, występ, konsultacje). Godzina jest wymagana –
+  jeśli jej nie podałam, zapytaj.
+Daty względne („w czwartek”, „jutro”) liczysz od dzisiejszej daty. Gdy nie wiesz, który to rodzaj
+albo data jest niejednoznaczna, zapytaj jednym krótkim pytaniem, zanim uruchomisz scenariusz.
+
 - tytul krótki (do 60 znaków), szczegóły i rzeczy do przyniesienia w opis, kwotę w PLN w kwota (liczba).
 - Kilka spraw w jednej wiadomości = osobne uruchomienia.
-- Po uruchomieniu odpowiedz jedną linią: co dodałeś i na kiedy. Gdy uruchomienie się nie powiedzie, powiedz to wprost.
+- Po uruchomieniu odpowiedz jedną linią: co dodałeś i na kiedy – godzinę podawaj tylko dla wydarzeń.
+  Gdy uruchomienie się nie powiedzie, powiedz to wprost.
 ```
 
 ## Status
