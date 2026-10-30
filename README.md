@@ -5,7 +5,7 @@ Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki,
 ## Jak to działa
 
 1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
-2. Wieczorem dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej (przycisk **Zrobione**), a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie” (przyciski **Biorę to** i **Zrobione**). Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
+2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej (przycisk **Zrobione**), a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie” (przyciski **Biorę to** i **Zrobione**). Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
 3. Bez innych maili – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
 4. Dashboard **„Kto to ogarnia”** pokazuje wolne i przypisane sprawy oraz liczniki, a tabela `Zdarzenia` pozwala policzyć czas do przypisania.
 
