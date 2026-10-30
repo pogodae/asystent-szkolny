@@ -247,10 +247,23 @@ textarea.input { resize: vertical; min-height: 72px; }
   .top { padding-top: 26px; }
   .hello h1 { font-size: 26px; }
   .tabs, .fab { display: none; }
-  .board { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
+  /* moje sprawy szeroko po lewej; po prawej sprawy drugiej osoby, pod nimi zrobione */
+  .board {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: auto 1fr;
+    grid-template-areas: "moje inne" "moje zrobione"; gap: 18px 28px; align-items: start;
+  }
+  .col.moje { grid-area: moje; }
+  .col.inne { grid-area: inne; }
+  .col.zrobione { grid-area: zrobione; opacity: .92; margin-top: 8px; }
   .col[hidden] { display: block; }
   .col-head { display: flex; }
-  .col.zrobione { opacity: .92; }
+  .col.moje .col-head { font-size: 14px; color: var(--fg); }
+  .col.inne .card { padding: 12px; }
+  .col.inne .title { font-size: 14.5px; }
+}
+@media (min-width: 1100px) {
+  .col.moje .list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .col.moje .list > .empty { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
