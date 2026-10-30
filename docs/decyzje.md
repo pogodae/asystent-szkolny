@@ -1,10 +1,14 @@
 # Decyzje projektowe
 
-## Dlaczego dwa kroki (GET → POST)
+## Maile bez przycisków akcji
+
+Po przejściu na jedno przypomnienie dzień przed terminem maile mają tylko przycisk **Otwórz listę spraw**. Wszystkie akcje robi się na dashboardzie, więc z Make zniknęła obsługa kliknięć (S2): strony potwierdzenia, token w linku i wywołania Silnika z maila. Scenariusz API zmniejszył się mniej więcej o połowę. Link z dawnego maila pokazuje stronę z odnośnikiem do listy. Dwie sekcje poniżej opisują wcześniejsze rozwiązanie.
+
+## Dlaczego dwa kroki (GET → POST) – wcześniej
 
 Link w mailu (GET) tylko pokazuje stronę potwierdzenia. Stan zmienia dopiero przycisk na tej stronie (POST z `ok=1`). Skanery linków w poczcie i podglądy linków wykonują GET, więc nie przypiszą zadania przez przypadek.
 
-## Dlaczego token w linku
+## Dlaczego token w linku – wcześniej
 
 Link zawiera ID rekordu, klucz rodzica i losowy `Token` zadania (UUID). S2 szuka rekordu formułą `AND(RECORD_ID()='t', {Token}='k')`. Zmieniony lub zgadnięty link kończy się stroną „Link nieważny” (HTTP 403) i zdarzeniem `Odrzucone kliknięcie`. Parametry są najpierw sprawdzane wyrażeniami regularnymi, żeby nie dało się wstrzyknąć niczego do formuły Airtable.
 

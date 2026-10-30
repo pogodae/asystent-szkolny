@@ -25,7 +25,7 @@ Darmowy plan Make pozwala na 2 aktywne scenariusze. Role ze SPEC (S1, S1-W, S2, 
 | Scenariusz | Wyzwalacz | Odpowiada za |
 | --- | --- | --- |
 | **Asystent – Silnik** | na żądanie (Claude, Call a scenario), kolejka | S1 dodaj zadanie; „Zmień status”: take, done, release, przejmij |
-| **Asystent – API** | jeden Custom webhook, trasa po `?cel=` | S2 kliknięcia z maili, S1-W, S5 API dashboardu, S3 przypomnienia |
+| **Asystent – API** | jeden Custom webhook, trasa po `?cel=` | S1-W, S5 API dashboardu, S3 przypomnienia (dawne S2 – kliknięcia z maili – usunięte) |
 
 Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, więc mail i dashboard stosują te same reguły. S3 aktualizuje tylko pola przypomnień, dlatego działa bezpośrednio w API.
 
@@ -33,7 +33,7 @@ Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, wi�
 
 | Wejście | Adres |
 | --- | --- |
-| Kliknięcia z maili | `S2_WEBHOOK_URL?t=…&a=take&p=…&k=…` |
+| Stary link z maila | `S2_WEBHOOK_URL?t=…` – strona z odnośnikiem do listy spraw |
 | S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key`; JSON: `tytul`, `termin`, `rodzaj` (Do dnia / W dniu / Wydarzenie), `opis`, `kwota`, `id_zrodla` |
 | Dashboard | `S2_WEBHOOK_URL?cel=api` (pola formularza `u`, `s`, `akcja`, `id`) |
 | S3 | `S2_WEBHOOK_URL?cel=przypomnienia` + `X-Api-Key` (raz dziennie rano z GitHub Actions) |

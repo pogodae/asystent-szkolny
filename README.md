@@ -5,7 +5,7 @@ Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki,
 ## Jak to działa
 
 1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
-2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej (przycisk **Zrobione**), a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie” (przyciski **Biorę to** i **Zrobione**). Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
+2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem: do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”. Osoba z ustawieniem „Tylko przypisane” dostaje też maila od razu, gdy ktoś przypisze jej sprawę. W mailu jest tylko przycisk **Otwórz listę spraw** – wszystkie akcje (Biorę to, Zrobione, Oddaj, Przejmij, → Dawid) robi się na dashboardzie.
 3. Bez innych maili – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
 4. Dashboard **„Kto to ogarnia”** pokazuje wolne i przypisane sprawy oraz liczniki, a tabela `Zdarzenia` pozwala policzyć czas do przypisania.
 
@@ -14,7 +14,7 @@ Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decy
 ## Stos
 
 - **Airtable** – jedyne źródło stanu (`Zadania`, `Rodzice`, `Zdarzenia`) z formułami pomocniczymi.
-- **Make** – 2 scenariusze: *Silnik* (zmiany stanu, kolejka) i *API* (jeden webhook dla maili, S1-W, dashboardu i przypomnień).
+- **Make** – 2 scenariusze: *Silnik* (zmiany stanu, kolejka) i *API* (jeden webhook dla S1-W, dashboardu i przypomnień).
 - **Gmail** – maile HTML z przyciskami ([templates/](templates/)).
 - **GitHub Pages** – dashboard w jednym pliku HTML ([dashboard/index.html](dashboard/index.html)).
 - **GitHub Actions** – harmonogram przypomnień ([.github/workflows/przypomnienia.yml](.github/workflows/przypomnienia.yml)).
@@ -28,7 +28,7 @@ Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decy
 | `make/build.py` | scenariusze Make opisane w Pythonie, generator blueprintów |
 | `make/deploy.py` | wgrywa blueprinty przez API Make i eksportuje stan do `make/*.json` |
 | `make/silnik.json`, `make/api.json` | aktualne blueprinty (sekrety zastąpione znacznikami `__NAZWA__`) |
-| `templates/` | maile i strony odpowiedzi S2 |
+| `templates/` | maile (przypomnienie, „jutro”, przypisanie) i strona dla starych linków |
 | `tests/smoke_test.py` | automatyczne testy z planu testów |
 
 ## Uruchomienie od zera

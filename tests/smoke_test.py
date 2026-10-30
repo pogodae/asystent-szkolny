@@ -1,13 +1,12 @@
 """Smoke test asystenta: automatyczne testy z sekcji „Plan testów” w SPEC.
 
 Testy tworzą zadania z tytułem „SMOKE …” i na końcu je usuwają (razem ze zdarzeniami).
-Uwaga: test 2 dodaje zadanie przez S1-W, więc oboje aktywni rodzice dostaną mail „Nowe”.
-Ręcznie zostają: 1 („dodaj” w Claude), 6–7 (prawdziwe maile u obojga), 9–11 na prawdziwym
-harmonogramie, 15 (telefon).
+Maili nie wysyłają (przypomnienia idą tylko rano dzień przed terminem).
+Koszt: około 50 operacji Make – darmowy plan ma ~1000 miesięcznie, więc uruchamiaj z rozwagą.
+Ręcznie zostają: 1 („dodaj” w Claude), przypomnienia na prawdziwym harmonogramie, 15 (telefon).
 
 Użycie:  python tests/smoke_test.py
 """
-import re
 import sys
 import time
 import uuid
@@ -28,10 +27,6 @@ wyniki = []
 def check(nr, opis, warunek, szczegoly=""):
     wyniki.append(bool(warunek))
     print(f"{'OK ' if warunek else 'BŁĄD'} #{nr:<3} {opis}" + (f"  [{szczegoly}]" if szczegoly and not warunek else ""))
-
-
-def h1(r):
-    return " ".join(re.findall(r"<h1>(.*?)</h1>", r.text))
 
 
 def dashboard(**kw):
@@ -63,17 +58,8 @@ def main():
         check(2, "ten sam id_zrodla 2× → utworzono, potem duplikat",
               r1.json().get("status") == "utworzono" and r2.json().get("status") == "duplikat", f"{r1.text} {r2.text}")
 
-        tid, tok = nowe_zadanie("SMOKE kliknięcia")
-        r = requests.get(URL, params={"t": tid, "a": "take", "p": U, "k": tok})
-        st = at.get_record("Zadania", tid)["fields"].get("Status")
-        check(5, "GET „Biorę to” → potwierdzenie, rekord bez zmian", "Biorę to" in r.text and st == "Nowe", st)
-
-        r = requests.get(URL, params={"t": tid, "a": "take", "p": U, "k": "zly-token-0000"})
-        check(8, "zmieniony token → „Link nieważny”, 403", r.status_code == 403 and "Link nieważny" in r.text, r.status_code)
-
-        r = requests.post(URL, data={"t": tid, "a": "take", "p": U, "k": tok, "ok": "1"})
-        f = at.get_record("Zadania", tid)["fields"]
-        check(6, "POST potwierdzenia → Przypisane", f.get("Status") == "Przypisane" and "Gotowe" in h1(r), h1(r))
+        r = requests.get(URL, params={"t": "rec00000000000000", "a": "take", "p": U, "k": "stary-link"})
+        check(5, "stary link z maila → strona z odnośnikiem do listy", r.status_code == 200 and "Sprawy są na liście" in r.text, r.status_code)
 
         tid2, _ = nowe_zadanie("SMOKE dashboard")
         j = dashboard(akcja="lista").json()
@@ -94,10 +80,6 @@ def main():
             for e in z["fields"].get("Zdarzenia", []):
                 at.delete_record("Zdarzenia", e)
             at.delete_record("Zadania", z["id"])
-        # „Nieważny link” z testu 8 nie jest podpięty do zadania – rozpoznajemy go po ID w opisie
-        for e in at.list_records("Zdarzenia", "FIND('Nieważny link', {Opis})"):
-            if any(i in e["fields"].get("Opis", "") for i in ids):
-                at.delete_record("Zdarzenia", e["id"])
     print(f"\n{sum(wyniki)}/{len(wyniki)} OK")
     return 0 if all(wyniki) else 1
 
