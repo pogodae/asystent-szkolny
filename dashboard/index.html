@@ -127,6 +127,12 @@ main { padding-top: 4px; padding-bottom: 110px; }
 .card:hover { box-shadow: var(--shadow-lift); }
 .card.busy { opacity: .5; pointer-events: none; }
 .card.late { border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
+/* kolor kolumny (moje / druga osoba / zrobione): pasek z lewej i delikatne tło karty */
+.col .card { border-left: 4px solid var(--col, var(--line));
+  background: color-mix(in srgb, var(--col, transparent) 5%, var(--surface)); }
+.col.zrobione .card.closed { background: color-mix(in srgb, var(--col) 6%, transparent); }
+.col-head .dot, .tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--col); flex: none; }
+.col-head { color: color-mix(in srgb, var(--col, var(--fg-2)) 70%, var(--fg)); }
 .card-top { display: flex; align-items: flex-start; gap: 10px; }
 .title { flex: 1; min-width: 0; margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; letter-spacing: -.005em; overflow-wrap: anywhere; }
 .avatar {
@@ -357,7 +363,7 @@ const CONFIG = {
   lista: "https://script.google.com/macros/s/AKfycbwaBpd7UpIlvPCi8e4nDQ1t1hJSQrr7OUoQy72I7xufYyEMc5lMMKYLomFKodU8Skx3/exec",
   // imię jak w Airtable + klucz rodzica (do przypisywania zadań)
   rodzice: [{ imie: "Ewa", klucz: "ewa", kolor: "#6d5efc" }, { imie: "Dawid", klucz: "dawid", kolor: "#d4467e" }],
-  kategorie: [{ nazwa: "Dominik", kolor: "#2f7fd6" }, { nazwa: "Mateusz", kolor: "#16a34a" }, { nazwa: "Dom", kolor: "#e07b24" }],
+  kategorie: [{ nazwa: "Dominik", kolor: "#2f7fd6" }, { nazwa: "Mateusz", kolor: "#0d9488" }, { nazwa: "Dom", kolor: "#e07b24" }],
 };
 
 const H = 3600e3;
@@ -450,6 +456,9 @@ function avatar(imie) {
   return `<span class="avatar" style="--av:${r ? r.kolor : "#8a8a92"}" title="${esc(imie)}">${esc(imie[0].toUpperCase())}</span>`;
 }
 const katKolor = (k) => (CONFIG.kategorie.find((x) => x.nazwa === k) || {}).kolor;
+// kolor kolumny: moje = kolor mojego awatara, druga osoba = jej kolor, zrobione = zielony
+const kolorKolumny = (key) => key === "zrobione" ? "#16a34a"
+  : ((CONFIG.rodzice.find((r) => (key === "moje" ? r.imie === state.ja : r.imie !== state.ja)) || {}).kolor || "#8a8a92");
 const drugi = () => CONFIG.rodzice.find((r) => r.imie !== state.ja) || CONFIG.rodzice[1];
 
 // ---- model ----
@@ -521,14 +530,14 @@ function render() {
     `<span class="pill ${cols[1].items.length ? "" : "zero"}"><b>${cols[1].items.length}</b>${esc(cols[1].label)}</span>` +
     (late ? `<span class="pill bad"><b>${late}</b>po terminie</span>` : "");
   $("tabs").innerHTML = cols.map((c) =>
-    `<button class="tab" role="tab" type="button" data-tab="${c.key}" aria-selected="${state.tab === c.key}">${esc(c.short || c.label)} <span class="n">${c.items.length}</span></button>`).join("");
+    `<button class="tab" role="tab" type="button" data-tab="${c.key}" aria-selected="${state.tab === c.key}" style="--col:${kolorKolumny(c.key)}"><span class="dot"></span>${esc(c.short || c.label)} <span class="n">${c.items.length}</span></button>`).join("");
   $("main").innerHTML = `<div class="board">${cols.map((c) => {
     let list = c.items.map((z) => card(z, c.key)).join("") || `<div class="empty">${PUSTE[c.key]}</div>`;
     if (c.key === "zrobione" && c.items.length && !state.showDone && innerWidth >= 900) {
       list = `<button class="btn done-toggle" type="button" id="show-done">Ostatnie 7 dni <span>${c.items.length}</span></button>`;
     }
-    return `<section class="col ${c.key}" ${state.tab === c.key ? "" : "hidden"}>
-      <div class="col-head">${esc(c.label)}<span class="n">${c.items.length}</span></div>
+    return `<section class="col ${c.key}" style="--col:${kolorKolumny(c.key)}" ${state.tab === c.key ? "" : "hidden"}>
+      <div class="col-head"><span class="dot"></span>${esc(c.label)}<span class="n">${c.items.length}</span></div>
       <div class="list">${list}</div></section>`;
   }).join("")}</div>`;
 }
