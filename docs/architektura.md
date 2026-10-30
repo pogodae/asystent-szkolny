@@ -48,6 +48,7 @@ Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Ma
 | Lista na dashboardzie | 0 z Google Apps Script ([apps-script/](../apps-script/)); 4 z Make, gdy skrypt nie jest podłączony | Apps Script: co minutę przy powrocie do karty i co 5 min; Make: co 30 min |
 | Zrobione | 4 (API 2 + Silnik 2) | na kliknięcie |
 | → Dawid (przekazanie z mailem) | 6 | na kliknięcie |
+| Usuń (kosz; status Anulowane, sprawa zostaje w Airtable) | 3 | na kliknięcie |
 | Dodanie sprawy z dashboardu | 3 | na sprawę |
 | Dodanie sprawy przez Claude | 1–2 | na sprawę |
 

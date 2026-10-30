@@ -1307,6 +1307,119 @@
     {
      "flow": [
       {
+       "id": 450,
+       "filter": {
+        "name": "Usuń",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "api",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.u}}",
+           "b": "ewa",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.s}}",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "b": "usun",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "api",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.u}}",
+           "b": "dawid",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.s}}",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "b": "usun",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "id": "{{1.id}}",
+        "base": "appBSubdL1R6lgjY8",
+        "table": "tblrnPwEGqiGYxSbd",
+        "record": {
+         "fldB3iQHvOIUgYn1I": "Anulowane"
+        },
+        "typecast": false,
+        "useColumnId": false
+       },
+       "module": "airtable:ActionUpdateRecords",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 2250
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 451,
+       "mapper": {
+        "body": "{\"ok\":true}",
+        "status": 200,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 2250
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
        "id": 430,
        "filter": {
         "name": "Nieznana akcja",
@@ -1335,6 +1448,11 @@
           {
            "a": "{{1.akcja}}",
            "b": "dodaj",
+           "o": "text:notequal"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "b": "usun",
            "o": "text:notequal"
           },
           {
@@ -1376,6 +1494,11 @@
           },
           {
            "a": "{{1.akcja}}",
+           "b": "usun",
+           "o": "text:notequal"
+          },
+          {
+           "a": "{{1.akcja}}",
            "b": "done",
            "o": "text:notequal"
           },
@@ -1406,7 +1529,7 @@
        "metadata": {
         "designer": {
          "x": 600,
-         "y": 2250
+         "y": 2500
         }
        },
        "parameters": {}
@@ -1453,7 +1576,7 @@
        "metadata": {
         "designer": {
          "x": 600,
-         "y": 2500
+         "y": 2750
         }
        },
        "parameters": {}
@@ -1501,7 +1624,7 @@
        "metadata": {
         "designer": {
          "x": 600,
-         "y": 2750
+         "y": 3000
         }
        },
        "parameters": {
@@ -1518,7 +1641,7 @@
        "metadata": {
         "designer": {
          "x": 900,
-         "y": 2750
+         "y": 3000
         }
        },
        "parameters": {}
@@ -1542,7 +1665,7 @@
        "metadata": {
         "designer": {
          "x": 1200,
-         "y": 2750
+         "y": 3000
         }
        },
        "parameters": {
@@ -1585,7 +1708,7 @@
            "metadata": {
             "designer": {
              "x": 1800,
-             "y": 2750
+             "y": 3000
             }
            },
            "parameters": {
@@ -1607,7 +1730,7 @@
            "metadata": {
             "designer": {
              "x": 2100,
-             "y": 2750
+             "y": 3000
             }
            },
            "parameters": {
@@ -1651,7 +1774,7 @@
            "metadata": {
             "designer": {
              "x": 1800,
-             "y": 3000
+             "y": 3250
             }
            },
            "parameters": {
@@ -1668,7 +1791,7 @@
            "metadata": {
             "designer": {
              "x": 2100,
-             "y": 3000
+             "y": 3250
             }
            },
            "parameters": {}
@@ -1688,7 +1811,7 @@
            "metadata": {
             "designer": {
              "x": 2400,
-             "y": 3000
+             "y": 3250
             }
            },
            "parameters": {
@@ -1702,7 +1825,7 @@
        "metadata": {
         "designer": {
          "x": 1500,
-         "y": 2750
+         "y": 3000
         }
        },
        "parameters": {}

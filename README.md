@@ -45,7 +45,7 @@ python tests/smoke_test.py
 
 ## Dodawanie zadań
 
-- **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły). Dla osób, które nie używają Claude. Każda nowa sprawa należy do Ewy; przycisk **→ Dawid** przekazuje ją Dawidowi (dostaje maila).
+- **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły). Dla osób, które nie używają Claude. Każda nowa sprawa należy do Ewy; przycisk **→ Dawid** przekazuje ją Dawidowi (dostaje maila), a **kosz** usuwa ją po potwierdzeniu (status „Anulowane” – sprawa znika z listy, ale zostaje w Airtable i można ją przywrócić, zmieniając status).
 
 Każda sprawa ma **kategorię**: *Dominik*, *Mateusz* albo *Dom* (kolorowy znacznik i filtr na dashboardzie, dopisek w temacie maila) oraz **rodzaj**: *Do dnia* (np. zgoda – „do 14 listopada”), *W dniu* (np. przynieść 20 zł – „sobota, 14 listopada”) albo *Wydarzenie* (np. zebranie – „sobota, 14 listopada, 17:00”). Godzina jest ustalana i wyświetlana tylko dla wydarzeń; dla pozostałych system używa stałej godziny wyłącznie do przypomnień (W dniu: 7:30, Do dnia: 20:00).
 
