@@ -4,7 +4,7 @@ Sprawy ze szkoły (wycieczki, zgody, wpłaty, zebrania) giną między dwojgiem r
 
 ## Jak to działa
 
-1. Zadanie dodajesz zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
+1. Zadanie dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem (pod przyszły scraper MobiDziennika).
 2. Oboje rodzice dostają mail z przyciskami **Biorę to** i **Zrobione**. Link najpierw pokazuje stronę potwierdzenia (GET), a zmiana następuje dopiero po kliknięciu na tej stronie (POST), więc skaner linków w poczcie niczego nie przypisze.
 3. Nieprzypisane zadanie wraca co 4 h (z dopiskiem PILNE), osoba przypisana dostaje przypomnienie wieczór przed terminem, a po terminie przychodzi eskalacja.
 4. Dashboard **„Kto to ogarnia”** pokazuje wolne i przypisane sprawy oraz liczniki, a tabela `Zdarzenia` pozwala policzyć czas do przypisania.
@@ -42,16 +42,29 @@ python make/deploy.py silnik api --activate
 python tests/smoke_test.py
 ```
 
-## Instrukcje dla projektu Claude „Asystent szkolny”
+## Dodawanie zadań
+
+- **Dashboard:** przycisk **+ Dodaj** (tytuł, termin, kwota, szczegóły). Dla osób, które nie używają Claude.
+- **Claude:** zdanie „dodaj …” w projekcie „Asystent szkolny” z włączonym konektorem Make.
+- **Webhook S1-W:** `POST ?cel=dodaj` z nagłówkiem `X-Api-Key` (np. przyszły scraper MobiDziennika).
+
+Nie dodawaj zadań ręcznie w Airtable: taki rekord nie ma tokenu ani maili.
+
+### Instrukcje dla projektu Claude „Asystent szkolny”
+
+Wklej do instrukcji projektu w claude.ai (konektor Make musi być włączony):
 
 ```markdown
-Gdy piszę „dodaj …”, dodajesz sprawy szkolne scenariuszem Make „Asystent – Silnik” z akcja=dodaj.
-- Strefa czasowa: Europe/Warsaw. Daty względne („w czwartek”, „jutro”) liczysz od dzisiejszej daty.
+Gdy piszę „dodaj …”, dodajesz sprawę szkolną w Make: uruchom scenariusz
+„Asystent – Silnik (dodaj i zmień status)” (ID 10071371) narzędziem do uruchamiania scenariuszy,
+z danymi: akcja = "dodaj", tytul, termin, opis, kwota, zrodlo = "Claude".
+- Strefa czasowa: Europe/Warsaw. termin w ISO 8601 z przesunięciem, np. 2026-11-14T07:30:00+01:00
+  (zimą +01:00, latem +02:00). Daty względne („w czwartek”, „jutro”) liczysz od dzisiejszej daty.
 - Brak godziny: wycieczki i przyniesienie czegoś = 07:30, zebrania bez godziny = zapytaj.
 - Data niejednoznaczna: zapytaj jednym krótkim pytaniem, zanim uruchomisz scenariusz.
-- tytul krótki (do 60 znaków), szczegóły i rzeczy do przyniesienia w opis, kwotę w PLN w kwota.
-- Kilka spraw w jednej wiadomości = osobne wywołania.
-- Po wywołaniu odpowiedz jedną linią: co dodałeś i na kiedy.
+- tytul krótki (do 60 znaków), szczegóły i rzeczy do przyniesienia w opis, kwotę w PLN w kwota (liczba).
+- Kilka spraw w jednej wiadomości = osobne uruchomienia.
+- Po uruchomieniu odpowiedz jedną linią: co dodałeś i na kiedy. Gdy uruchomienie się nie powiedzie, powiedz to wprost.
 ```
 
 ## Status
