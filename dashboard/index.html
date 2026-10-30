@@ -134,6 +134,13 @@ main { padding-top: 4px; padding-bottom: 110px; }
   font-size: 12px; font-weight: 650; color: #fff; background: var(--av, #8a8a92);
 }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+/* termin: data u góry, „za ile dni” pod spodem */
+.when { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; color: var(--fg-2); }
+.when svg { width: 16px; height: 16px; margin-top: 2px; opacity: .75; }
+.when b { display: block; font-size: 14.5px; font-weight: 600; color: var(--fg); line-height: 1.3; }
+.when span { display: block; font-size: 13px; color: var(--muted); line-height: 1.3; }
+.when.soon svg, .when.soon span { color: var(--warn); opacity: 1; }
+.when.late svg, .when.late span, .when.late b { color: var(--bad); opacity: 1; }
 .chip {
   display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 8px; border-radius: 7px;
   font-size: 12.5px; font-weight: 550; background: var(--surface-2); color: var(--fg-2);
@@ -416,25 +423,22 @@ const zlCale = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PL
 const zlGrosze = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", minimumFractionDigits: 2 });
 const zl = { format: (v) => (Number.isInteger(+v) ? zlCale : zlGrosze).format(v) };
 const fmtDzienTyg = new Intl.DateTimeFormat("pl-PL", { weekday: "short", timeZone: TZ });
-// konkretna data z dniem tygodnia, np. „pt 31 paź”
-const dataTyg = (d) => `${fmtDzienTyg.format(d).replace(".", "")} ${fmtDate.format(d)}`;
-// określenie względne + konkretna data, np. „jutro · pt 31 paź”, „za 3 dni, 17:00 · pon 2 lis”;
-// godzina tylko dla wydarzeń (i starych zadań bez rodzaju); „Do dnia” z przedrostkiem „do”
+// termin w dwóch liniach: data (np. „sob, 31 paź”, dla wydarzeń z godziną) i „za ile dni”;
+// godzina tylko dla wydarzeń (i starych zadań bez rodzaju); dla „Do dnia” druga linia mówi, ile zostało
 function kiedy(iso, rodzaj) {
   const d = new Date(iso), now = new Date();
-  const diffDays = Math.round((new Date(dayKey(d)) - new Date(dayKey(now))) / 864e5);
-  const data = dataTyg(d);
-  const blisko = diffDays > -7 && diffDays < 7;
-  if (rodzaj === "Do dnia") {
-    if (diffDays === 0) return `do dziś · ${data}`;
-    if (diffDays === 1) return `do jutra · ${data}`;
-    // „do niedz 1 lis” byłoby niegramatyczne – dzień tygodnia na końcu
-    return `do ${fmtDate.format(d)} · ${fmtDzienTyg.format(d).replace(".", "")}`;
-  }
-  const dzien = diffDays === 0 ? "dziś" : diffDays === 1 ? "jutro" : diffDays === -1 ? "wczoraj"
-    : diffDays > 1 ? `za ${diffDays} dni` : `${-diffDays} dni temu`;
-  const godz = rodzaj === "W dniu" ? "" : (blisko && diffDays > 1 || diffDays < -1 ? ", " : " ") + fmtTime.format(d);
-  return blisko ? `${dzien}${godz} · ${data}` : `${data}${godz && ", " + fmtTime.format(d)}`;
+  const n = Math.round((new Date(dayKey(d)) - new Date(dayKey(now))) / 864e5);
+  const godzina = rodzaj === "W dniu" || rodzaj === "Do dnia" ? "" : `, ${fmtTime.format(d)}`;
+  const data = `${fmtDzienTyg.format(d).replace(".", "")}, ${fmtDate.format(d)}${godzina}`;
+  const zostalo = (k) => (k % 10 >= 2 && k % 10 <= 4 && (k % 100 < 12 || k % 100 > 14) ? "zostały" : "zostało") + ` ${k} dni`;
+  let ile;
+  if (n < -1) ile = `${-n} dni temu`;
+  else if (n === -1) ile = "wczoraj";
+  else if (rodzaj === "Do dnia") ile = n === 0 ? "do dziś" : n === 1 ? "do jutra" : zostalo(n);
+  else ile = n === 0 ? "dziś" : n === 1 ? "jutro" : `za ${n} dni`;
+  // „do niedz, 1 lis” byłoby niegramatyczne – przy „Do dnia” dzień tygodnia w nawiasie na końcu
+  if (rodzaj === "Do dnia") return { data: `do ${fmtDate.format(d)} (${fmtDzienTyg.format(d).replace(".", "")})`, ile };
+  return { data, ile };
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -486,17 +490,18 @@ function card(z, col) {
   }
   const kiedyCls = z.late ? "late" : z.soon ? "soon" : "";
   const ikona = z.late ? I.alert : z.rodzaj === "Wydarzenie" ? I.clock : z.rodzaj === "Do dnia" ? I.flag : I.cal;
+  const t = kiedy(z.termin, z.rodzaj);
   const btns = {
     moje: [["done", "Zrobione", "done"]],
     inne: [["done", "Zrobione", "done"]],
   }[col];
   return `<article class="card ${z.late ? "late" : ""} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
     <div class="card-top"><p class="title">${esc(z.tytul)}</p>${col === "inne" ? avatar(z.osoba) : ""}</div>
-    <div class="chips">
+    <div class="when ${kiedyCls}">${ikona}<div><b>${esc(t.data)}</b><span>${z.late ? "po terminie · " : ""}${esc(t.ile)}</span></div></div>
+    ${z.kategoria || z.kwota ? `<div class="chips">
       ${z.kategoria ? `<span class="chip kat" style="--kat:${katKolor(z.kategoria)}"><span class="dot"></span>${esc(z.kategoria)}</span>` : ""}
-      <span class="chip ${kiedyCls}">${ikona}${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
       ${z.kwota ? `<span class="chip">${I.coin}${esc(zl.format(z.kwota))}</span>` : ""}
-    </div>
+    </div>` : ""}
     ${z.opis ? `<details class="more"><summary>${I.chev}Szczegóły</summary><p>${esc(z.opis)}</p></details>` : ""}
     <div class="actions">${btns.map(([a, l, c]) =>
       `<button class="btn ${c}" data-akcja="${a}" data-id="${z.id}" type="button">${l}</button>`).join("")}
