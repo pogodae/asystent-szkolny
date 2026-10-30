@@ -1,0 +1,2401 @@
+{
+ "flow": [
+  {
+   "id": 1,
+   "mapper": {},
+   "module": "gateway:CustomWebHook",
+   "version": 1,
+   "metadata": {
+    "designer": {
+     "x": 0,
+     "y": 0
+    }
+   },
+   "parameters": {
+    "hook": 4476401,
+    "maxResults": 1
+   }
+  },
+  {
+   "id": 2,
+   "mapper": null,
+   "module": "builtin:BasicRouter",
+   "routes": [
+    {
+     "flow": [
+      {
+       "id": 3,
+       "filter": {
+        "name": "Kliknięcie: złe parametry",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "notexist"
+          },
+          {
+           "a": "{{1.t}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:notpattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "notexist"
+          },
+          {
+           "a": "{{1.a}}",
+           "b": "^(take|done)$",
+           "o": "text:notpattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "notexist"
+          },
+          {
+           "a": "{{1.p}}",
+           "b": "^[a-z0-9_-]{1,30}$",
+           "o": "text:notpattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "notexist"
+          },
+          {
+           "a": "{{1.k}}",
+           "b": "^[A-Za-z0-9-]{8,64}$",
+           "o": "text:notpattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Link nieważny</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Link nieważny</h1>\n<p>Ten link jest nieprawidłowy albo wygasł. Otwórz najnowszy mail ze szkoły.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+        "status": 403,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "text/html; charset=utf-8"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 0
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 4,
+       "filter": {
+        "name": "Kliknięcie: parametry OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "notexist"
+          },
+          {
+           "a": "{{1.t}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.a}}",
+           "b": "^(take|done)$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.p}}",
+           "b": "^[a-z0-9_-]{1,30}$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.k}}",
+           "b": "^[A-Za-z0-9-]{8,64}$",
+           "o": "text:pattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND(RECORD_ID()='{{1.t}}', {Token}='{{1.k}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 250
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 5,
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND({Aktywny}, {Klucz}='{{1.p}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 250
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 6,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 7,
+           "filter": {
+            "name": "Nie znaleziono",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ],
+             [
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fldXk11pEacYX8Waq": "Nieważny link: t={{1.t}} p={{1.p}}",
+             "fldyY0Iv9loL9L34q": "Odrzucone kliknięcie"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 8,
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Link nieważny</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Link nieważny</h1>\n<p>Ten link jest nieprawidłowy albo wygasł. Otwórz najnowszy mail ze szkoły.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+            "status": 403,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 10,
+           "filter": {
+            "name": "GET: zamknięte",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Zrobione",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Anulowane",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldKsFnx31RYDCmGz}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Zadanie zamknięte</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 11,
+           "filter": {
+            "name": "GET: take, ma ktoś inny",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{1.a}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{5.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldKsFnx31RYDCmGz}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Już przejęte przez {{4.body.records[1].fields.fldy9rjTgd8OpBuWt}}</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 14,
+           "filter": {
+            "name": "GET: take, już moje",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{1.a}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{5.body.records[1].id}}",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldKsFnx31RYDCmGz}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">To już Twoje</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 12,
+           "filter": {
+            "name": "GET: take, wolne",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{1.a}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldKsFnx31RYDCmGz}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"take\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"\">Biorę to</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 13,
+           "filter": {
+            "name": "GET: done, otwarte",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{1.a}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "o": "notexist"
+              },
+              {
+               "a": "{{1.a}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{4.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldKsFnx31RYDCmGz}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"done\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"done\">Zrobione</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "text/html; charset=utf-8"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 20,
+           "filter": {
+            "name": "POST: potwierdzone",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{5.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.ok}}",
+               "b": "1",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "id": "{{4.body.records[1].id}}",
+             "akcja": "{{1.a}}",
+             "klucz": "{{1.p}}"
+            }
+           },
+           "module": "scenario-service:CallSubscenario",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1750
+            }
+           },
+           "parameters": {
+            "scenario": "SCN_10071371",
+            "shouldWaitForExecutionEnd": true
+           }
+          },
+          {
+           "id": 22,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "RECORD_ID()='{{1.t}}'"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 23,
+           "mapper": null,
+           "module": "builtin:BasicRouter",
+           "routes": [
+            {
+             "flow": [
+              {
+               "id": 30,
+               "filter": {
+                "name": "Gotowe, to Twoje",
+                "conditions": [
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "take",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Przypisane",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldKNoba8yEYeFS17[1]}}",
+                   "b": "{{5.body.records[1].id}}",
+                   "o": "text:equal"
+                  }
+                 ]
+                ]
+               },
+               "mapper": {
+                "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Gotowe, to Twoje</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Gotowe, to Twoje</h1>\n<p>{{22.body.records[1].fields.fldbqEXa4YxsfbBun}} – termin {{22.body.records[1].fields.fldKsFnx31RYDCmGz}}. Przypomnę wieczór przed terminem.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+                "status": 200,
+                "headers": [
+                 {
+                  "key": "Content-Type",
+                  "value": "text/html; charset=utf-8"
+                 }
+                ]
+               },
+               "module": "gateway:WebhookRespond",
+               "version": 1,
+               "metadata": {
+                "designer": {
+                 "x": 2400,
+                 "y": 1750
+                }
+               },
+               "parameters": {}
+              }
+             ]
+            },
+            {
+             "flow": [
+              {
+               "id": 31,
+               "filter": {
+                "name": "Już przejęte przez {{22.body.records[1].",
+                "conditions": [
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "take",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Przypisane",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldKNoba8yEYeFS17[1]}}",
+                   "b": "{{5.body.records[1].id}}",
+                   "o": "text:notequal"
+                  }
+                 ]
+                ]
+               },
+               "mapper": {
+                "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Już przejęte przez {{22.body.records[1].fields.fldy9rjTgd8OpBuWt}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Już przejęte przez {{22.body.records[1].fields.fldy9rjTgd8OpBuWt}}</h1>\n<p>Nic nie musisz robić.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+                "status": 200,
+                "headers": [
+                 {
+                  "key": "Content-Type",
+                  "value": "text/html; charset=utf-8"
+                 }
+                ]
+               },
+               "module": "gateway:WebhookRespond",
+               "version": 1,
+               "metadata": {
+                "designer": {
+                 "x": 2400,
+                 "y": 2000
+                }
+               },
+               "parameters": {}
+              }
+             ]
+            },
+            {
+             "flow": [
+              {
+               "id": 32,
+               "filter": {
+                "name": "Zadanie zamknięte",
+                "conditions": [
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "take",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Zrobione",
+                   "o": "text:equal"
+                  }
+                 ],
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "take",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Anulowane",
+                   "o": "text:equal"
+                  }
+                 ],
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "done",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Anulowane",
+                   "o": "text:equal"
+                  }
+                 ]
+                ]
+               },
+               "mapper": {
+                "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Zadanie zamknięte</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Zadanie zamknięte</h1>\n<p>Ta sprawa jest już zamknięta.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+                "status": 200,
+                "headers": [
+                 {
+                  "key": "Content-Type",
+                  "value": "text/html; charset=utf-8"
+                 }
+                ]
+               },
+               "module": "gateway:WebhookRespond",
+               "version": 1,
+               "metadata": {
+                "designer": {
+                 "x": 2400,
+                 "y": 2250
+                }
+               },
+               "parameters": {}
+              }
+             ]
+            },
+            {
+             "flow": [
+              {
+               "id": 33,
+               "filter": {
+                "name": "Zrobione, dzięki",
+                "conditions": [
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "done",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Zrobione",
+                   "o": "text:equal"
+                  }
+                 ]
+                ]
+               },
+               "mapper": {
+                "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Zrobione, dzięki</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Zrobione, dzięki</h1>\n<p>{{22.body.records[1].fields.fldbqEXa4YxsfbBun}} – zamknięte.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+                "status": 200,
+                "headers": [
+                 {
+                  "key": "Content-Type",
+                  "value": "text/html; charset=utf-8"
+                 }
+                ]
+               },
+               "module": "gateway:WebhookRespond",
+               "version": 1,
+               "metadata": {
+                "designer": {
+                 "x": 2400,
+                 "y": 2500
+                }
+               },
+               "parameters": {}
+              }
+             ]
+            },
+            {
+             "flow": [
+              {
+               "id": 34,
+               "filter": {
+                "name": "Coś poszło nie tak",
+                "conditions": [
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "take",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Nowe",
+                   "o": "text:equal"
+                  }
+                 ],
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "done",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Nowe",
+                   "o": "text:equal"
+                  }
+                 ],
+                 [
+                  {
+                   "a": "{{1.a}}",
+                   "b": "done",
+                   "o": "text:equal"
+                  },
+                  {
+                   "a": "{{22.body.records[1].fields.fldB3iQHvOIUgYn1I}}",
+                   "b": "Przypisane",
+                   "o": "text:equal"
+                  }
+                 ]
+                ]
+               },
+               "mapper": {
+                "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Coś poszło nie tak</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Coś poszło nie tak</h1>\n<p>Spróbuj jeszcze raz za chwilę albo otwórz listę spraw.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+                "status": 200,
+                "headers": [
+                 {
+                  "key": "Content-Type",
+                  "value": "text/html; charset=utf-8"
+                 }
+                ]
+               },
+               "module": "gateway:WebhookRespond",
+               "version": 1,
+               "metadata": {
+                "designer": {
+                 "x": 2400,
+                 "y": 2750
+                }
+               },
+               "parameters": {}
+              }
+             ]
+            }
+           ],
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 1750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 1200,
+         "y": 250
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 300,
+       "filter": {
+        "name": "S1-W: zły klucz",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:notequal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "{\"status\":\"blad\",\"komunikat\":\"Brak lub zły nagłówek X-Api-Key\"}",
+        "status": 401,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 500
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 301,
+       "filter": {
+        "name": "S1-W: błąd danych",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.termin}}",
+           "b": "{{now}}",
+           "o": "date:lessorequal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "{\"status\":\"blad\",\"komunikat\":\"Brak tytułu albo termin nie jest datą w przyszłości.\"}",
+        "status": 400,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 750
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 310,
+       "filter": {
+        "name": "S1-W: dane OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.termin}}",
+           "b": "{{now}}",
+           "o": "date:greater"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND('{{1.id_zrodla}}' != '', {ID źródła} = '{{1.id_zrodla}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1000
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 311,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 312,
+           "filter": {
+            "name": "Duplikat",
+            "conditions": [
+             [
+              {
+               "a": "{{310.body.records[1].id}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "{\"status\":\"duplikat\",\"id\":\"{{310.body.records[1].id}}\"}",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 1000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 320,
+           "filter": {
+            "name": "Nowe",
+            "conditions": [
+             [
+              {
+               "a": "{{310.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "opis": "{{1.opis}}",
+             "akcja": "dodaj",
+             "kwota": "{{1.kwota}}",
+             "tytul": "{{1.tytul}}",
+             "termin": "{{1.termin}}",
+             "zrodlo": "{{ifempty(1.zrodlo; \"Webhook\")}}",
+             "id_zrodla": "{{1.id_zrodla}}"
+            }
+           },
+           "module": "scenario-service:CallSubscenario",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 1250
+            }
+           },
+           "parameters": {
+            "scenario": "SCN_10071371",
+            "shouldWaitForExecutionEnd": true
+           }
+          },
+          {
+           "id": 321,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND('{{1.id_zrodla}}' != '', {ID źródła} = '{{1.id_zrodla}}')"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 322,
+           "mapper": {
+            "body": "{\"status\":\"utworzono\",\"id\":\"{{321.body.records[1].id}}\",\"termin\":\"{{1.termin}}\"}",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 1000
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 400,
+       "filter": {
+        "name": "API: złe dane logowania",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "api",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.u}}",
+           "b": "^[a-z0-9_-]{1,30}$",
+           "o": "text:notpattern"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "api",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.s}}",
+           "b": "^[A-Za-z0-9_-]{16,64}$",
+           "o": "text:notpattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "{\"ok\":false,\"powod\":\"brak_dostepu\"}",
+        "status": 403,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1250
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 401,
+       "filter": {
+        "name": "API: dane logowania OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "api",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.u}}",
+           "b": "^[a-z0-9_-]{1,30}$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.s}}",
+           "b": "^[A-Za-z0-9_-]{16,64}$",
+           "o": "text:pattern"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "qs": [
+         {
+          "key": "filterByFormula",
+          "value": "AND({Aktywny}, {Klucz}='{{1.u}}', {Klucz dostępu}='{{1.s}}')"
+         },
+         {
+          "key": "returnFieldsByFieldId",
+          "value": "true"
+         }
+        ],
+        "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+        "method": "GET",
+        "headers": []
+       },
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1500
+        }
+       },
+       "parameters": {
+        "__IMTCONN__": 14707783
+       }
+      },
+      {
+       "id": 402,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 403,
+           "filter": {
+            "name": "Brak dostępu",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "notexist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "{\"ok\":false,\"powod\":\"brak_dostepu\"}",
+            "status": 403,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 1500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 410,
+           "filter": {
+            "name": "Lista",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "lista",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "OR({Status}='Nowe', {Status}='Przypisane', AND({Status}='Zrobione', DATETIME_DIFF(NOW(), {Zrobiono}, 'days') < 7))"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 1750
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 411,
+           "mapper": {
+            "object": "{{410.body.records}}"
+           },
+           "module": "json:TransformToJSON",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 1750
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 412,
+           "mapper": {
+            "body": "{\"ok\":true,\"ja\":\"{{401.body.records[1].fields.fldNY2MTdN0GPOVdx}}\",\"zadania\":{{411.json}}}",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 1750
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 420,
+           "filter": {
+            "name": "Zmiana statusu",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "take",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id}}",
+               "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id}}",
+               "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "release",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id}}",
+               "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przejmij",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id}}",
+               "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "id": "{{1.id}}",
+             "akcja": "{{1.akcja}}",
+             "klucz": "{{1.u}}"
+            }
+           },
+           "module": "scenario-service:CallSubscenario",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "scenario": "SCN_10071371",
+            "shouldWaitForExecutionEnd": true
+           }
+          },
+          {
+           "id": 421,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "RECORD_ID()='{{1.id}}'"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 422,
+           "mapper": {
+            "object": "{{421.body.records[1]}}"
+           },
+           "module": "json:TransformToJSON",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2000
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 423,
+           "mapper": {
+            "body": "{\"ok\":true,\"zadanie\":{{422.json}}}",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 430,
+           "filter": {
+            "name": "Nieznana akcja",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "lista",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "take",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "done",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "release",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przejmij",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "{\"ok\":false,\"powod\":\"nieznana_akcja\"}",
+            "status": 400,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 1500
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 500,
+       "filter": {
+        "name": "S3: zły klucz",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "przypomnienia",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:notequal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "{\"ok\":false}",
+        "status": 401,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 1750
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    },
+    {
+     "flow": [
+      {
+       "id": 501,
+       "filter": {
+        "name": "S3: start",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "przypomnienia",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          }
+         ]
+        ]
+       },
+       "mapper": {
+        "body": "{\"ok\":true}",
+        "status": 200,
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "application/json; charset=utf-8"
+         },
+         {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://pogodae.github.io"
+         }
+        ]
+       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 2000
+        }
+       },
+       "parameters": {}
+      },
+      {
+       "id": 502,
+       "mapper": null,
+       "module": "builtin:BasicRouter",
+       "routes": [
+        {
+         "flow": [
+          {
+           "id": 510,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND({Status}='Nowe', DATETIME_DIFF(NOW(),{Utworzono},'hours')>={{ifempty(1.odstep; 4)}}, OR({Ostatnie przypomnienie}=BLANK(), DATETIME_DIFF(NOW(),{Ostatnie przypomnienie},'hours')>={{ifempty(1.odstep; 4)}}))"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 511,
+           "mapper": {
+            "array": "{{510.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 2000
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 514,
+           "mapper": {
+            "id": "{{511.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0QJqw2alYIYa7r": "{{ifempty(511.fields.fld0QJqw2alYIYa7r; 0) + 1}}",
+             "fldOIYTKituV1TBjR": "{{now}}"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 515,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld3gFPcPMANbP3NH": [
+              "{{511.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Przypomnienie"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 512,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "{Aktywny}"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 513,
+           "mapper": {
+            "array": "{{512.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 2000
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 516,
+           "mapper": {
+            "to": [
+             "{{513.fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldy2D2ty28uZDEBB}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nikt jeszcze nie wziął tej sprawy</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{511.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{511.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{511.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{511.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=take&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=done&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldy2D2ty28uZDEBB}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 3000,
+             "y": 2000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 520,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND({Status}='Przypisane', NOT({Przypomnienie przed terminem}), {Godzin do terminu}>0, {Godzin do terminu}<=28, OR('{{1.wieczor}}'='1', VALUE(DATETIME_FORMAT(SET_TIMEZONE(NOW(), 'Europe/Warsaw'), 'H'))>=18, {Godzin do terminu}<=6))"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 521,
+           "mapper": {
+            "array": "{{520.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 2250
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 522,
+           "mapper": {
+            "id": "{{521.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fldEaRdxdBntiaWV7": true
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 523,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld3gFPcPMANbP3NH": [
+              "{{521.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "Jutro: {{521.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Przypomnienie"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 524,
+           "mapper": {
+            "qs": [
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV/{{521.fields.fldKNoba8yEYeFS17[1]}}",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 2250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 525,
+           "mapper": {
+            "to": [
+             "{{524.body.fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Jutro: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Przypomnienie: to Twoja sprawa na jutro</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{521.id}}&amp;a=done&amp;p={{524.body.fields.fld0U6X7hMhOxLv4a}}&amp;k={{521.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę masz Ty – {{524.body.fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] Jutro: {{521.fields.fldbqEXa4YxsfbBun}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 2250
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 530,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND(OR({Status}='Nowe', {Status}='Przypisane'), IS_BEFORE({Termin}, NOW()), NOT({Po terminie}))"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 531,
+           "mapper": {
+            "array": "{{530.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 2500
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 532,
+           "mapper": {
+            "id": "{{531.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fldRH1fD200OHmSqy": true
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 533,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld3gFPcPMANbP3NH": [
+              "{{531.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "Po terminie: {{531.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Eskalacja"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 534,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "{Aktywny}"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 535,
+           "mapper": {
+            "array": "{{534.body.records}}"
+           },
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 2500
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 536,
+           "mapper": {
+            "to": [
+             "{{535.fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Po terminie: {{531.fields.fldbqEXa4YxsfbBun}} – zrobione?</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Termin minął. Czy sprawa jest zrobiona?</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{531.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{531.fields.fldKsFnx31RYDCmGz}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{531.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{531.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{531.id}}&amp;a=done&amp;p={{535.fields.fld0U6X7hMhOxLv4a}}&amp;k={{531.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Przypisane do: {{531.fields.fldy9rjTgd8OpBuWt}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "[Szkoła] Po terminie: {{531.fields.fldbqEXa4YxsfbBun}} – zrobione?",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 3000,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          }
+         ]
+        }
+       ],
+       "version": 1,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 2000
+        }
+       },
+       "parameters": {}
+      }
+     ]
+    }
+   ],
+   "version": 1,
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   },
+   "parameters": {}
+  }
+ ],
+ "name": "Asystent – API (maile, webhook, dashboard, przypomnienia)",
+ "metadata": {
+  "instant": true,
+  "version": 1,
+  "designer": {
+   "orphans": []
+  },
+  "scenario": {
+   "dlq": true,
+   "dataloss": false,
+   "maxErrors": 3,
+   "autoCommit": true,
+   "roundtrips": 1,
+   "sequential": false,
+   "confidential": false,
+   "freshVariables": false,
+   "autoCommitTriggerLast": true
+  }
+ }
+}

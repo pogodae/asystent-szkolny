@@ -1,0 +1,21 @@
+# S3 – przypomnienia. Darmowy plan Make pozwala na 2 aktywne scenariusze, więc harmonogram
+# trzyma GitHub Actions: 3 razy dziennie wywołuje webhook API z ?cel=przypomnienia.
+# Godziny w UTC: 6:00 i 12:00 (rano, po południu) oraz 17:30 (wieczór przed terminem, ≥18:00 w Polsce).
+name: Przypomnienia
+
+on:
+  schedule:
+    - cron: "0 6,12 * * *"
+    - cron: "30 17 * * *"
+  workflow_dispatch:
+
+jobs:
+  przypomnienia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wywołaj S3 w Make
+        env:
+          API_URL: ${{ secrets.MAKE_API_WEBHOOK_URL }}
+          API_KEY: ${{ secrets.S1W_API_KEY }}
+        run: |
+          curl --fail-with-body -sS -X POST "$API_URL?cel=przypomnienia" -H "X-Api-Key: $API_KEY"
