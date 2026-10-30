@@ -17,6 +17,7 @@ Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decy
 - **Make** – 2 scenariusze: *Silnik* (zmiany stanu, kolejka) i *API* (jeden webhook dla S1-W, dashboardu i przypomnień).
 - **Gmail** – maile HTML z przyciskami ([templates/](templates/)).
 - **GitHub Pages** – dashboard w jednym pliku HTML ([dashboard/index.html](dashboard/index.html)).
+- **Google Apps Script** – odczyt listy dla dashboardu bez operacji Make ([apps-script/](apps-script/README.md)).
 - **GitHub Actions** – harmonogram przypomnień ([.github/workflows/przypomnienia.yml](.github/workflows/przypomnienia.yml)).
 
 ## Struktura
