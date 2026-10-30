@@ -415,20 +415,26 @@ const dayKey = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(
 const zlCale = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
 const zlGrosze = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", minimumFractionDigits: 2 });
 const zl = { format: (v) => (Number.isInteger(+v) ? zlCale : zlGrosze).format(v) };
+const fmtDzienTyg = new Intl.DateTimeFormat("pl-PL", { weekday: "short", timeZone: TZ });
+// konkretna data z dniem tygodnia, np. „pt 31 paź”
+const dataTyg = (d) => `${fmtDzienTyg.format(d).replace(".", "")} ${fmtDate.format(d)}`;
+// określenie względne + konkretna data, np. „jutro · pt 31 paź”, „za 3 dni, 17:00 · pon 2 lis”;
 // godzina tylko dla wydarzeń (i starych zadań bez rodzaju); „Do dnia” z przedrostkiem „do”
 function kiedy(iso, rodzaj) {
   const d = new Date(iso), now = new Date();
   const diffDays = Math.round((new Date(dayKey(d)) - new Date(dayKey(now))) / 864e5);
-  const data = fmtDate.format(d);
+  const data = dataTyg(d);
+  const blisko = diffDays > -7 && diffDays < 7;
   if (rodzaj === "Do dnia") {
-    if (diffDays === 0) return "do dziś";
-    if (diffDays === 1) return "do jutra";
-    return `do ${data}`;
+    if (diffDays === 0) return `do dziś · ${data}`;
+    if (diffDays === 1) return `do jutra · ${data}`;
+    // „do niedz 1 lis” byłoby niegramatyczne – dzień tygodnia na końcu
+    return `do ${fmtDate.format(d)} · ${fmtDzienTyg.format(d).replace(".", "")}`;
   }
   const dzien = diffDays === 0 ? "dziś" : diffDays === 1 ? "jutro" : diffDays === -1 ? "wczoraj"
-    : diffDays > 1 && diffDays < 7 ? `za ${diffDays} dni` : diffDays < -1 && diffDays > -7 ? `${-diffDays} dni temu` : data;
-  if (rodzaj === "W dniu") return dzien;
-  return `${dzien}${/\d/.test(dzien) ? "," : ""} ${fmtTime.format(d)}`;
+    : diffDays > 1 ? `za ${diffDays} dni` : `${-diffDays} dni temu`;
+  const godz = rodzaj === "W dniu" ? "" : (blisko && diffDays > 1 || diffDays < -1 ? ", " : " ") + fmtTime.format(d);
+  return blisko ? `${dzien}${godz} · ${data}` : `${data}${godz && ", " + fmtTime.format(d)}`;
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
