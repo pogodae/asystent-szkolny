@@ -113,7 +113,11 @@ WYLICZANE = {
         {"name": "Kwota linia", **formula("IF({Kwota}, 'Kwota: ' & {Kwota} & ' zł', '')")},
         {"name": "Dopisek pilne", **formula(
             "IF(OR({Liczba przypomnień} >= 2, {Godzin do terminu} < 24), ' – PILNE', '')")},
-        {"name": "Kategoria dopisek", **formula("IF({Kategoria}, ' · ' & {Kategoria}, '')")},    ],
+        {"name": "Kategoria dopisek", **formula("IF({Kategoria}, ' · ' & {Kategoria}, '')")},
+        # przypomnienie dzień przed: termin wypada jutro (kalendarzowo, w Polsce)
+        {"name": "Termin jutro", **formula(
+            "DATETIME_FORMAT(SET_TIMEZONE({Termin}, 'Europe/Warsaw'), 'YYYY-MM-DD') = "
+            "DATETIME_FORMAT(SET_TIMEZONE(DATEADD(NOW(), 1, 'days'), 'Europe/Warsaw'), 'YYYY-MM-DD')")},    ],
     "Zdarzenia": [
         {"name": "Kiedy", **CREATED},
     ],

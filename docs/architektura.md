@@ -40,4 +40,13 @@ Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, wi�
 
 ## Budżet operacji
 
-Darmowy plan ma około 1000 operacji miesięcznie. Pusty przebieg S3 kosztuje około 5 operacji, czyli przy 3 przebiegach dziennie około 450 miesięcznie. Odświeżenie dashboardu to 4 operacje, dlatego strona odświeża się przy otwarciu, po akcji, przy powrocie do karty i co 10 minut, a nie co 60 s.
+Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Make wstrzymuje scenariusze. Dlatego:
+
+| Co | Operacje | Jak często |
+| --- | --- | --- |
+| Przypomnienia (S3) | ok. 4 + 2–3 na każdą sprawę na jutro | raz dziennie wieczorem (GitHub Actions) |
+| Lista na dashboardzie | 4 | przy otwarciu, gdy lista w telefonie jest starsza niż 15 min, albo „Odśwież” |
+| Akcja z dashboardu (biorę, zrobione, …) | ok. 8 (API + Silnik) | na kliknięcie |
+| Dodanie sprawy | ok. 7 | na sprawę |
+
+Maile wychodzą tylko wieczorem dzień przed terminem (do osoby przypisanej, a przy sprawie wolnej do rodziców z powiadomieniami „Wszystkie”) oraz od razu przy przypisaniu sprawy osobie z ustawieniem „Tylko przypisane”. Dostęp do API dashboardu sprawdzają filtry z parami klucz + klucz dostępu, bez zapytania do Airtable.
