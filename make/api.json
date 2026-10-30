@@ -1707,6 +1707,214 @@
         {
          "flow": [
           {
+           "id": 440,
+           "filter": {
+            "name": "Dodaj: błąd danych",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.tytul}}",
+               "o": "notexist"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id_zrodla}}",
+               "b": "^dash-[a-f0-9-]{8,40}$",
+               "o": "text:notpattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.termin}}",
+               "b": "{{now}}",
+               "o": "date:lessorequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "body": "{\"ok\":false,\"powod\":\"blad_danych\"}",
+            "status": 400,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2250
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 441,
+           "filter": {
+            "name": "Dodaj: dane OK",
+            "conditions": [
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.tytul}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.id_zrodla}}",
+               "b": "^dash-[a-f0-9-]{8,40}$",
+               "o": "text:pattern"
+              },
+              {
+               "a": "{{1.termin}}",
+               "b": "{{now}}",
+               "o": "date:greater"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "opis": "{{1.opis}}",
+             "akcja": "dodaj",
+             "kwota": "{{1.kwota}}",
+             "tytul": "{{1.tytul}}",
+             "termin": "{{1.termin}}",
+             "zrodlo": "Dashboard",
+             "id_zrodla": "{{1.id_zrodla}}"
+            }
+           },
+           "module": "scenario-service:CallSubscenario",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "scenario": "SCN_10071371",
+            "shouldWaitForExecutionEnd": true
+           }
+          },
+          {
+           "id": 442,
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "{ID źródła}='{{1.id_zrodla}}'"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 2500
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 443,
+           "mapper": {
+            "object": "{{442.body.records[1]}}"
+           },
+           "module": "json:TransformToJSON",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 2500
+            }
+           },
+           "parameters": {}
+          },
+          {
+           "id": 444,
+           "mapper": {
+            "body": "{\"ok\":true,\"zadanie\":{{443.json}}}",
+            "status": 200,
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 2500
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
            "id": 430,
            "filter": {
             "name": "Nieznana akcja",
@@ -1719,6 +1927,11 @@
               {
                "a": "{{1.akcja}}",
                "b": "lista",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
                "o": "text:notequal"
               },
               {
@@ -1763,7 +1976,7 @@
            "metadata": {
             "designer": {
              "x": 1200,
-             "y": 2250
+             "y": 2750
             }
            },
            "parameters": {}

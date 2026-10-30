@@ -72,6 +72,17 @@ details p { white-space: pre-line; margin: 6px 0 0; overflow-wrap: anywhere; }
   box-shadow: 0 4px 20px rgba(0,0,0,.2); z-index: 5; }
 .notice { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; max-width: 520px; margin: 40px auto; }
 .done-col details > summary { list-style: none; }
+.icon-btn.add { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 600; }
+dialog { border: 0; border-radius: 16px; padding: 0; width: min(440px, calc(100% - 32px));
+  background: var(--card); color: var(--fg); box-shadow: 0 10px 40px rgba(0,0,0,.3); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+dialog form { padding: 20px; }
+dialog h2 { margin: 0 0 12px; font-size: 19px; }
+dialog label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+dialog input, dialog textarea { display: block; width: 100%; margin-top: 4px; padding: 11px 12px; font: inherit;
+  font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
+dialog textarea { resize: vertical; }
+.hint { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
 @media (min-width: 900px) {
   .tabs { display: none; }
   .board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -83,13 +94,29 @@ details p { white-space: pre-line; margin: 6px 0 0; overflow-wrap: anywhere; }
 <header>
   <div class="top">
     <h1>Kto to ogarnia</h1>
-    <button class="icon-btn" id="refresh" title="Odśwież">↻ Odśwież</button>
+    <button class="icon-btn add" id="add" title="Dodaj sprawę">+ Dodaj</button>
+    <button class="icon-btn" id="refresh" title="Odśwież">↻</button>
   </div>
   <div class="stats" id="stats"></div>
   <div class="tabs" id="tabs" role="tablist"></div>
 </header>
 <main id="main"></main>
 <div class="toast" id="toast" hidden></div>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2>Nowa sprawa</h2>
+    <label>Co<input name="tytul" required maxlength="100" placeholder="np. Wycieczka do Krakowa" autocomplete="off"></label>
+    <label>Kiedy<input name="termin" type="datetime-local" required></label>
+    <label>Kwota (zł)<input name="kwota" type="number" min="0" step="0.01" inputmode="decimal" placeholder="opcjonalnie"></label>
+    <label>Szczegóły<textarea name="opis" rows="3" placeholder="co przynieść, zgoda… (opcjonalnie)"></textarea></label>
+    <p class="hint">Oboje dostaniecie maila z przyciskiem „Biorę to”.</p>
+    <div class="actions">
+      <button type="button" class="ghost" id="cancel">Anuluj</button>
+      <button type="submit" id="save">Dodaj</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 // ---- konfiguracja (adres API = webhook Make z ?cel=api; dane chroni para u + s) ----
@@ -119,9 +146,9 @@ function login() {
 const auth = login();
 
 // ---- API: proste POST-y (form-urlencoded), bez preflightu ----
-async function call(akcja, id) {
-  if (auth.demo) return demoCall(akcja, id);
-  const body = new URLSearchParams({ u: auth.u || "", s: auth.s || "", akcja });
+async function call(akcja, id, extra = {}) {
+  if (auth.demo) return demoCall(akcja, id, extra);
+  const body = new URLSearchParams({ u: auth.u || "", s: auth.s || "", akcja, ...extra });
   if (id) body.set("id", id);
   const r = await fetch(CONFIG.api, { method: "POST", body });
   const j = await r.json().catch(() => ({ ok: false, powod: "blad" }));
@@ -261,12 +288,44 @@ async function act(akcja, id) {
   }
 }
 
+// ---- dodawanie sprawy z formularza ----
+function openAdd() {
+  if (!auth.demo && (!auth.u || !auth.s)) return noAccess();
+  const f = $("form"); f.reset();
+  const jutro = new Date(); jutro.setDate(jutro.getDate() + 1); jutro.setHours(7, 30, 0, 0);
+  const pad = (n) => String(n).padStart(2, "0");
+  f.termin.value = `${jutro.getFullYear()}-${pad(jutro.getMonth() + 1)}-${pad(jutro.getDate())}T07:30`;
+  $("dlg").showModal(); f.tytul.focus();
+}
+async function add(e) {
+  e.preventDefault();
+  const f = $("form"), termin = new Date(f.termin.value);
+  if (!(termin > new Date())) { toast("Termin musi być w przyszłości."); return; }
+  const dane = {
+    tytul: f.tytul.value.trim(), termin: termin.toISOString(), opis: f.opis.value.trim(),
+    kwota: f.kwota.value, id_zrodla: "dash-" + crypto.randomUUID(),
+  };
+  $("save").disabled = true; $("save").textContent = "Dodaję…";
+  try {
+    const j = await call("dodaj", null, dane);
+    state.zadania.push(j.zadanie); state.tab = "wolne";
+    $("dlg").close(); render(); toast("Dodane – maile poszły do Was obojga.");
+  } catch (err) {
+    toast(err.powod === "blad_danych" ? "Sprawdź tytuł i termin." : "Nie udało się dodać. Spróbuj jeszcze raz.");
+  } finally {
+    $("save").disabled = false; $("save").textContent = "Dodaj";
+  }
+}
+$("form").addEventListener("submit", add);
+
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
   if (b.dataset.akcja) act(b.dataset.akcja, b.dataset.id);
   else if (b.dataset.tab) { state.tab = b.dataset.tab; render(); }
   else if (b.id === "refresh") load();
+  else if (b.id === "add") openAdd();
+  else if (b.id === "cancel") $("dlg").close();
 });
 // odświeżanie przy powrocie do karty i co 10 min, gdy strona jest widoczna
 // (rzadziej niż w SPEC, bo darmowy plan Make ma limit operacji)
@@ -274,16 +333,23 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) load
 setInterval(() => { if (!document.hidden) load(); }, 10 * 60e3);
 
 // ---- tryb demo (?demo=1): przykładowe dane bez API ----
-function demoCall(akcja, id) {
+function demoCall(akcja, id, extra = {}) {
   const now = Date.now(), iso = (h) => new Date(now + h * H).toISOString();
+  if (akcja === "dodaj") {
+    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin,
+      "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Nowe", "Utworzono": iso(0) } };
+    demoCall.data.push(z);
+    return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
+  }
   if (akcja === "lista") {
-    return Promise.resolve({ ok: true, ja: "Ewa", zadania: demoCall.data ||= [
+    demoCall.data ||= [
       { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
       { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Termin": iso(20), "Status": "Nowe", "Utworzono": iso(-1) } },
       { id: "d3", fields: { "Tytuł": "Strój na WF", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
       { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Termin": iso(100), "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
       { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Termin": iso(-48), "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
-    ] });
+    ];
+    return Promise.resolve({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) });
   }
   const z = structuredClone(demoCall.data.find((x) => x.id === id));
   const f = z.fields;

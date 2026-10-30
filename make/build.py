@@ -399,7 +399,7 @@ SILNIK_INTERFACE = {
          "label": "Data i godzina w Europe/Warsaw (ISO 8601), np. 2026-11-14T08:00:00+01:00"},
         {"name": "opis", "type": "text", "required": False, "label": "Co przynieść, ile zapłacić, szczegóły"},
         {"name": "kwota", "type": "number", "required": False, "label": "Kwota w PLN"},
-        {"name": "zrodlo", "type": "text", "required": False, "label": "Claude, Webhook lub Scraper; domyślnie Claude"},
+        {"name": "zrodlo", "type": "text", "required": False, "label": "Claude, Webhook, Scraper lub Dashboard; domyślnie Claude"},
         {"name": "id_zrodla", "type": "text", "required": False, "label": "Identyfikator do deduplikacji"},
         {"name": "id", "type": "text", "required": False, "label": "ID zadania (dla zmiany statusu)"},
         {"name": "klucz", "type": "text", "required": False, "label": "Klucz rodzica (dla zmiany statusu)"},
@@ -560,6 +560,9 @@ def s5_routes(cel_eq):
     otwarte = ("OR({Status}='Nowe', {Status}='Przypisane', "
                "AND({Status}='Zrobione', DATETIME_DIFF(NOW(), {Zrobiono}, 'days') < 7))")
     zmiana = [[exists(ja), eq(q["akcja"], a), match(q["id"], "^rec[A-Za-z0-9]{14}$")] for a in STATUS_AKCJE]
+    dodaj = eq(q["akcja"], "dodaj")
+    n = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "id_zrodla")}
+    PD = "^dash-[a-f0-9-]{8,40}$"
     return [
         [jresp(400, 403, '{"ok":false,"powod":"brak_dostepu"}',
                flt("API: złe dane logowania", [cel, nomatch(q["u"], PU)], [cel, nomatch(q["s"], PS)]))],
@@ -577,8 +580,21 @@ def s5_routes(cel_eq):
               find_names(421, f"RECORD_ID()='{q['id']}'"),
               tojson(422, "{{421.body.records[1]}}"),
               jresp(423, 200, '{"ok":true,"zadanie":{{422.json}}}')],
+             # --- dodaj z formularza: id_zrodla generuje strona (dash-…), żeby odczytać nowy rekord
+             [jresp(440, 400, '{"ok":false,"powod":"blad_danych"}',
+                    flt("Dodaj: błąd danych", [exists(ja), dodaj, missing(n["tytul"])],
+                        [exists(ja), dodaj, nomatch(n["id_zrodla"], PD)],
+                        [exists(ja), dodaj, {"a": n["termin"], "o": "date:lessorequal", "b": "{{now}}"}]))],
+             [call(441, "MAKE_ID_SILNIK", {"akcja": "dodaj", "tytul": n["tytul"], "termin": n["termin"],
+                                           "opis": n["opis"], "kwota": n["kwota"], "zrodlo": "Dashboard",
+                                           "id_zrodla": n["id_zrodla"]},
+                   flt("Dodaj: dane OK", [exists(ja), dodaj, exists(n["tytul"]), match(n["id_zrodla"], PD),
+                                          {"a": n["termin"], "o": "date:greater", "b": "{{now}}"}])),
+              find_names(442, f"{{ID źródła}}='{n['id_zrodla']}'"),
+              tojson(443, "{{442.body.records[1]}}"),
+              jresp(444, 200, '{"ok":true,"zadanie":{{443.json}}}')],
              [jresp(430, 400, '{"ok":false,"powod":"nieznana_akcja"}',
-                    flt("Nieznana akcja", [exists(ja), ne(q["akcja"], "lista"),
+                    flt("Nieznana akcja", [exists(ja), ne(q["akcja"], "lista"), ne(q["akcja"], "dodaj"),
                                            *[ne(q["akcja"], a) for a in STATUS_AKCJE]]))],
          )],
     ]

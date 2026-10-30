@@ -27,7 +27,7 @@ def link(table_id):
 
 
 STATUSY = ("Nowe", "Przypisane", "Zrobione", "Anulowane")
-ZRODLA = ("Claude", "Webhook", "Scraper")
+ZRODLA = ("Claude", "Webhook", "Scraper", "Dashboard")
 TYPY_ZDARZEN = ("Utworzono", "Przypisano", "Zrobione", "Przypomnienie", "Eskalacja",
                 "Odrzucone kliknięcie", "Błąd", "Oddano")
 
