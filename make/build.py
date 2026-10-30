@@ -244,6 +244,9 @@ def metadata(sequential=False, interface=None):
 
 
 STATUS_AKCJE = ("take", "done", "release", "przejmij")
+# rodzaj terminu; pusty = Wydarzenie (data z godziną)
+RODZAJ_PAT = "^(Do dnia|W dniu|Wydarzenie)?$"
+RODZAJ = '{{ifempty(1.rodzaj; "Wydarzenie")}}'
 
 
 def status_routes():
@@ -342,7 +345,7 @@ def status_routes():
 def dodaj_routes():
     """S1 – Dodaj zadanie: walidacja, deduplikacja, rekord, zdarzenie, maile do aktywnych rodziców."""
     s2 = env("S2_WEBHOOK_URL")
-    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla")}
+    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj")}
     jest = eq("{{1.akcja}}", "dodaj")
     w_przyszlosci = {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}
     z = Zadanie(222)
@@ -355,9 +358,10 @@ def dodaj_routes():
         [ret(201, {"ok": False, "powod": "blad", "status": "blad", "tytul": i["tytul"],
                    "naglowek": "Nie dodano", "tresc": "Brak tytułu albo termin nie jest w przyszłości."},
              flt("Dodaj: błąd danych", [jest, missing(i["tytul"])], [jest, missing(i["termin"])],
-                 [jest, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}]))],
+                 [jest, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
+                 [jest, nomatch(i["rodzaj"], RODZAJ_PAT)]))],
         [at_find(210, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')",
-                 flt("Dodaj: dane OK", [jest, exists(i["tytul"]), w_przyszlosci])),
+                 flt("Dodaj: dane OK", [jest, exists(i["tytul"]), w_przyszlosci, match(i["rodzaj"], RODZAJ_PAT)])),
          router(
              211,
              [ret(212, {"ok": False, "powod": "duplikat", "status": "duplikat", "tytul": i["tytul"],
@@ -368,13 +372,13 @@ def dodaj_routes():
                  F("Zadania", "Termin"): i["termin"], F("Zadania", "Kwota"): i["kwota"],
                  F("Zadania", "Status"): "Nowe", F("Zadania", "Token"): "{{uuid}}",
                  F("Zadania", "Źródło"): '{{ifempty(1.zrodlo; "Claude")}}', F("Zadania", "ID źródła"): i["id_zrodla"],
-                 F("Zadania", "Liczba przypomnień"): 0},
+                 F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Rodzaj"): RODZAJ},
                  flt("Nowe zadanie", [missing("{{210.body.records[1].id}}")])),
               zdarzenie(221, "Utworzono", f"Nowe: {i['tytul']}", "{{220.id}}"),
               at_get(222, "Zadania", "{{220.id}}"),
               at_find(223, "Rodzice", "{Aktywny}"),
               feeder(225, "{{223.body.records}}"),
-              gmail(226, r["Email"], f"[Szkoła] Nowe: {z['Tytuł']} – do {z['Termin krótko']}", mail)],
+              gmail(226, r["Email"], f"[Szkoła] Nowe: {z['Tytuł']} – {z['Termin krótko']}", mail)],
          )],
     ]
 
@@ -400,6 +404,8 @@ SILNIK_INTERFACE = {
         {"name": "opis", "type": "text", "required": False, "label": "Co przynieść, ile zapłacić, szczegóły"},
         {"name": "kwota", "type": "number", "required": False, "label": "Kwota w PLN"},
         {"name": "zrodlo", "type": "text", "required": False, "label": "Claude, Webhook, Scraper lub Dashboard; domyślnie Claude"},
+        {"name": "rodzaj", "type": "text", "required": False,
+         "label": "Do dnia (zrobić najpóźniej tego dnia, termin T20:00), W dniu (tego dnia, np. przynieść coś, termin T07:30) albo Wydarzenie (o konkretnej godzinie); domyślnie Wydarzenie"},
         {"name": "id_zrodla", "type": "text", "required": False, "label": "Identyfikator do deduplikacji"},
         {"name": "id", "type": "text", "required": False, "label": "ID zadania (dla zmiany statusu)"},
         {"name": "klucz", "type": "text", "required": False, "label": "Klucz rodzica (dla zmiany statusu)"},
@@ -517,17 +523,18 @@ API_KEY = '{{first(map(1.__IMTHEADERS__; "value"; "name"; "x-api-key"))}}'
 
 def s1w_routes(cel_eq):
     """S1-W – dodawanie zadań webhookiem (POST JSON, nagłówek X-Api-Key)."""
-    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla")}
+    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj")}
     cel = cel_eq("dodaj")
     klucz_ok = eq(API_KEY, env("S1W_API_KEY"))
-    dane_ok = [exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}]
+    dane_ok = [exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}, match(i["rodzaj"], RODZAJ_PAT)]
     dup = "{{310.body.records[1].id}}"
     return [
         [jresp(300, 401, '{"status":"blad","komunikat":"Brak lub zły nagłówek X-Api-Key"}',
                flt("S1-W: zły klucz", [cel, ne(API_KEY, env("S1W_API_KEY"))]))],
         [jresp(301, 400, '{"status":"blad","komunikat":"Brak tytułu albo termin nie jest datą w przyszłości."}',
                flt("S1-W: błąd danych", [cel, klucz_ok, missing(i["tytul"])], [cel, klucz_ok, missing(i["termin"])],
-                   [cel, klucz_ok, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}]))],
+                   [cel, klucz_ok, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
+                   [cel, klucz_ok, nomatch(i["rodzaj"], RODZAJ_PAT)]))],
         [at_find(310, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')",
                  flt("S1-W: dane OK", [cel, klucz_ok, *dane_ok])),
          router(
@@ -535,7 +542,8 @@ def s1w_routes(cel_eq):
              [jresp(312, 200, '{"status":"duplikat","id":"' + dup + '"}', flt("Duplikat", [exists(dup)]))],
              [call(320, "MAKE_ID_SILNIK", {"akcja": "dodaj", "tytul": i["tytul"], "termin": i["termin"],
                                            "opis": i["opis"], "kwota": i["kwota"],
-                                           "zrodlo": '{{ifempty(1.zrodlo; "Webhook")}}', "id_zrodla": i["id_zrodla"]},
+                                           "zrodlo": '{{ifempty(1.zrodlo; "Webhook")}}', "id_zrodla": i["id_zrodla"],
+                                           "rodzaj": i["rodzaj"]},
                    flt("Nowe", [missing(dup)])),
               at_find(321, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')"),
               jresp(322, 200, '{"status":"utworzono","id":"{{321.body.records[1].id}}","termin":"' + i["termin"] + '"}')],
@@ -561,7 +569,7 @@ def s5_routes(cel_eq):
                "AND({Status}='Zrobione', DATETIME_DIFF(NOW(), {Zrobiono}, 'days') < 7))")
     zmiana = [[exists(ja), eq(q["akcja"], a), match(q["id"], "^rec[A-Za-z0-9]{14}$")] for a in STATUS_AKCJE]
     dodaj = eq(q["akcja"], "dodaj")
-    n = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "id_zrodla")}
+    n = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "id_zrodla", "rodzaj")}
     PD = "^dash-[a-f0-9-]{8,40}$"
     return [
         [jresp(400, 403, '{"ok":false,"powod":"brak_dostepu"}',
@@ -584,11 +592,13 @@ def s5_routes(cel_eq):
              [jresp(440, 400, '{"ok":false,"powod":"blad_danych"}',
                     flt("Dodaj: błąd danych", [exists(ja), dodaj, missing(n["tytul"])],
                         [exists(ja), dodaj, nomatch(n["id_zrodla"], PD)],
+                        [exists(ja), dodaj, nomatch(n["rodzaj"], RODZAJ_PAT)],
                         [exists(ja), dodaj, {"a": n["termin"], "o": "date:lessorequal", "b": "{{now}}"}]))],
              [call(441, "MAKE_ID_SILNIK", {"akcja": "dodaj", "tytul": n["tytul"], "termin": n["termin"],
-                                           "opis": n["opis"], "kwota": n["kwota"], "zrodlo": "Dashboard",
+                                           "opis": n["opis"], "kwota": n["kwota"], "zrodlo": "Dashboard", "rodzaj": n["rodzaj"],
                                            "id_zrodla": n["id_zrodla"]},
                    flt("Dodaj: dane OK", [exists(ja), dodaj, exists(n["tytul"]), match(n["id_zrodla"], PD),
+                                          match(n["rodzaj"], RODZAJ_PAT),
                                           {"a": n["termin"], "o": "date:greater", "b": "{{now}}"}])),
               find_names(442, f"{{ID źródła}}='{n['id_zrodla']}'"),
               tojson(443, "{{442.body.records[1]}}"),

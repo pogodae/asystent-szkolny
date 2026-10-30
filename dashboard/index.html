@@ -83,6 +83,18 @@ dialog input, dialog textarea { display: block; width: 100%; margin-top: 4px; pa
   font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
 dialog textarea { resize: vertical; }
 .hint { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
+.seg { display: flex; gap: 6px; border: 0; padding: 0; margin: 0 0 6px; min-width: 0; }
+dialog form { overflow-x: hidden; }
+.seg legend { font-size: 14px; color: var(--muted); padding: 0; margin-bottom: 4px; }
+.seg label { flex: 1; margin: 0; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; text-align: center; padding: 10px 4px; border-radius: 10px; font-size: 15px;
+  background: var(--chip); color: var(--fg); cursor: pointer; border: 1px solid var(--line); }
+.seg input:checked + span { background: var(--blue); color: #fff; border-color: var(--blue); }
+.seg input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 2px; }
+.row { display: flex; gap: 10px; margin-top: 8px; }
+.row label { flex: 1; min-width: 0; }
+.row label[hidden] { display: none; }
 @media (min-width: 900px) {
   .tabs { display: none; }
   .board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -107,7 +119,17 @@ dialog textarea { resize: vertical; }
   <form id="form" method="dialog">
     <h2>Nowa sprawa</h2>
     <label>Co<input name="tytul" required maxlength="100" placeholder="np. Wycieczka do Krakowa" autocomplete="off"></label>
-    <label>Kiedy<input name="termin" type="datetime-local" required></label>
+    <fieldset class="seg">
+      <legend>Rodzaj</legend>
+      <label><input type="radio" name="rodzaj" value="Do dnia"><span>Do dnia</span></label>
+      <label><input type="radio" name="rodzaj" value="W dniu" checked><span>W dniu</span></label>
+      <label><input type="radio" name="rodzaj" value="Wydarzenie"><span>O godzinie</span></label>
+    </fieldset>
+    <p class="hint" id="rodzaj-hint"></p>
+    <div class="row">
+      <label>Dzień<input name="dzien" type="date" required></label>
+      <label id="godzina-pole" hidden>Godzina<input name="godzina" type="time" value="17:00"></label>
+    </div>
     <label>Kwota (zł)<input name="kwota" type="number" min="0" step="0.01" inputmode="decimal" placeholder="opcjonalnie"></label>
     <label>Szczegóły<textarea name="opis" rows="3" placeholder="co przynieść, zgoda… (opcjonalnie)"></textarea></label>
     <p class="hint">Oboje dostaniecie maila z przyciskiem „Biorę to”.</p>
@@ -160,16 +182,20 @@ async function call(akcja, id, extra = {}) {
 const fmtTime = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
 const fmtDate = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "short", timeZone: "Europe/Warsaw" });
 const dayKey = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw" }).format(d);
-function kiedy(iso) {
+// godzina tylko dla wydarzeń (i starych zadań bez rodzaju); „Do dnia” z przedrostkiem „do”
+function kiedy(iso, rodzaj) {
   const d = new Date(iso), now = new Date();
   const diffDays = Math.round((new Date(dayKey(d)) - new Date(dayKey(now))) / 864e5);
-  const t = fmtTime.format(d);
-  if (diffDays === 0) return `dziś ${t}`;
-  if (diffDays === 1) return `jutro ${t}`;
-  if (diffDays === -1) return `wczoraj ${t}`;
-  if (diffDays > 1 && diffDays < 7) return `za ${diffDays} dni, ${t}`;
-  if (diffDays < -1 && diffDays > -7) return `${-diffDays} dni temu`;
-  return `${fmtDate.format(d)}, ${t}`;
+  const data = fmtDate.format(d);
+  if (rodzaj === "Do dnia") {
+    if (diffDays === 0) return "do dziś";
+    if (diffDays === 1) return "do jutra";
+    return `do ${data}`;
+  }
+  const dzien = diffDays === 0 ? "dziś" : diffDays === 1 ? "jutro" : diffDays === -1 ? "wczoraj"
+    : diffDays > 1 && diffDays < 7 ? `za ${diffDays} dni` : diffDays < -1 && diffDays > -7 ? `${-diffDays} dni temu` : data;
+  if (rodzaj === "W dniu") return dzien;
+  return `${dzien}${/\d/.test(dzien) ? "," : ""} ${fmtTime.format(d)}`;
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -180,7 +206,7 @@ function view(z) {
   const f = z.fields, termin = new Date(f["Termin"]), now = Date.now();
   return {
     id: z.id, tytul: f["Tytuł"] || "(bez tytułu)", opis: f["Opis"] || "", kwota: f["Kwota"],
-    status: f["Status"], osoba: (f["Osoba imię"] || "").trim(), termin,
+    status: f["Status"], osoba: (f["Osoba imię"] || "").trim(), termin, rodzaj: f["Rodzaj"] || "Wydarzenie",
     late: termin < now && f["Status"] !== "Zrobione",
     soon: termin >= now && termin - now < 24 * H,
     wisi: f["Status"] === "Nowe" && now - new Date(f["Utworzono"]) > CONFIG.wisiPoGodzinach * H,
@@ -211,7 +237,7 @@ function card(z, col) {
   return `<article class="card ${termCls} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
     <p class="title">${esc(z.tytul)}</p>
     <div class="meta">
-      <span class="${termCls}">${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin))}</span>
+      <span class="${termCls}">${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
       ${z.kwota ? `<span>${esc(z.kwota)} zł</span>` : ""}
       ${col === "inne" && z.osoba ? `<span class="badge">${esc(z.osoba)}</span>` : ""}
       ${col === "zrobione" && z.osoba ? `<span class="badge">${esc(z.osoba)}</span>` : ""}
@@ -289,20 +315,36 @@ async function act(akcja, id) {
 }
 
 // ---- dodawanie sprawy z formularza ----
+// godzina ustawiana tylko dla wydarzeń; dla pozostałych rodzajów stała godzina służy
+// wyłącznie przypomnieniom (W dniu – przed szkołą, Do dnia – wieczorem tego dnia)
+const GODZINA = { "W dniu": "07:30", "Do dnia": "20:00" };
+const OPIS_RODZAJU = {
+  "Do dnia": "Zrobić najpóźniej tego dnia (np. oddać zgodę, zapłacić).",
+  "W dniu": "Tego konkretnego dnia (np. przynieść 20 zł, strój na WF).",
+  "Wydarzenie": "O konkretnej godzinie (np. zebranie, występ).",
+};
+function syncRodzaj() {
+  const f = $("form"), r = f.rodzaj.value;
+  $("godzina-pole").hidden = r !== "Wydarzenie";
+  f.godzina.required = r === "Wydarzenie";
+  $("rodzaj-hint").textContent = OPIS_RODZAJU[r];
+}
 function openAdd() {
   if (!auth.demo && (!auth.u || !auth.s)) return noAccess();
   const f = $("form"); f.reset();
-  const jutro = new Date(); jutro.setDate(jutro.getDate() + 1); jutro.setHours(7, 30, 0, 0);
+  const jutro = new Date(); jutro.setDate(jutro.getDate() + 1);
   const pad = (n) => String(n).padStart(2, "0");
-  f.termin.value = `${jutro.getFullYear()}-${pad(jutro.getMonth() + 1)}-${pad(jutro.getDate())}T07:30`;
+  f.dzien.value = `${jutro.getFullYear()}-${pad(jutro.getMonth() + 1)}-${pad(jutro.getDate())}`;
+  syncRodzaj();
   $("dlg").showModal(); f.tytul.focus();
 }
 async function add(e) {
   e.preventDefault();
-  const f = $("form"), termin = new Date(f.termin.value);
+  const f = $("form"), rodzaj = f.rodzaj.value;
+  const termin = new Date(`${f.dzien.value}T${rodzaj === "Wydarzenie" ? f.godzina.value : GODZINA[rodzaj]}`);
   if (!(termin > new Date())) { toast("Termin musi być w przyszłości."); return; }
   const dane = {
-    tytul: f.tytul.value.trim(), termin: termin.toISOString(), opis: f.opis.value.trim(),
+    tytul: f.tytul.value.trim(), termin: termin.toISOString(), opis: f.opis.value.trim(), rodzaj,
     kwota: f.kwota.value, id_zrodla: "dash-" + crypto.randomUUID(),
   };
   $("save").disabled = true; $("save").textContent = "Dodaję…";
@@ -317,6 +359,7 @@ async function add(e) {
   }
 }
 $("form").addEventListener("submit", add);
+$("form").addEventListener("change", (e) => { if (e.target.name === "rodzaj") syncRodzaj(); });
 
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
@@ -336,17 +379,17 @@ setInterval(() => { if (!document.hidden) load(); }, 10 * 60e3);
 function demoCall(akcja, id, extra = {}) {
   const now = Date.now(), iso = (h) => new Date(now + h * H).toISOString();
   if (akcja === "dodaj") {
-    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin,
+    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj,
       "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Nowe", "Utworzono": iso(0) } };
     demoCall.data.push(z);
     return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
   }
   if (akcja === "lista") {
     demoCall.data ||= [
-      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
-      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Termin": iso(20), "Status": "Nowe", "Utworzono": iso(-1) } },
-      { id: "d3", fields: { "Tytuł": "Strój na WF", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
-      { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Termin": iso(100), "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
+      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Rodzaj": "W dniu", "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
+      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Nowe", "Utworzono": iso(-1) } },
+      { id: "d3", fields: { "Tytuł": "Strój na WF", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Rodzaj": "W dniu", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
+      { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Termin": iso(100), "Rodzaj": "Do dnia", "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
       { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Termin": iso(-48), "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
     ];
     return Promise.resolve({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) });
