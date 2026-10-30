@@ -2,141 +2,311 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#f6f6f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121214" media="(prefers-color-scheme: dark)">
 <title>Kto to ogarnia</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234f46e5'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root {
-  --bg: #f4f4f5; --card: #ffffff; --fg: #18181b; --muted: #71717a; --line: #e4e4e7;
-  --blue: #2563eb; --green: #16a34a; --orange: #ea580c; --red: #dc2626; --chip: #f4f4f5;
+  --bg: #f6f6f4; --surface: #ffffff; --surface-2: #f0f0ed; --fg: #1c1c1e; --fg-2: #55555c; --muted: #8a8a92;
+  --line: #e7e7e3; --line-2: #dcdcd7;
+  --accent: #4f46e5; --accent-fg: #ffffff; --accent-soft: #eef0ff; --accent-ink: #3730a3;
+  --ok: #15803d; --ok-soft: #e8f6ec;
+  --warn: #b45309; --warn-soft: #fdf3e2;
+  --bad: #c62828; --bad-soft: #fdecea;
+  --shadow: 0 1px 2px rgba(20,20,30,.04), 0 1px 1px rgba(20,20,30,.03);
+  --shadow-lift: 0 8px 24px rgba(20,20,30,.08), 0 2px 6px rgba(20,20,30,.05);
+  --radius: 14px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111113; --card: #1c1c1f; --fg: #f4f4f5; --muted: #a1a1aa; --line: #2e2e33;
-    --blue: #3b82f6; --green: #22c55e; --orange: #f97316; --red: #ef4444; --chip: #27272a;
+    --bg: #121214; --surface: #1b1b1e; --surface-2: #232327; --fg: #ededef; --fg-2: #b4b4bb; --muted: #84848d;
+    --line: #2a2a2f; --line-2: #34343a;
+    --accent: #8b85ff; --accent-fg: #111114; --accent-soft: #23223a; --accent-ink: #c7c4ff;
+    --ok: #4ade80; --ok-soft: #16261c;
+    --warn: #f5b454; --warn-soft: #2b2316;
+    --bad: #ff7b72; --bad-soft: #2e1a1a;
+    --shadow: 0 1px 0 rgba(255,255,255,.02);
+    --shadow-lift: 0 10px 30px rgba(0,0,0,.45);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111113; --card: #1c1c1f; --fg: #f4f4f5; --muted: #a1a1aa; --line: #2e2e33;
-  --blue: #3b82f6; --green: #22c55e; --orange: #f97316; --red: #ef4444; --chip: #27272a;
+  --bg: #121214; --surface: #1b1b1e; --surface-2: #232327; --fg: #ededef; --fg-2: #b4b4bb; --muted: #84848d;
+  --line: #2a2a2f; --line-2: #34343a;
+  --accent: #8b85ff; --accent-fg: #111114; --accent-soft: #23223a; --accent-ink: #c7c4ff;
+  --ok: #4ade80; --ok-soft: #16261c;
+  --warn: #f5b454; --warn-soft: #2b2316;
+  --bad: #ff7b72; --bad-soft: #2e1a1a;
+  --shadow: 0 1px 0 rgba(255,255,255,.02);
+  --shadow-lift: 0 10px 30px rgba(0,0,0,.45);
   color-scheme: dark;
 }
+
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg);
-  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-header { position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 16px 8px;
-  border-bottom: 1px solid var(--line); }
-.top { display: flex; align-items: center; gap: 12px; max-width: 1280px; margin: 0 auto; }
-h1 { font-size: 20px; margin: 0; flex: 1; }
-.icon-btn { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 10px;
-  padding: 8px 12px; font-size: 15px; cursor: pointer; }
-.stats { display: flex; gap: 8px; max-width: 1280px; margin: 10px auto 0; flex-wrap: wrap; }
-.stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-size: 14px; }
-.stat b { font-size: 18px; margin-right: 4px; }
-.stat.red b { color: var(--red); }
-.tabs { display: flex; gap: 6px; max-width: 1280px; margin: 10px auto 0; overflow-x: auto; }
-.tab { flex: 1; border: 0; border-radius: 10px; padding: 9px 6px; background: var(--chip); color: var(--fg);
-  font-size: 15px; cursor: pointer; white-space: nowrap; }
-.tab[aria-selected="true"] { background: var(--blue); color: #fff; }
-main { max-width: 1280px; margin: 0 auto; padding: 12px 16px 40px; }
-.board { display: grid; grid-template-columns: 1fr; gap: 16px; }
-.col { min-width: 0; }
-.col h2 { font-size: 16px; margin: 4px 0 10px; display: flex; justify-content: space-between; align-items: center; }
-.col h2 .n { color: var(--muted); font-weight: 400; }
-.col[hidden] { display: none; }
-.card { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-  padding: 12px 12px 12px 16px; margin-bottom: 10px; overflow: hidden; transition: opacity .2s; }
-.card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: transparent; }
-.card.soon::before { background: var(--orange); }
-.card.late::before { background: var(--red); }
-.card.busy { opacity: .55; pointer-events: none; }
-.title { font-weight: 600; font-size: 16px; margin: 0 0 4px; overflow-wrap: anywhere; }
-.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; color: var(--muted); font-size: 14px; }
-.meta .late { color: var(--red); font-weight: 600; }
-.meta .soon { color: var(--orange); font-weight: 600; }
-.badge { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; background: var(--chip); color: var(--fg); }
-.badge.wisi { background: var(--orange); color: #fff; }
-details { margin-top: 6px; font-size: 14px; }
-details summary { cursor: pointer; color: var(--muted); }
-details p { white-space: pre-line; margin: 6px 0 0; overflow-wrap: anywhere; }
-.actions { display: flex; gap: 8px; margin-top: 10px; }
-.actions button { flex: 1; border: 0; border-radius: 10px; padding: 11px 8px; font-size: 15px; font-weight: 600;
-  cursor: pointer; color: #fff; background: var(--blue); }
-.actions .done { background: var(--green); }
-.actions .ghost { background: var(--chip); color: var(--fg); }
-.empty { color: var(--muted); font-size: 14px; padding: 8px 2px; }
-.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); max-width: calc(100% - 32px);
-  background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.2); z-index: 5; }
-.notice { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; max-width: 520px; margin: 40px auto; }
-.done-col details > summary { list-style: none; }
-.icon-btn.add { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 600; }
-dialog { border: 0; border-radius: 16px; padding: 0; width: min(440px, calc(100% - 32px));
-  background: var(--card); color: var(--fg); box-shadow: 0 10px 40px rgba(0,0,0,.3); }
-dialog::backdrop { background: rgba(0,0,0,.45); }
-dialog form { padding: 20px; }
-dialog h2 { margin: 0 0 12px; font-size: 19px; }
-dialog label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 12px; }
-dialog input, dialog textarea { display: block; width: 100%; margin-top: 4px; padding: 11px 12px; font: inherit;
-  font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
-dialog textarea { resize: vertical; }
-.hint { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
-.seg { display: flex; gap: 6px; border: 0; padding: 0; margin: 0 0 6px; min-width: 0; }
-dialog form { overflow-x: hidden; }
-.seg legend { font-size: 14px; color: var(--muted); padding: 0; margin-bottom: 4px; }
-.seg label { flex: 1; margin: 0; }
-.seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg span { display: block; text-align: center; padding: 10px 4px; border-radius: 10px; font-size: 15px;
-  background: var(--chip); color: var(--fg); cursor: pointer; border: 1px solid var(--line); }
-.seg input:checked + span { background: var(--blue); color: #fff; border-color: var(--blue); }
-.seg input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 2px; }
-.row { display: flex; gap: 10px; margin-top: 8px; }
-.row label { flex: 1; min-width: 0; }
-.row label[hidden] { display: none; }
-@media (min-width: 900px) {
-  .tabs { display: none; }
-  .board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .col[hidden] { display: block; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 15px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; font-feature-settings: "tnum" 1;
 }
+button { font: inherit; color: inherit; }
+svg { display: block; flex: none; }
+
+/* ---------- nagłówek ---------- */
+header {
+  position: sticky; top: 0; z-index: 3; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
+  border-bottom: 1px solid transparent; transition: border-color .2s;
+}
+header.scrolled { border-bottom-color: var(--line); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+.top { display: flex; align-items: center; gap: 12px; padding: 18px 0 6px; }
+.hello { flex: 1; min-width: 0; }
+.hello h1 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -.02em; }
+.hello p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 14px;
+  border-radius: 10px; border: 1px solid var(--line-2); background: var(--surface); cursor: pointer;
+  font-size: 14px; font-weight: 550; white-space: nowrap; transition: background .15s, border-color .15s, transform .1s;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.icon { width: 38px; padding: 0; }
+.btn.icon.spin svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.summary { display: flex; gap: 8px; padding: 10px 0 12px; flex-wrap: wrap; }
+.pill {
+  display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 12px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); font-size: 13px; color: var(--fg-2);
+}
+.pill b { font-size: 15px; color: var(--fg); font-weight: 650; }
+.pill.bad { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.pill.bad b { color: var(--bad); }
+.pill.zero { opacity: .55; }
+
+.tabs { display: flex; gap: 4px; padding: 4px; margin-bottom: 12px; background: var(--surface-2); border-radius: 12px; }
+.tab {
+  flex: 1; min-width: 0; border: 0; background: transparent; border-radius: 9px; padding: 8px 4px; cursor: pointer;
+  font-size: 14px; font-weight: 550; color: var(--fg-2); display: flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tab .n { font-size: 12px; color: var(--muted); font-weight: 500; }
+.tab[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow), 0 0 0 1px var(--line); }
+
+/* ---------- tablica ---------- */
+main { padding-top: 4px; padding-bottom: 110px; }
+.board { display: grid; grid-template-columns: 1fr; gap: 20px; }
+.col { min-width: 0; }
+.col[hidden] { display: none; }
+.col-head { display: none; align-items: center; gap: 8px; margin: 0 2px 12px; font-size: 13px; font-weight: 600;
+  color: var(--fg-2); text-transform: uppercase; letter-spacing: .06em; }
+.col-head .n { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: 0;
+  background: var(--surface-2); border-radius: 999px; padding: 1px 8px; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 14px 12px; box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s, opacity .2s, border-color .2s;
+}
+.card:hover { box-shadow: var(--shadow-lift); }
+.card.busy { opacity: .5; pointer-events: none; }
+.card.late { border-color: color-mix(in srgb, var(--bad) 35%, var(--line)); }
+.card-top { display: flex; align-items: flex-start; gap: 10px; }
+.title { flex: 1; min-width: 0; margin: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; letter-spacing: -.005em; overflow-wrap: anywhere; }
+.avatar {
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  font-size: 12px; font-weight: 650; color: #fff; background: var(--av, #8a8a92);
+}
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 8px; border-radius: 7px;
+  font-size: 12.5px; font-weight: 550; background: var(--surface-2); color: var(--fg-2);
+}
+.chip svg { width: 13px; height: 13px; opacity: .8; }
+.chip.soon { background: var(--warn-soft); color: var(--warn); }
+.chip.late { background: var(--bad-soft); color: var(--bad); }
+.chip.idle { background: var(--warn-soft); color: var(--warn); }
+.more { margin-top: 8px; font-size: 13.5px; color: var(--fg-2); }
+.more summary { cursor: pointer; color: var(--muted); list-style: none; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary svg { width: 14px; height: 14px; transition: transform .2s; }
+.more[open] summary svg { transform: rotate(90deg); }
+.more p { white-space: pre-line; margin: 6px 0 0; overflow-wrap: anywhere; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.actions .btn { flex: 1; height: 38px; }
+.actions .btn.done { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
+.actions .btn.done:hover { filter: brightness(.97); }
+.actions .btn.quiet { background: transparent; border-color: var(--line-2); color: var(--fg-2); }
+
+.card.closed { background: transparent; box-shadow: none; padding: 10px 12px; }
+.card.closed .title { font-weight: 500; color: var(--fg-2); text-decoration: line-through; text-decoration-color: var(--line-2); }
+.card.closed .check { width: 20px; height: 20px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; flex: none; }
+.card.closed .check svg { width: 12px; height: 12px; }
+
+.empty {
+  border: 1.5px dashed var(--line-2); border-radius: var(--radius); padding: 22px 16px; text-align: center;
+  color: var(--muted); font-size: 14px;
+}
+.done-toggle { width: 100%; justify-content: space-between; background: transparent; border-style: dashed; color: var(--fg-2); }
+.skeleton { height: 112px; border-radius: var(--radius); background: linear-gradient(90deg, var(--surface-2), var(--surface), var(--surface-2));
+  background-size: 200% 100%; animation: sh 1.2s ease-in-out infinite; }
+@keyframes sh { to { background-position: -200% 0; } }
+
+.notice { max-width: 440px; margin: 12vh auto 0; text-align: center; padding: 0 16px; }
+.notice .ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; margin: 0 auto 14px;
+  background: var(--accent-soft); color: var(--accent); }
+.notice h2 { margin: 0 0 6px; font-size: 20px; letter-spacing: -.01em; }
+.notice p { margin: 0; color: var(--fg-2); }
+
+/* ---------- pływający przycisk (telefon) ---------- */
+.fab {
+  position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 4;
+  width: 56px; height: 56px; border-radius: 18px; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-fg); box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 40%, transparent);
+  display: grid; place-items: center; transition: transform .15s;
+}
+.fab:active { transform: scale(.94); }
+.fab svg { width: 24px; height: 24px; }
+
+/* ---------- toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); opacity: 0;
+  max-width: calc(100% - 32px); z-index: 6; display: flex; align-items: center; gap: 8px;
+  background: var(--fg); color: var(--bg); padding: 11px 16px; border-radius: 12px; font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow-lift); transition: opacity .2s, transform .2s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- formularz ---------- */
+dialog {
+  border: 0; padding: 0; width: 100%; max-width: 460px; max-height: calc(100dvh - 24px);
+  background: var(--surface); color: var(--fg); border-radius: 20px; box-shadow: var(--shadow-lift);
+}
+dialog::backdrop { background: rgba(10,10,14,.42); backdrop-filter: blur(2px); }
+dialog[open] { animation: up .22s ease-out; }
+@keyframes up { from { transform: translateY(16px); } }
+dialog form { padding: 20px; overflow-x: hidden; }
+.sheet-head { display: flex; align-items: center; margin-bottom: 14px; }
+.sheet-head h2 { flex: 1; margin: 0; font-size: 19px; letter-spacing: -.01em; }
+.field { display: block; margin-bottom: 14px; }
+.field > span { display: block; font-size: 13px; font-weight: 550; color: var(--fg-2); margin-bottom: 6px; }
+.field small { font-weight: 400; color: var(--muted); }
+.input {
+  display: block; width: 100%; padding: 11px 12px; font: inherit; font-size: 16px; color: var(--fg);
+  background: var(--bg); border: 1px solid var(--line-2); border-radius: 11px; transition: border-color .15s, box-shadow .15s;
+}
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+textarea.input { resize: vertical; min-height: 72px; }
+.seg { display: flex; gap: 4px; padding: 4px; border: 0; margin: 0; min-width: 0; background: var(--surface-2); border-radius: 12px; }
+.seg label { flex: 1; min-width: 0; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span {
+  display: block; text-align: center; padding: 8px 4px; border-radius: 9px; font-size: 14px; font-weight: 550;
+  color: var(--fg-2); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.seg input:checked + span { background: var(--surface); color: var(--fg); box-shadow: var(--shadow), 0 0 0 1px var(--line); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+.hint { margin: 6px 2px 0; font-size: 12.5px; color: var(--muted); }
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; min-width: 0; }
+.row .field[hidden] { display: none; }
+.form-foot { display: flex; gap: 8px; margin-top: 6px; }
+.form-foot .btn { flex: 1; height: 44px; font-size: 15px; }
+.form-note { margin: 12px 0 0; font-size: 12.5px; color: var(--muted); text-align: center; }
+
+/* ---------- układy ---------- */
+@media (max-width: 899px) {
+  .top .add-desktop { display: none; }
+  .toast { bottom: calc(90px + env(safe-area-inset-bottom)); }
+  dialog { margin: auto 0 0; max-width: none; border-radius: 20px 20px 0 0; padding-bottom: env(safe-area-inset-bottom); }
+  dialog[open] { animation: sheet .25s ease-out; }
+  @keyframes sheet { from { transform: translateY(40px); } }
+}
+@media (min-width: 900px) {
+  .top { padding-top: 26px; }
+  .hello h1 { font-size: 26px; }
+  .tabs, .fab { display: none; }
+  .board { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: start; }
+  .col[hidden] { display: block; }
+  .col-head { display: flex; }
+  .col.zrobione { opacity: .92; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<header>
-  <div class="top">
-    <h1>Kto to ogarnia</h1>
-    <button class="icon-btn add" id="add" title="Dodaj sprawę">+ Dodaj</button>
-    <button class="icon-btn" id="refresh" title="Odśwież">↻</button>
+<header id="hdr">
+  <div class="wrap">
+    <div class="top">
+      <div class="hello">
+        <h1 id="hello">Kto to ogarnia</h1>
+        <p id="today"></p>
+      </div>
+      <button class="btn primary add-desktop" id="add" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Dodaj sprawę
+      </button>
+      <button class="btn icon" id="refresh" type="button" title="Odśwież" aria-label="Odśwież">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+      </button>
+    </div>
+    <div class="summary" id="summary"></div>
+    <div class="tabs" id="tabs" role="tablist"></div>
   </div>
-  <div class="stats" id="stats"></div>
-  <div class="tabs" id="tabs" role="tablist"></div>
 </header>
-<main id="main"></main>
-<div class="toast" id="toast" hidden></div>
 
-<dialog id="dlg">
+<main class="wrap" id="main"></main>
+
+<button class="fab" id="fab" type="button" aria-label="Dodaj sprawę">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="dlg" aria-labelledby="dlg-title">
   <form id="form" method="dialog">
-    <h2>Nowa sprawa</h2>
-    <label>Co<input name="tytul" required maxlength="100" placeholder="np. Wycieczka do Krakowa" autocomplete="off"></label>
-    <fieldset class="seg">
-      <legend>Rodzaj</legend>
-      <label><input type="radio" name="rodzaj" value="Do dnia"><span>Do dnia</span></label>
-      <label><input type="radio" name="rodzaj" value="W dniu" checked><span>W dniu</span></label>
-      <label><input type="radio" name="rodzaj" value="Wydarzenie"><span>O godzinie</span></label>
-    </fieldset>
-    <p class="hint" id="rodzaj-hint"></p>
+    <div class="sheet-head">
+      <h2 id="dlg-title">Nowa sprawa</h2>
+      <button class="btn icon" type="button" id="cancel-x" aria-label="Zamknij">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <label class="field"><span>Co</span>
+      <input class="input" name="tytul" required maxlength="100" placeholder="np. Wycieczka do Krakowa" autocomplete="off">
+    </label>
+    <div class="field">
+      <span>Rodzaj</span>
+      <fieldset class="seg">
+        <legend class="sr" hidden>Rodzaj</legend>
+        <label><input type="radio" name="rodzaj" value="Do dnia"><span>Do dnia</span></label>
+        <label><input type="radio" name="rodzaj" value="W dniu" checked><span>W dniu</span></label>
+        <label><input type="radio" name="rodzaj" value="Wydarzenie"><span>O godzinie</span></label>
+      </fieldset>
+      <p class="hint" id="rodzaj-hint"></p>
+    </div>
     <div class="row">
-      <label>Dzień<input name="dzien" type="date" required></label>
-      <label id="godzina-pole" hidden>Godzina<input name="godzina" type="time" value="17:00"></label>
+      <label class="field"><span>Dzień</span><input class="input" name="dzien" type="date" required></label>
+      <label class="field" id="godzina-pole" hidden><span>Godzina</span><input class="input" name="godzina" type="time" value="17:00"></label>
     </div>
-    <label>Kwota (zł)<input name="kwota" type="number" min="0" step="0.01" inputmode="decimal" placeholder="opcjonalnie"></label>
-    <label>Szczegóły<textarea name="opis" rows="3" placeholder="co przynieść, zgoda… (opcjonalnie)"></textarea></label>
-    <p class="hint">Oboje dostaniecie maila z przyciskiem „Biorę to”.</p>
-    <div class="actions">
-      <button type="button" class="ghost" id="cancel">Anuluj</button>
-      <button type="submit" id="save">Dodaj</button>
+    <div class="row">
+      <label class="field"><span>Kwota <small>opcjonalnie</small></span>
+        <input class="input" name="kwota" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0 zł">
+      </label>
     </div>
+    <label class="field"><span>Szczegóły <small>opcjonalnie</small></span>
+      <textarea class="input" name="opis" rows="2" placeholder="co przynieść, zgoda…"></textarea>
+    </label>
+    <div class="form-foot">
+      <button type="button" class="btn" id="cancel">Anuluj</button>
+      <button type="submit" class="btn primary" id="save">Dodaj</button>
+    </div>
+    <p class="form-note">Oboje dostaniecie maila z przyciskiem „Biorę to”.</p>
   </form>
 </dialog>
 
@@ -149,8 +319,21 @@ const CONFIG = {
 };
 
 const H = 3600e3;
-const state = { ja: "", zadania: [], tab: "wolne", busy: new Set() };
+const state = { ja: "", zadania: [], tab: "wolne", busy: new Set(), loaded: false, showDone: false };
 const $ = (id) => document.getElementById(id);
+
+// ---- ikony ----
+const I = {
+  cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>',
+  coin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5v1.5M12 16v1.5"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5M12 16h.01"/></svg>',
+  hour: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>',
+};
 
 // ---- logowanie: ?u=&s= raz zapisane w localStorage i usunięte z paska adresu ----
 function store(key, val) {
@@ -179,9 +362,14 @@ async function call(akcja, id, extra = {}) {
 }
 
 // ---- formatowanie ----
-const fmtTime = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
-const fmtDate = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "short", timeZone: "Europe/Warsaw" });
-const dayKey = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Warsaw" }).format(d);
+const TZ = "Europe/Warsaw";
+const fmtTime = new Intl.DateTimeFormat("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: TZ });
+const fmtDate = new Intl.DateTimeFormat("pl-PL", { day: "numeric", month: "short", timeZone: TZ });
+const fmtToday = new Intl.DateTimeFormat("pl-PL", { weekday: "long", day: "numeric", month: "long", timeZone: TZ });
+const dayKey = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d);
+const zlCale = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
+const zlGrosze = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", minimumFractionDigits: 2 });
+const zl = { format: (v) => (Number.isInteger(+v) ? zlCale : zlGrosze).format(v) };
 // godzina tylko dla wydarzeń (i starych zadań bez rodzaju); „Do dnia” z przedrostkiem „do”
 function kiedy(iso, rodzaj) {
   const d = new Date(iso), now = new Date();
@@ -199,6 +387,13 @@ function kiedy(iso, rodzaj) {
 }
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+// stały kolor awatara: według kolejności w CONFIG.rodzice (różne kolory dla obojga)
+function avatar(imie) {
+  if (!imie) return "";
+  const kolory = ["#6d5efc", "#0f9d8a", "#e0703b", "#2f86d6"];
+  const i = CONFIG.rodzice.indexOf(imie);
+  return `<span class="avatar" style="--av:${kolory[i < 0 ? 3 : i % kolory.length]}" title="${esc(imie)}">${esc(imie[0].toUpperCase())}</span>`;
 }
 
 // ---- model ----
@@ -219,76 +414,96 @@ function columns() {
   const byTermin = (a, b) => a.termin - b.termin;
   return [
     { key: "wolne", label: "Wolne", items: all.filter((z) => z.status === "Nowe").sort(byTermin) },
-    { key: "moje", label: state.ja || "Moje", items: all.filter((z) => z.status === "Przypisane" && z.osoba === state.ja).sort(byTermin) },
+    { key: "moje", label: state.ja ? `${state.ja} (Ty)` : "Moje", short: state.ja || "Moje", items: all.filter((z) => z.status === "Przypisane" && z.osoba === state.ja).sort(byTermin) },
     { key: "inne", label: inny, items: all.filter((z) => z.status === "Przypisane" && z.osoba !== state.ja).sort(byTermin) },
     { key: "zrobione", label: "Zrobione", items: all.filter((z) => z.status === "Zrobione").sort((a, b) => (b.zrobiono || 0) - (a.zrobiono || 0)) },
   ];
 }
 
 // ---- widok ----
+const PUSTE = {
+  wolne: "Nic nie czeka na chętnych.",
+  moje: "Nic na Twojej głowie.",
+  inne: "Tu nic nie ma.",
+  zrobione: "Jeszcze nic w tym tygodniu.",
+};
 function card(z, col) {
-  const termCls = z.late ? "late" : z.soon ? "soon" : "";
+  if (col === "zrobione") {
+    return `<article class="card closed"><div class="card-top"><span class="check">${I.check}</span>
+      <p class="title">${esc(z.tytul)}</p>${avatar(z.osoba)}</div></article>`;
+  }
+  const kiedyCls = z.late ? "late" : z.soon ? "soon" : "";
+  const ikona = z.late ? I.alert : z.rodzaj === "Wydarzenie" ? I.clock : z.rodzaj === "Do dnia" ? I.flag : I.cal;
   const btns = {
-    wolne: [["take", "Biorę to", ""], ["done", "Zrobione", "done"]],
-    moje: [["done", "Zrobione", "done"], ["release", "Oddaj", "ghost"]],
-    inne: [["done", "Zrobione", "done"], ["przejmij", "Przejmij", "ghost"]],
-    zrobione: [],
+    wolne: [["take", "Biorę to", "primary"], ["done", "Zrobione", "done"]],
+    moje: [["done", "Zrobione", "done"], ["release", "Oddaj", "quiet"]],
+    inne: [["done", "Zrobione", "done"], ["przejmij", "Przejmij", "quiet"]],
   }[col];
-  return `<article class="card ${termCls} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
-    <p class="title">${esc(z.tytul)}</p>
-    <div class="meta">
-      <span class="${termCls}">${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
-      ${z.kwota ? `<span>${esc(z.kwota)} zł</span>` : ""}
-      ${col === "inne" && z.osoba ? `<span class="badge">${esc(z.osoba)}</span>` : ""}
-      ${col === "zrobione" && z.osoba ? `<span class="badge">${esc(z.osoba)}</span>` : ""}
-      ${z.wisi ? `<span class="badge wisi">wisi</span>` : ""}
+  return `<article class="card ${z.late ? "late" : ""} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
+    <div class="card-top"><p class="title">${esc(z.tytul)}</p>${col === "inne" ? avatar(z.osoba) : ""}</div>
+    <div class="chips">
+      <span class="chip ${kiedyCls}">${ikona}${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
+      ${z.kwota ? `<span class="chip">${I.coin}${esc(zl.format(z.kwota))}</span>` : ""}
+      ${z.wisi ? `<span class="chip idle">${I.hour}czeka</span>` : ""}
     </div>
-    ${z.opis ? `<details><summary>Szczegóły</summary><p>${esc(z.opis)}</p></details>` : ""}
-    ${btns.length ? `<div class="actions">${btns.map(([a, l, c]) =>
-      `<button class="${c}" data-akcja="${a}" data-id="${z.id}">${l}</button>`).join("")}</div>` : ""}
+    ${z.opis ? `<details class="more"><summary>${I.chev}Szczegóły</summary><p>${esc(z.opis)}</p></details>` : ""}
+    <div class="actions">${btns.map(([a, l, c]) =>
+      `<button class="btn ${c}" data-akcja="${a}" data-id="${z.id}" type="button">${l}</button>`).join("")}</div>
   </article>`;
 }
 function render() {
   const cols = columns();
   const all = state.zadania.map(view);
-  $("stats").innerHTML =
-    `<span class="stat"><b>${cols[0].items.length}</b>wolne</span>` +
-    `<span class="stat"><b>${cols[1].items.length}</b>moje</span>` +
-    `<span class="stat red"><b>${all.filter((z) => z.late).length}</b>po terminie</span>`;
+  const late = all.filter((z) => z.late).length;
+  $("hello").textContent = state.ja ? `Cześć, ${state.ja}` : "Kto to ogarnia";
+  $("summary").innerHTML =
+    `<span class="pill ${cols[0].items.length ? "" : "zero"}"><b>${cols[0].items.length}</b>wolne</span>` +
+    `<span class="pill ${cols[1].items.length ? "" : "zero"}"><b>${cols[1].items.length}</b>Twoje</span>` +
+    (late ? `<span class="pill bad"><b>${late}</b>po terminie</span>` : "");
   $("tabs").innerHTML = cols.map((c) =>
-    `<button class="tab" role="tab" data-tab="${c.key}" aria-selected="${state.tab === c.key}">${esc(c.label)} ${c.items.length}</button>`).join("");
+    `<button class="tab" role="tab" type="button" data-tab="${c.key}" aria-selected="${state.tab === c.key}">${esc(c.short || c.label)} <span class="n">${c.items.length}</span></button>`).join("");
   $("main").innerHTML = `<div class="board">${cols.map((c) => {
-    const list = c.items.map((z) => card(z, c.key)).join("") || `<p class="empty">Pusto</p>`;
-    const body = c.key === "zrobione"
-      ? `<details class="done-col"><summary class="empty">Pokaż ostatnie 7 dni (${c.items.length})</summary>${list}</details>`
-      : list;
-    return `<section class="col" ${state.tab === c.key ? "" : "hidden"}>
-      <h2>${esc(c.label)} <span class="n">${c.items.length}</span></h2>${body}</section>`;
+    let list = c.items.map((z) => card(z, c.key)).join("") || `<div class="empty">${PUSTE[c.key]}</div>`;
+    if (c.key === "zrobione" && c.items.length && !state.showDone && innerWidth >= 900) {
+      list = `<button class="btn done-toggle" type="button" id="show-done">Ostatnie 7 dni <span>${c.items.length}</span></button>`;
+    }
+    return `<section class="col ${c.key}" ${state.tab === c.key ? "" : "hidden"}>
+      <div class="col-head">${esc(c.label)}<span class="n">${c.items.length}</span></div>
+      <div class="list">${list}</div></section>`;
   }).join("")}</div>`;
 }
+function skeleton() {
+  $("main").innerHTML = `<div class="board">${[0, 1, 2, 3].map((i) =>
+    `<section class="col" ${i ? "hidden" : ""}><div class="list"><div class="skeleton"></div><div class="skeleton"></div></div></section>`).join("")}</div>`;
+}
 function toast(msg) {
-  const t = $("toast"); t.textContent = msg; t.hidden = false;
-  clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 3500);
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3200);
 }
 function noAccess() {
-  $("stats").innerHTML = ""; $("tabs").innerHTML = "";
-  $("main").innerHTML = `<div class="notice"><h2>Brak dostępu</h2>
-    <p>Otwórz swój osobisty link do tablicy (z parametrami <code>u</code> i <code>s</code>). Jeśli go nie masz, poproś o nowy.</p></div>`;
+  $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("fab").hidden = true; $("add").hidden = true;
+  $("main").innerHTML = `<div class="notice"><div class="ico">${I.lock}</div><h2>Brak dostępu</h2>
+    <p>Otwórz swój osobisty link do tablicy (z parametrami <code>u</code> i <code>s</code>). Wystarczy raz – potem strona Cię zapamięta.</p></div>`;
 }
 
 // ---- dane i akcje ----
 async function load() {
   if (!auth.demo && (!auth.u || !auth.s)) return noAccess();
+  if (!state.loaded) skeleton();
+  $("refresh").classList.add("spin");
   try {
     const j = await call("lista");
-    state.ja = j.ja; state.zadania = j.zadania || [];
+    state.ja = j.ja; state.zadania = j.zadania || []; state.loaded = true;
     render();
   } catch (e) {
     if (e.powod === "brak_dostepu") return noAccess();
     toast("Nie udało się pobrać listy. Spróbuj odświeżyć.");
+  } finally {
+    $("refresh").classList.remove("spin");
   }
 }
 const OCZEKIWANE = { take: "Przypisane", done: "Zrobione", release: "Nowe", przejmij: "Przypisane" };
+const POTWIERDZENIA = { take: "To Twoje", done: "Zrobione – dzięki!", release: "Oddane – znowu wolne", przejmij: "Przejęte" };
 async function act(akcja, id) {
   const idx = state.zadania.findIndex((z) => z.id === id);
   if (idx < 0) return;
@@ -298,7 +513,7 @@ async function act(akcja, id) {
   f["Status"] = OCZEKIWANE[akcja];
   if (akcja === "take" || akcja === "przejmij") f["Osoba imię"] = state.ja;
   if (akcja === "release") f["Osoba imię"] = "";
-  if (akcja === "done") f["Zrobiono"] = new Date().toISOString();
+  if (akcja === "done") { f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= state.ja; }
   state.busy.add(id); render();
   try {
     const j = await call(akcja, id);
@@ -306,6 +521,7 @@ async function act(akcja, id) {
     state.zadania[idx] = j.zadanie;
     if (akcja === "take" && nf["Status"] === "Przypisane" && kto !== state.ja) toast(`Już przejęte przez ${kto}`);
     else if (nf["Status"] !== OCZEKIWANE[akcja]) toast("Ktoś zmienił to zadanie w międzyczasie.");
+    else toast(POTWIERDZENIA[akcja]);
   } catch (e) {
     state.zadania[idx] = before;
     toast(e.powod === "brak_dostepu" ? "Brak dostępu" : "Nie udało się. Spróbuj jeszcze raz.");
@@ -319,9 +535,9 @@ async function act(akcja, id) {
 // wyłącznie przypomnieniom (W dniu – przed szkołą, Do dnia – wieczorem tego dnia)
 const GODZINA = { "W dniu": "07:30", "Do dnia": "20:00" };
 const OPIS_RODZAJU = {
-  "Do dnia": "Zrobić najpóźniej tego dnia (np. oddać zgodę, zapłacić).",
-  "W dniu": "Tego konkretnego dnia (np. przynieść 20 zł, strój na WF).",
-  "Wydarzenie": "O konkretnej godzinie (np. zebranie, występ).",
+  "Do dnia": "Zrobić najpóźniej tego dnia – np. oddać zgodę, zapłacić.",
+  "W dniu": "Tego konkretnego dnia – np. przynieść 20 zł, strój na WF.",
+  "Wydarzenie": "O konkretnej godzinie – np. zebranie, występ.",
 };
 function syncRodzaj() {
   const f = $("form"), r = f.rodzaj.value;
@@ -351,7 +567,7 @@ async function add(e) {
   try {
     const j = await call("dodaj", null, dane);
     state.zadania.push(j.zadanie); state.tab = "wolne";
-    $("dlg").close(); render(); toast("Dodane – maile poszły do Was obojga.");
+    $("dlg").close(); render(); toast("Dodane – maile poszły do Was obojga");
   } catch (err) {
     toast(err.powod === "blad_danych" ? "Sprawdź tytuł i termin." : "Nie udało się dodać. Spróbuj jeszcze raz.");
   } finally {
@@ -360,20 +576,26 @@ async function add(e) {
 }
 $("form").addEventListener("submit", add);
 $("form").addEventListener("change", (e) => { if (e.target.name === "rodzaj") syncRodzaj(); });
+$("dlg").addEventListener("click", (e) => { if (e.target === $("dlg")) $("dlg").close(); });
 
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button");
   if (!b) return;
   if (b.dataset.akcja) act(b.dataset.akcja, b.dataset.id);
-  else if (b.dataset.tab) { state.tab = b.dataset.tab; render(); }
+  else if (b.dataset.tab) { state.tab = b.dataset.tab; render(); scrollTo({ top: 0 }); }
   else if (b.id === "refresh") load();
-  else if (b.id === "add") openAdd();
-  else if (b.id === "cancel") $("dlg").close();
+  else if (b.id === "add" || b.id === "fab") openAdd();
+  else if (b.id === "cancel" || b.id === "cancel-x") $("dlg").close();
+  else if (b.id === "show-done") { state.showDone = true; render(); }
 });
+addEventListener("scroll", () => $("hdr").classList.toggle("scrolled", scrollY > 4), { passive: true });
+addEventListener("resize", () => { clearTimeout(render.t); render.t = setTimeout(() => state.loaded && render(), 150); });
 // odświeżanie przy powrocie do karty i co 10 min, gdy strona jest widoczna
 // (rzadziej niż w SPEC, bo darmowy plan Make ma limit operacji)
 document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
 setInterval(() => { if (!document.hidden) load(); }, 10 * 60e3);
+
+$("today").textContent = fmtToday.format(new Date()).replace(/^./, (c) => c.toUpperCase());
 
 // ---- tryb demo (?demo=1): przykładowe dane bez API ----
 function demoCall(akcja, id, extra = {}) {
@@ -390,14 +612,15 @@ function demoCall(akcja, id, extra = {}) {
       { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Nowe", "Utworzono": iso(-1) } },
       { id: "d3", fields: { "Tytuł": "Strój na WF", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Rodzaj": "W dniu", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
       { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Termin": iso(100), "Rodzaj": "Do dnia", "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
-      { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Termin": iso(-48), "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
+      { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Termin": iso(-48), "Rodzaj": "W dniu", "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
+      { id: "d6", fields: { "Tytuł": "Zgoda na basen", "Termin": iso(-30), "Rodzaj": "Do dnia", "Status": "Zrobione", "Osoba imię": "Ewa", "Zrobiono": iso(-32), "Utworzono": iso(-90) } },
     ];
-    return Promise.resolve({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) });
+    return new Promise((r) => setTimeout(() => r({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) }), 300));
   }
   const z = structuredClone(demoCall.data.find((x) => x.id === id));
   const f = z.fields;
   if (akcja === "take" && f["Status"] === "Nowe") { f["Status"] = "Przypisane"; f["Osoba imię"] = "Ewa"; }
-  else if (akcja === "done") { f["Status"] = "Zrobione"; f["Zrobiono"] = new Date().toISOString(); }
+  else if (akcja === "done") { f["Status"] = "Zrobione"; f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= "Ewa"; }
   else if (akcja === "release") { f["Status"] = "Nowe"; f["Osoba imię"] = ""; }
   else if (akcja === "przejmij") { f["Osoba imię"] = "Ewa"; }
   demoCall.data[demoCall.data.findIndex((x) => x.id === id)] = z;
