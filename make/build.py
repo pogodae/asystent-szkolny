@@ -480,8 +480,12 @@ def s5_routes(cel_eq):
                                                       match(n["rodzaj"], RODZAJ_PAT), match(n["kategoria"], KATEGORIA_PAT),
                                                       {"a": n["termin"], "o": "date:greater", "b": "{{now}}"}]))),
          jresp(444, 200, '{"ok":true,"id":"{{441.id}}"}')],
+        # usuń: „miękko” – status Anulowane (znika z listy, zostaje w Airtable, da się przywrócić); bez Silnika
+        [at_update(450, "Zadania", q["id"], {F("Zadania", "Status"): "Anulowane"},
+                   flt("Usuń", *zalogowany([eq(q["akcja"], "usun"), match(q["id"], "^rec[A-Za-z0-9]{14}$")]))),
+         jresp(451, 200, '{"ok":true}')],
         [jresp(430, 400, '{"ok":false,"powod":"nieznana_akcja"}',
-               flt("Nieznana akcja", *zalogowany([ne(q["akcja"], "lista"), ne(q["akcja"], "dodaj"),
+               flt("Nieznana akcja", *zalogowany([ne(q["akcja"], "lista"), ne(q["akcja"], "dodaj"), ne(q["akcja"], "usun"),
                                                   *[ne(q["akcja"], a) for a in STATUS_AKCJE]])))],
     ]
 
