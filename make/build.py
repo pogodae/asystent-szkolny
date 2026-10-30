@@ -1,4 +1,4 @@
-"""Generator blueprintów Make dla asystenta szkolnego.
+"""Generator blueprintów Make dla asystenta „Kto to ogarnia” (sprawy dzieci i domu).
 
 Scenariusze są opisane tutaj w Pythonie, a skrypt zapisuje dwie wersje każdego blueprintu:
   make/<nazwa>.json          – do repo: sekrety (URL-e webhooków, klucz API) zastąpione znacznikami __NAZWA__
@@ -243,7 +243,11 @@ def metadata(sequential=False, interface=None):
     return md
 
 
-STATUS_AKCJE = ("take", "done", "release", "przejmij")
+STATUS_AKCJE = ("take", "done", "release", "przejmij", "przypisz")
+# kategoria: czego dotyczy sprawa (pusta = bez kategorii)
+KATEGORIA_PAT = "^(Dominik|Mateusz|Dom)?$"
+# rodzice z powiadomieniami „Tylko przypisane” nie dostają maili o sprawach, które ich nie dotyczą
+DO_WSZYSTKICH = "{Powiadomienia}!='Tylko przypisane'"
 # rodzaj terminu; pusty = Wydarzenie (data z godziną)
 RODZAJ_PAT = "^(Do dnia|W dniu|Wydarzenie)?$"
 RODZAJ = '{{ifempty(1.rodzaj; "Wydarzenie")}}'
@@ -269,6 +273,9 @@ def status_routes():
     mail_wolne = template("wolne.html", imie=a["Imię"], stopka_kto="Nikt jeszcze nie wziął tej sprawy.",
                           link_take=link(s2, z.id, "take", o["Klucz"], z["Token"]),
                           link_done=link(s2, z.id, "done", o["Klucz"], z["Token"]), **z.mail_vars())
+    t = Rodzic(110)        # komu przypisujemy (akcja przypisz)
+    mail_przypisane = template("przypisane.html", imie=a["Imię"], stopka_kto="Sprawa jest teraz Twoja.",
+                               link_done=link(s2, z.id, "done", t["Klucz"], z["Token"]), **z.mail_vars())
     prev = Rodzic(90, single=True)
     mail_przejeta = template("przejeta_od_ciebie.html", imie=a["Imię"], stopka_kto=f"Sprawę bierze: {a['Imię']}",
                              **z.mail_vars())
@@ -277,7 +284,7 @@ def status_routes():
         at_get(2, "Zadania", "{{1.id}}",
                flt("Zmiana statusu", *[[eq(akcja, x), match("{{1.id}}", "^rec[A-Za-z0-9]{14}$")] for x in STATUS_AKCJE])),
         at_find(3, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}='{{{{1.klucz}}}}')"),
-        at_find(4, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}!='{{{{1.klucz}}}}')"),
+        at_find(4, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}!='{{{{1.klucz}}}}', {DO_WSZYSTKICH})"),
         router(
             5,
             [wynik(10, False, "brak_dostepu", "Brak dostępu", "Nie rozpoznaję tego rodzica.", status="",
@@ -287,7 +294,8 @@ def status_routes():
                                             F("Zadania", "Osoba"): [a.id], F("Zadania", "Przypisano"): now},
                        flt("Biorę: wolne", [ok_a, eq(akcja, "take"), eq(st, "Nowe")])),
              zdarzenie(21, "Przypisano", f"{a['Imię']} bierze: {z['Tytuł']}", z.id, a.id),
-             gmail(23, o["Email"], f"[Szkoła] {a['Imię']} bierze: {z['Tytuł']}", mail_przejete),
+             gmail(23, o["Email"], f"{a['Imię']} bierze: {z['Tytuł']}{z['Kategoria dopisek']}", mail_przejete,
+                   flt("Drugi rodzic chce maile", [exists(o.id)])),
              wynik(22, True, "", "Gotowe, to Twoje",
                    f"{z['Tytuł']} – termin {z['Termin tekst']}. Przypomnę wieczór przed terminem.",
                    kto=a["Imię"], status="Przypisane")],
@@ -321,7 +329,8 @@ def status_routes():
                         F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Ostatnie przypomnienie"): now},
                        flt("Oddaj: moje", [ok_a, eq(akcja, "release"), eq(st, "Przypisane"), eq(z.osoba, a.id)])),
              zdarzenie(81, "Oddano", f"{a['Imię']} oddaje: {z['Tytuł']}", z.id, a.id),
-             gmail(83, o["Email"], f"[Szkoła] Wolne: {z['Tytuł']}", mail_wolne),
+             gmail(83, o["Email"], f"Wolne: {z['Tytuł']}{z['Kategoria dopisek']}", mail_wolne,
+                   flt("Drugi rodzic chce maile", [exists(o.id)])),
              wynik(82, True, "", "Oddane", f"{z['Tytuł']} jest znowu wolne.", status="Nowe")],
             [wynik(85, False, "nie_twoje", "To nie Twoje zadanie", "Oddać może tylko osoba przypisana.",
                    kto=z["Osoba imię"],
@@ -332,20 +341,35 @@ def status_routes():
                     flt("Przejmij: cudze", [ok_a, eq(akcja, "przejmij"), eq(st, "Przypisane"), ne(z.osoba, a.id)])),
              at_update(91, "Zadania", z.id, {F("Zadania", "Osoba"): [a.id], F("Zadania", "Przypisano"): now}),
              zdarzenie(92, "Przypisano", f"{a['Imię']} przejmuje od {z['Osoba imię']}: {z['Tytuł']}", z.id, a.id),
-             gmail(94, prev["Email"], f"[Szkoła] {a['Imię']} przejmuje: {z['Tytuł']}", mail_przejeta),
+             gmail(94, prev["Email"], f"{a['Imię']} przejmuje: {z['Tytuł']}{z['Kategoria dopisek']}", mail_przejeta,
+                   flt("Poprzednia osoba chce maile", [ne(prev["Powiadomienia"], "Tylko przypisane")])),
              wynik(93, True, "", "Przejęte", f"{z['Tytuł']} jest teraz Twoje.", kto=a["Imię"], status="Przypisane")],
             [wynik(95, False, "stan_zmieniony", "Nie da się przejąć", "To zadanie nie jest przypisane do drugiej osoby.",
                    kto=z["Osoba imię"],
                    flt_=flt("Przejmij: nie da się", [ok_a, eq(akcja, "przejmij"), eq(st, "Nowe")],
                             [ok_a, eq(akcja, "przejmij"), eq(st, "Przypisane"), eq(z.osoba, a.id)]))],
+            # --- przypisz: wolne albo własne zadanie dostaje wskazana osoba (dla = jej klucz); mail tylko do niej
+            [at_find(110, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}='{{{{1.dla}}}}')",
+                     flt("Przypisz: można", [ok_a, eq(akcja, "przypisz"), eq(st, "Nowe")],
+                         [ok_a, eq(akcja, "przypisz"), eq(st, "Przypisane"), eq(z.osoba, a.id)])),
+             at_update(111, "Zadania", z.id, {F("Zadania", "Status"): "Przypisane", F("Zadania", "Osoba"): [t.id],
+                                             F("Zadania", "Przypisano"): now},
+                       flt("Jest taka osoba", [exists(t.id)])),
+             zdarzenie(112, "Przypisano", f"{a['Imię']} przypisuje {t['Imię']}: {z['Tytuł']}", z.id, a.id),
+             gmail(113, t["Email"], f"{a['Imię']} przypisuje Ci: {z['Tytuł']}{z['Kategoria dopisek']}", mail_przypisane,
+                   flt("Nie sobie", [ne(t.id, a.id)])),
+             wynik(114, True, "", "Przypisane", f"{z['Tytuł']} ma teraz {t['Imię']}.", kto=t["Imię"], status="Przypisane")],
+            [wynik(115, False, "przejete", f"Już przejęte przez {z['Osoba imię']}", "Przypisać można wolne albo swoje zadanie.",
+                   kto=z["Osoba imię"],
+                   flt_=flt("Przypisz: cudze", [ok_a, eq(akcja, "przypisz"), eq(st, "Przypisane"), ne(z.osoba, a.id)]))],
         ),
     ]
 
 
 def dodaj_routes():
-    """S1 – Dodaj zadanie: walidacja, deduplikacja, rekord, zdarzenie, maile do aktywnych rodziców."""
+    """S1 – Dodaj zadanie: walidacja, deduplikacja, rekord, zdarzenie, maile do rodziców z pełnymi powiadomieniami."""
     s2 = env("S2_WEBHOOK_URL")
-    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj")}
+    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj", "kategoria")}
     jest = eq("{{1.akcja}}", "dodaj")
     w_przyszlosci = {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}
     z = Zadanie(222)
@@ -359,9 +383,10 @@ def dodaj_routes():
                    "naglowek": "Nie dodano", "tresc": "Brak tytułu albo termin nie jest w przyszłości."},
              flt("Dodaj: błąd danych", [jest, missing(i["tytul"])], [jest, missing(i["termin"])],
                  [jest, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
-                 [jest, nomatch(i["rodzaj"], RODZAJ_PAT)]))],
+                 [jest, nomatch(i["rodzaj"], RODZAJ_PAT)], [jest, nomatch(i["kategoria"], KATEGORIA_PAT)]))],
         [at_find(210, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')",
-                 flt("Dodaj: dane OK", [jest, exists(i["tytul"]), w_przyszlosci, match(i["rodzaj"], RODZAJ_PAT)])),
+                 flt("Dodaj: dane OK", [jest, exists(i["tytul"]), w_przyszlosci, match(i["rodzaj"], RODZAJ_PAT),
+                                         match(i["kategoria"], KATEGORIA_PAT)])),
          router(
              211,
              [ret(212, {"ok": False, "powod": "duplikat", "status": "duplikat", "tytul": i["tytul"],
@@ -372,13 +397,14 @@ def dodaj_routes():
                  F("Zadania", "Termin"): i["termin"], F("Zadania", "Kwota"): i["kwota"],
                  F("Zadania", "Status"): "Nowe", F("Zadania", "Token"): "{{uuid}}",
                  F("Zadania", "Źródło"): '{{ifempty(1.zrodlo; "Claude")}}', F("Zadania", "ID źródła"): i["id_zrodla"],
-                 F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Rodzaj"): RODZAJ},
+                 F("Zadania", "Liczba przypomnień"): 0, F("Zadania", "Rodzaj"): RODZAJ,
+                 F("Zadania", "Kategoria"): i["kategoria"]},
                  flt("Nowe zadanie", [missing("{{210.body.records[1].id}}")])),
               zdarzenie(221, "Utworzono", f"Nowe: {i['tytul']}", "{{220.id}}"),
               at_get(222, "Zadania", "{{220.id}}"),
-              at_find(223, "Rodzice", "{Aktywny}"),
+              at_find(223, "Rodzice", f"AND({{Aktywny}}, {DO_WSZYSTKICH})"),
               feeder(225, "{{223.body.records}}"),
-              gmail(226, r["Email"], f"[Szkoła] Nowe: {z['Tytuł']} – {z['Termin krótko']}", mail)],
+              gmail(226, r["Email"], f"Nowe: {z['Tytuł']} – {z['Termin krótko']}{z['Kategoria dopisek']}", mail)],
          )],
     ]
 
@@ -397,7 +423,7 @@ def silnik():
 SILNIK_INTERFACE = {
     "input": [
         {"name": "akcja", "type": "text", "required": True,
-         "label": "dodaj – nowa sprawa szkolna; take / done / release / przejmij – zmiana statusu"},
+         "label": "dodaj – nowa sprawa (dzieci albo dom); take / done / release / przejmij / przypisz – zmiana statusu"},
         {"name": "tytul", "type": "text", "required": False, "label": "Krótka nazwa sprawy, maks. 100 znaków"},
         {"name": "termin", "type": "text", "required": False,
          "label": "Data i godzina w Europe/Warsaw (ISO 8601), np. 2026-11-14T08:00:00+01:00"},
@@ -406,9 +432,12 @@ SILNIK_INTERFACE = {
         {"name": "zrodlo", "type": "text", "required": False, "label": "Claude, Webhook, Scraper lub Dashboard; domyślnie Claude"},
         {"name": "rodzaj", "type": "text", "required": False,
          "label": "Do dnia (zrobić najpóźniej tego dnia, termin T20:00), W dniu (tego dnia, np. przynieść coś, termin T07:30) albo Wydarzenie (o konkretnej godzinie); domyślnie Wydarzenie"},
+        {"name": "kategoria", "type": "text", "required": False,
+         "label": "Czego dotyczy sprawa: Dominik, Mateusz albo Dom (puste = bez kategorii)"},
         {"name": "id_zrodla", "type": "text", "required": False, "label": "Identyfikator do deduplikacji"},
         {"name": "id", "type": "text", "required": False, "label": "ID zadania (dla zmiany statusu)"},
         {"name": "klucz", "type": "text", "required": False, "label": "Klucz rodzica (dla zmiany statusu)"},
+        {"name": "dla", "type": "text", "required": False, "label": "Klucz osoby, której przypisujemy (akcja przypisz)"},
     ],
     "output": [
         {"name": "ok", "type": "boolean", "label": "Czy się udało"},
@@ -523,10 +552,11 @@ API_KEY = '{{first(map(1.__IMTHEADERS__; "value"; "name"; "x-api-key"))}}'
 
 def s1w_routes(cel_eq):
     """S1-W – dodawanie zadań webhookiem (POST JSON, nagłówek X-Api-Key)."""
-    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj")}
+    i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj", "kategoria")}
     cel = cel_eq("dodaj")
     klucz_ok = eq(API_KEY, env("S1W_API_KEY"))
-    dane_ok = [exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}, match(i["rodzaj"], RODZAJ_PAT)]
+    dane_ok = [exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}, match(i["rodzaj"], RODZAJ_PAT),
+               match(i["kategoria"], KATEGORIA_PAT)]
     dup = "{{310.body.records[1].id}}"
     return [
         [jresp(300, 401, '{"status":"blad","komunikat":"Brak lub zły nagłówek X-Api-Key"}',
@@ -534,7 +564,7 @@ def s1w_routes(cel_eq):
         [jresp(301, 400, '{"status":"blad","komunikat":"Brak tytułu albo termin nie jest datą w przyszłości."}',
                flt("S1-W: błąd danych", [cel, klucz_ok, missing(i["tytul"])], [cel, klucz_ok, missing(i["termin"])],
                    [cel, klucz_ok, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
-                   [cel, klucz_ok, nomatch(i["rodzaj"], RODZAJ_PAT)]))],
+                   [cel, klucz_ok, nomatch(i["rodzaj"], RODZAJ_PAT)], [cel, klucz_ok, nomatch(i["kategoria"], KATEGORIA_PAT)]))],
         [at_find(310, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')",
                  flt("S1-W: dane OK", [cel, klucz_ok, *dane_ok])),
          router(
@@ -543,7 +573,7 @@ def s1w_routes(cel_eq):
              [call(320, "MAKE_ID_SILNIK", {"akcja": "dodaj", "tytul": i["tytul"], "termin": i["termin"],
                                            "opis": i["opis"], "kwota": i["kwota"],
                                            "zrodlo": '{{ifempty(1.zrodlo; "Webhook")}}', "id_zrodla": i["id_zrodla"],
-                                           "rodzaj": i["rodzaj"]},
+                                           "rodzaj": i["rodzaj"], "kategoria": i["kategoria"]},
                    flt("Nowe", [missing(dup)])),
               at_find(321, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')"),
               jresp(322, 200, '{"status":"utworzono","id":"{{321.body.records[1].id}}","termin":"' + i["termin"] + '"}')],
@@ -554,7 +584,7 @@ def s1w_routes(cel_eq):
 def s5_routes(cel_eq):
     """S5 – API dashboardu: proste POST-y (form-urlencoded), odpowiedź JSON z CORS."""
     cel = cel_eq("api")
-    q = {k: "{{1." + k + "}}" for k in ("u", "s", "akcja", "id")}
+    q = {k: "{{1." + k + "}}" for k in ("u", "s", "akcja", "id", "dla")}
     PU, PS = "^[a-z0-9_-]{1,30}$", "^[A-Za-z0-9_-]{16,64}$"
     ja = "{{401.body.records[1].id}}"
 
@@ -567,9 +597,10 @@ def s5_routes(cel_eq):
 
     otwarte = ("OR({Status}='Nowe', {Status}='Przypisane', "
                "AND({Status}='Zrobione', DATETIME_DIFF(NOW(), {Zrobiono}, 'days') < 7))")
-    zmiana = [[exists(ja), eq(q["akcja"], a), match(q["id"], "^rec[A-Za-z0-9]{14}$")] for a in STATUS_AKCJE]
+    zmiana = [[exists(ja), eq(q["akcja"], a), match(q["id"], "^rec[A-Za-z0-9]{14}$"), match(q["dla"], "^[a-z0-9_-]{0,30}$")]
+              for a in STATUS_AKCJE]
     dodaj = eq(q["akcja"], "dodaj")
-    n = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "id_zrodla", "rodzaj")}
+    n = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "id_zrodla", "rodzaj", "kategoria")}
     PD = "^dash-[a-f0-9-]{8,40}$"
     return [
         [jresp(400, 403, '{"ok":false,"powod":"brak_dostepu"}',
@@ -583,7 +614,7 @@ def s5_routes(cel_eq):
               tojson(411, "{{410.body.records}}"),
               jresp(412, 200, '{"ok":true,"ja":"{{401.body.records[1].fields.' + F("Rodzice", "Imię") +
                     '}}","zadania":{{411.json}}}')],
-             [call(420, "MAKE_ID_SILNIK", {"akcja": q["akcja"], "id": q["id"], "klucz": q["u"]},
+             [call(420, "MAKE_ID_SILNIK", {"akcja": q["akcja"], "id": q["id"], "klucz": q["u"], "dla": q["dla"]},
                    flt("Zmiana statusu", *zmiana)),
               find_names(421, f"RECORD_ID()='{q['id']}'"),
               tojson(422, "{{421.body.records[1]}}"),
@@ -593,12 +624,14 @@ def s5_routes(cel_eq):
                     flt("Dodaj: błąd danych", [exists(ja), dodaj, missing(n["tytul"])],
                         [exists(ja), dodaj, nomatch(n["id_zrodla"], PD)],
                         [exists(ja), dodaj, nomatch(n["rodzaj"], RODZAJ_PAT)],
+                        [exists(ja), dodaj, nomatch(n["kategoria"], KATEGORIA_PAT)],
                         [exists(ja), dodaj, {"a": n["termin"], "o": "date:lessorequal", "b": "{{now}}"}]))],
              [call(441, "MAKE_ID_SILNIK", {"akcja": "dodaj", "tytul": n["tytul"], "termin": n["termin"],
                                            "opis": n["opis"], "kwota": n["kwota"], "zrodlo": "Dashboard", "rodzaj": n["rodzaj"],
+                                           "kategoria": n["kategoria"],
                                            "id_zrodla": n["id_zrodla"]},
                    flt("Dodaj: dane OK", [exists(ja), dodaj, exists(n["tytul"]), match(n["id_zrodla"], PD),
-                                          match(n["rodzaj"], RODZAJ_PAT),
+                                          match(n["rodzaj"], RODZAJ_PAT), match(n["kategoria"], KATEGORIA_PAT),
                                           {"a": n["termin"], "o": "date:greater", "b": "{{now}}"}])),
               find_names(442, f"{{ID źródła}}='{n['id_zrodla']}'"),
               tojson(443, "{{442.body.records[1]}}"),
@@ -664,22 +697,24 @@ def s3_routes(cel_eq):
                                                       "; 0) + 1}}",
                   F("Zadania", "Ostatnie przypomnienie"): now}),
               zdarzenie(515, "Przypomnienie", f"Nikt jeszcze nie wziął: {za['Tytuł']}", za_id),
-              at_find(512, "Rodzice", "{Aktywny}"),
+              at_find(512, "Rodzice", f"AND({{Aktywny}}, {DO_WSZYSTKICH})"),
               feeder(513, "{{512.body.records}}"),
-              gmail(516, ra["Email"], f"[Szkoła] Nikt jeszcze nie wziął: {za['Tytuł']}{za['Dopisek pilne']}", mail_a)],
+              gmail(516, ra["Email"], f"Nikt jeszcze nie wziął: {za['Tytuł']}{za['Kategoria dopisek']}{za['Dopisek pilne']}", mail_a)],
              [at_find(520, "Zadania", formula_b),
               feeder(521, "{{520.body.records}}"),
               at_update(522, "Zadania", zb_id, {F("Zadania", "Przypomnienie przed terminem"): True}),
               zdarzenie(523, "Przypomnienie", f"Jutro: {zb['Tytuł']}", zb_id),
               at_get(524, "Rodzice", "{{521.fields." + F("Zadania", "Osoba") + "[1]}}"),
-              gmail(525, rb["Email"], f"[Szkoła] Jutro: {zb['Tytuł']}", mail_b)],
+              gmail(525, rb["Email"], f"Jutro: {zb['Tytuł']}{zb['Kategoria dopisek']}", mail_b)],
              [at_find(530, "Zadania", formula_c),
               feeder(531, "{{530.body.records}}"),
               at_update(532, "Zadania", zc_id, {F("Zadania", "Po terminie"): True}),
               zdarzenie(533, "Eskalacja", f"Po terminie: {zc['Tytuł']}", zc_id),
-              at_find(534, "Rodzice", "{Aktywny}"),
+              # po terminie: wszyscy z pełnymi powiadomieniami + osoba przypisana
+              at_find(534, "Rodzice", "AND({Aktywny}, OR(" + DO_WSZYSTKICH + ", RECORD_ID()='{{531.fields."
+                      + F("Zadania", "Osoba") + "[1]}}'))"),
               feeder(535, "{{534.body.records}}"),
-              gmail(536, rc["Email"], f"[Szkoła] Po terminie: {zc['Tytuł']} – zrobione?", mail_c)],
+              gmail(536, rc["Email"], f"Po terminie: {zc['Tytuł']}{zc['Kategoria dopisek']} – zrobione?", mail_c)],
          )],
     ]
 

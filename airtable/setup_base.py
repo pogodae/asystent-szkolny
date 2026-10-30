@@ -31,6 +31,10 @@ ZRODLA = ("Claude", "Webhook", "Scraper", "Dashboard")
 # Do dnia – zrobić najpóźniej tego dnia; W dniu – tego konkretnego dnia (np. przynieść 20 zł);
 # Wydarzenie – o konkretnej godzinie (np. zebranie). Godzina wyświetla się tylko dla wydarzeń.
 RODZAJE = ("Do dnia", "W dniu", "Wydarzenie")
+# czego dotyczy sprawa: dzieci i dom
+KATEGORIE = ("Dominik", "Mateusz", "Dom")
+# Wszystkie – każdy mail; Tylko przypisane – tylko maile o sprawach przypisanych do tej osoby
+POWIADOMIENIA = ("Wszystkie", "Tylko przypisane")
 TYPY_ZDARZEN = ("Utworzono", "Przypisano", "Zrobione", "Przypomnienie", "Eskalacja",
                 "Odrzucone kliknięcie", "Błąd", "Oddano")
 
@@ -42,6 +46,7 @@ def rodzice_fields():
         {"name": "Email", "type": "email"},
         {"name": "Aktywny", **CHECKBOX},
         {"name": "Klucz dostępu", "type": "singleLineText", "description": "sekret do dashboardu (?u=&s=)"},
+        {"name": "Powiadomienia", **select(*POWIADOMIENIA)},
     ]
 
 
@@ -51,6 +56,7 @@ def zadania_fields(rodzice_id):
         {"name": "Opis", "type": "multilineText"},
         {"name": "Termin", **DATETIME, "description": "Do dnia: 20:00 tego dnia, W dniu: 7:30 – godzina tylko do przypomnień"},
         {"name": "Rodzaj", **select(*RODZAJE)},
+        {"name": "Kategoria", **select(*KATEGORIE)},
         {"name": "Kwota", "type": "currency", "options": {"precision": 2, "symbol": "zł"}},
         {"name": "Status", **select(*STATUSY)},
         {"name": "Osoba", **link(rodzice_id), "description": "max 1 osoba"},
@@ -106,7 +112,8 @@ WYLICZANE = {
         {"name": "Kwota tekst", **formula("IF({Kwota}, {Kwota} & ' zł', '')")},
         {"name": "Kwota linia", **formula("IF({Kwota}, 'Kwota: ' & {Kwota} & ' zł', '')")},
         {"name": "Dopisek pilne", **formula(
-            "IF(OR({Liczba przypomnień} >= 2, {Godzin do terminu} < 24), ' – PILNE', '')")},    ],
+            "IF(OR({Liczba przypomnień} >= 2, {Godzin do terminu} < 24), ' – PILNE', '')")},
+        {"name": "Kategoria dopisek", **formula("IF({Kategoria}, ' · ' & {Kategoria}, '')")},    ],
     "Zdarzenia": [
         {"name": "Kiedy", **CREATED},
     ],

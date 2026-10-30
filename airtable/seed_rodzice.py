@@ -26,7 +26,9 @@ def main():
             set_env_value(dostep_var, dostep)
             print(f"  wygenerowano {dostep_var} i zapisano w .env")
 
-        fields = {"Imię": imie, "Klucz": klucz, "Email": email, "Aktywny": True, "Klucz dostępu": dostep}
+        powiadomienia = os.environ.get(f"RODZIC{i}_POWIADOMIENIA") or "Wszystkie"
+        fields = {"Imię": imie, "Klucz": klucz, "Email": email, "Aktywny": True, "Klucz dostępu": dostep,
+                  "Powiadomienia": powiadomienia}
         found = at.list_records("Rodzice", f"{{Klucz}}='{klucz}'")
         if found:
             at.update_record("Rodzice", found[0]["id"], fields)

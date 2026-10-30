@@ -91,6 +91,15 @@ header.scrolled { border-bottom-color: var(--line); }
 .pill.bad b { color: var(--bad); }
 .pill.zero { opacity: .55; }
 
+.filters { display: flex; gap: 6px; padding: 0 0 12px; overflow-x: auto; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.fchip {
+  display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; border-radius: 999px; flex: none;
+  border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 13.5px; font-weight: 550; color: var(--fg-2);
+}
+.fchip[aria-pressed="true"] { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--kat, var(--muted)); flex: none; }
+
 .tabs { display: flex; gap: 4px; padding: 4px; margin-bottom: 12px; background: var(--surface-2); border-radius: 12px; }
 .tab {
   flex: 1; min-width: 0; border: 0; background: transparent; border-radius: 9px; padding: 8px 4px; cursor: pointer;
@@ -133,6 +142,8 @@ main { padding-top: 4px; padding-bottom: 110px; }
 .chip.soon { background: var(--warn-soft); color: var(--warn); }
 .chip.late { background: var(--bad-soft); color: var(--bad); }
 .chip.idle { background: var(--warn-soft); color: var(--warn); }
+.chip.kat { background: color-mix(in srgb, var(--kat) 13%, transparent); color: color-mix(in srgb, var(--kat) 80%, var(--fg)); }
+.chip.kat .dot { width: 7px; height: 7px; }
 .more { margin-top: 8px; font-size: 13.5px; color: var(--fg-2); }
 .more summary { cursor: pointer; color: var(--muted); list-style: none; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
 .more summary::-webkit-details-marker { display: none; }
@@ -144,6 +155,8 @@ main { padding-top: 4px; padding-bottom: 110px; }
 .actions .btn.done { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
 .actions .btn.done:hover { filter: brightness(.97); }
 .actions .btn.quiet { background: transparent; border-color: var(--line-2); color: var(--fg-2); }
+.actions .btn.assign { flex: 0 0 auto; padding: 0 12px; background: transparent; border-color: var(--line-2); color: var(--fg-2); gap: 4px; }
+.actions .btn.assign svg { width: 14px; height: 14px; }
 
 .card.closed { background: transparent; box-shadow: none; padding: 10px 12px; }
 .card.closed .title { font-weight: 500; color: var(--fg-2); text-decoration: line-through; text-decoration-color: var(--line-2); }
@@ -207,11 +220,12 @@ textarea.input { resize: vertical; min-height: 72px; }
 .seg { display: flex; gap: 4px; padding: 4px; border: 0; margin: 0; min-width: 0; background: var(--surface-2); border-radius: 12px; }
 .seg label { flex: 1; min-width: 0; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg span {
+.seg label > span {
   display: block; text-align: center; padding: 8px 4px; border-radius: 9px; font-size: 14px; font-weight: 550;
   color: var(--fg-2); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .seg input:checked + span { background: var(--surface); color: var(--fg); box-shadow: var(--shadow), 0 0 0 1px var(--line); }
+.seg span .dot { display: inline-block; padding: 0; margin-right: 6px; vertical-align: 1px; }
 .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
 .hint { margin: 6px 2px 0; font-size: 12.5px; color: var(--muted); }
 .row { display: flex; gap: 10px; }
@@ -258,6 +272,7 @@ textarea.input { resize: vertical; min-height: 72px; }
       </button>
     </div>
     <div class="summary" id="summary"></div>
+    <div class="filters" id="filters" role="toolbar" aria-label="Filtr kategorii"></div>
     <div class="tabs" id="tabs" role="tablist"></div>
   </div>
 </header>
@@ -280,6 +295,10 @@ textarea.input { resize: vertical; min-height: 72px; }
     <label class="field"><span>Co</span>
       <input class="input" name="tytul" required maxlength="100" placeholder="np. Wycieczka do Krakowa" autocomplete="off">
     </label>
+    <div class="field">
+      <span>Czego dotyczy</span>
+      <fieldset class="seg" id="kategorie"></fieldset>
+    </div>
     <div class="field">
       <span>Rodzaj</span>
       <fieldset class="seg">
@@ -306,7 +325,7 @@ textarea.input { resize: vertical; min-height: 72px; }
       <button type="button" class="btn" id="cancel">Anuluj</button>
       <button type="submit" class="btn primary" id="save">Dodaj</button>
     </div>
-    <p class="form-note">Oboje dostaniecie maila z przyciskiem „Biorę to”.</p>
+    <p class="form-note">Wyślemy maila z przyciskiem „Biorę to” osobom, które chcą wszystkie powiadomienia.</p>
   </form>
 </dialog>
 
@@ -314,12 +333,14 @@ textarea.input { resize: vertical; min-height: 72px; }
 // ---- konfiguracja (adres API = webhook Make z ?cel=api; dane chroni para u + s) ----
 const CONFIG = {
   api: "https://hook.eu2.make.com/wpcm5vpf5m75aeb84hk2ukxvcc7sky5v?cel=api",
-  rodzice: ["Ewa", "Dawid"],
+  // imię jak w Airtable + klucz rodzica (do przypisywania zadań)
+  rodzice: [{ imie: "Ewa", klucz: "ewa", kolor: "#6d5efc" }, { imie: "Dawid", klucz: "dawid", kolor: "#d4467e" }],
+  kategorie: [{ nazwa: "Dominik", kolor: "#2f7fd6" }, { nazwa: "Mateusz", kolor: "#16a34a" }, { nazwa: "Dom", kolor: "#e07b24" }],
   wisiPoGodzinach: 4,
 };
 
 const H = 3600e3;
-const state = { ja: "", zadania: [], tab: "wolne", busy: new Set(), loaded: false, showDone: false };
+const state = { ja: "", zadania: [], tab: "wolne", busy: new Set(), loaded: false, showDone: false, filtr: "" };
 const $ = (id) => document.getElementById(id);
 
 // ---- ikony ----
@@ -332,6 +353,7 @@ const I = {
   hour: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"/></svg>',
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
   lock: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>',
 };
 
@@ -349,6 +371,7 @@ function login() {
   return { u: store("u"), s: store("s"), demo: p.get("demo") === "1" };
 }
 const auth = login();
+state.filtr = store("filtr") || "";
 
 // ---- API: proste POST-y (form-urlencoded), bez preflightu ----
 async function call(akcja, id, extra = {}) {
@@ -388,13 +411,14 @@ function kiedy(iso, rodzaj) {
 function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
-// stały kolor awatara: według kolejności w CONFIG.rodzice (różne kolory dla obojga)
+// stały kolor awatara z CONFIG.rodzice
 function avatar(imie) {
   if (!imie) return "";
-  const kolory = ["#6d5efc", "#0f9d8a", "#e0703b", "#2f86d6"];
-  const i = CONFIG.rodzice.indexOf(imie);
-  return `<span class="avatar" style="--av:${kolory[i < 0 ? 3 : i % kolory.length]}" title="${esc(imie)}">${esc(imie[0].toUpperCase())}</span>`;
+  const r = CONFIG.rodzice.find((x) => x.imie === imie);
+  return `<span class="avatar" style="--av:${r ? r.kolor : "#8a8a92"}" title="${esc(imie)}">${esc(imie[0].toUpperCase())}</span>`;
 }
+const katKolor = (k) => (CONFIG.kategorie.find((x) => x.nazwa === k) || {}).kolor;
+const drugi = () => CONFIG.rodzice.find((r) => r.imie !== state.ja) || CONFIG.rodzice[1];
 
 // ---- model ----
 function view(z) {
@@ -402,6 +426,7 @@ function view(z) {
   return {
     id: z.id, tytul: f["Tytuł"] || "(bez tytułu)", opis: f["Opis"] || "", kwota: f["Kwota"],
     status: f["Status"], osoba: (f["Osoba imię"] || "").trim(), termin, rodzaj: f["Rodzaj"] || "Wydarzenie",
+    kategoria: f["Kategoria"] || "",
     late: termin < now && f["Status"] !== "Zrobione",
     soon: termin >= now && termin - now < 24 * H,
     wisi: f["Status"] === "Nowe" && now - new Date(f["Utworzono"]) > CONFIG.wisiPoGodzinach * H,
@@ -409,8 +434,8 @@ function view(z) {
   };
 }
 function columns() {
-  const inny = CONFIG.rodzice.find((r) => r !== state.ja) || "Druga osoba";
-  const all = state.zadania.map(view);
+  const inny = drugi().imie;
+  const all = widoczne();
   const byTermin = (a, b) => a.termin - b.termin;
   return [
     { key: "wolne", label: "Wolne", items: all.filter((z) => z.status === "Nowe").sort(byTermin) },
@@ -442,19 +467,24 @@ function card(z, col) {
   return `<article class="card ${z.late ? "late" : ""} ${state.busy.has(z.id) ? "busy" : ""}" data-id="${z.id}">
     <div class="card-top"><p class="title">${esc(z.tytul)}</p>${col === "inne" ? avatar(z.osoba) : ""}</div>
     <div class="chips">
+      ${z.kategoria ? `<span class="chip kat" style="--kat:${katKolor(z.kategoria)}"><span class="dot"></span>${esc(z.kategoria)}</span>` : ""}
       <span class="chip ${kiedyCls}">${ikona}${z.late ? "po terminie · " : ""}${esc(kiedy(z.termin, z.rodzaj))}</span>
       ${z.kwota ? `<span class="chip">${I.coin}${esc(zl.format(z.kwota))}</span>` : ""}
       ${z.wisi ? `<span class="chip idle">${I.hour}czeka</span>` : ""}
     </div>
     ${z.opis ? `<details class="more"><summary>${I.chev}Szczegóły</summary><p>${esc(z.opis)}</p></details>` : ""}
     <div class="actions">${btns.map(([a, l, c]) =>
-      `<button class="btn ${c}" data-akcja="${a}" data-id="${z.id}" type="button">${l}</button>`).join("")}</div>
+      `<button class="btn ${c}" data-akcja="${a}" data-id="${z.id}" type="button">${l}</button>`).join("")}
+      ${col !== "inne" ? `<button class="btn assign" data-akcja="przypisz" data-id="${z.id}" type="button"
+        title="Przypisz: ${esc(drugi().imie)} (dostanie maila)">${I.arrow}${esc(drugi().imie)}</button>` : ""}</div>
   </article>`;
 }
 function render() {
   const cols = columns();
-  const all = state.zadania.map(view);
-  const late = all.filter((z) => z.late).length;
+  const late = widoczne().filter((z) => z.late).length;
+  $("filters").innerHTML = [["", "Wszystko"], ...CONFIG.kategorie.map((k) => [k.nazwa, k.nazwa])].map(([v, l]) =>
+    `<button class="fchip" type="button" data-filtr="${esc(v)}" aria-pressed="${state.filtr === v}">` +
+    `${v ? `<span class="dot" style="--kat:${katKolor(v)}"></span>` : ""}${esc(l)}</button>`).join("");
   $("hello").textContent = state.ja ? `Cześć, ${state.ja}` : "Kto to ogarnia";
   $("summary").innerHTML =
     `<span class="pill ${cols[0].items.length ? "" : "zero"}"><b>${cols[0].items.length}</b>wolne</span>` +
@@ -472,6 +502,10 @@ function render() {
       <div class="list">${list}</div></section>`;
   }).join("")}</div>`;
 }
+function widoczne() {
+  const all = state.zadania.map(view);
+  return state.filtr ? all.filter((z) => z.kategoria === state.filtr) : all;
+}
 function skeleton() {
   $("main").innerHTML = `<div class="board">${[0, 1, 2, 3].map((i) =>
     `<section class="col" ${i ? "hidden" : ""}><div class="list"><div class="skeleton"></div><div class="skeleton"></div></div></section>`).join("")}</div>`;
@@ -481,7 +515,7 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3200);
 }
 function noAccess() {
-  $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("fab").hidden = true; $("add").hidden = true;
+  $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("filters").innerHTML = ""; $("fab").hidden = true; $("add").hidden = true;
   $("main").innerHTML = `<div class="notice"><div class="ico">${I.lock}</div><h2>Brak dostępu</h2>
     <p>Otwórz swój osobisty link do tablicy (z parametrami <code>u</code> i <code>s</code>). Wystarczy raz – potem strona Cię zapamięta.</p></div>`;
 }
@@ -502,8 +536,9 @@ async function load() {
     $("refresh").classList.remove("spin");
   }
 }
-const OCZEKIWANE = { take: "Przypisane", done: "Zrobione", release: "Nowe", przejmij: "Przypisane" };
-const POTWIERDZENIA = { take: "To Twoje", done: "Zrobione – dzięki!", release: "Oddane – znowu wolne", przejmij: "Przejęte" };
+const OCZEKIWANE = { take: "Przypisane", done: "Zrobione", release: "Nowe", przejmij: "Przypisane", przypisz: "Przypisane" };
+const POTWIERDZENIA = { take: "To Twoje", done: "Zrobione – dzięki!", release: "Oddane – znowu wolne", przejmij: "Przejęte",
+  przypisz: () => `Przypisane: ${drugi().imie} – dostanie maila` };
 async function act(akcja, id) {
   const idx = state.zadania.findIndex((z) => z.id === id);
   if (idx < 0) return;
@@ -512,16 +547,18 @@ async function act(akcja, id) {
   const f = state.zadania[idx].fields;
   f["Status"] = OCZEKIWANE[akcja];
   if (akcja === "take" || akcja === "przejmij") f["Osoba imię"] = state.ja;
+  if (akcja === "przypisz") f["Osoba imię"] = drugi().imie;
   if (akcja === "release") f["Osoba imię"] = "";
   if (akcja === "done") { f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= state.ja; }
   state.busy.add(id); render();
   try {
-    const j = await call(akcja, id);
+    const j = await call(akcja, id, akcja === "przypisz" ? { dla: drugi().klucz } : {});
     const nf = j.zadanie.fields, kto = (nf["Osoba imię"] || "").trim();
     state.zadania[idx] = j.zadanie;
     if (akcja === "take" && nf["Status"] === "Przypisane" && kto !== state.ja) toast(`Już przejęte przez ${kto}`);
     else if (nf["Status"] !== OCZEKIWANE[akcja]) toast("Ktoś zmienił to zadanie w międzyczasie.");
-    else toast(POTWIERDZENIA[akcja]);
+    else if (akcja === "przypisz" && kto !== drugi().imie) toast("Nie udało się przypisać – odśwież listę.");
+    else toast(typeof POTWIERDZENIA[akcja] === "function" ? POTWIERDZENIA[akcja]() : POTWIERDZENIA[akcja]);
   } catch (e) {
     state.zadania[idx] = before;
     toast(e.powod === "brak_dostepu" ? "Brak dostępu" : "Nie udało się. Spróbuj jeszcze raz.");
@@ -545,9 +582,12 @@ function syncRodzaj() {
   f.godzina.required = r === "Wydarzenie";
   $("rodzaj-hint").textContent = OPIS_RODZAJU[r];
 }
+$("kategorie").innerHTML = '<legend hidden>Czego dotyczy</legend>' + CONFIG.kategorie.map((k) =>
+  `<label><input type="radio" name="kategoria" value="${esc(k.nazwa)}" required><span><span class="dot" style="--kat:${k.kolor}"></span>${esc(k.nazwa)}</span></label>`).join("");
 function openAdd() {
   if (!auth.demo && (!auth.u || !auth.s)) return noAccess();
   const f = $("form"); f.reset();
+  if (state.filtr) f.querySelector(`input[name=kategoria][value="${state.filtr}"]`).checked = true;
   const jutro = new Date(); jutro.setDate(jutro.getDate() + 1);
   const pad = (n) => String(n).padStart(2, "0");
   f.dzien.value = `${jutro.getFullYear()}-${pad(jutro.getMonth() + 1)}-${pad(jutro.getDate())}`;
@@ -560,14 +600,14 @@ async function add(e) {
   const termin = new Date(`${f.dzien.value}T${rodzaj === "Wydarzenie" ? f.godzina.value : GODZINA[rodzaj]}`);
   if (!(termin > new Date())) { toast("Termin musi być w przyszłości."); return; }
   const dane = {
-    tytul: f.tytul.value.trim(), termin: termin.toISOString(), opis: f.opis.value.trim(), rodzaj,
+    tytul: f.tytul.value.trim(), termin: termin.toISOString(), opis: f.opis.value.trim(), rodzaj, kategoria: f.kategoria.value,
     kwota: f.kwota.value, id_zrodla: "dash-" + crypto.randomUUID(),
   };
   $("save").disabled = true; $("save").textContent = "Dodaję…";
   try {
     const j = await call("dodaj", null, dane);
     state.zadania.push(j.zadanie); state.tab = "wolne";
-    $("dlg").close(); render(); toast("Dodane – maile poszły do Was obojga");
+    $("dlg").close(); render(); toast("Dodane");
   } catch (err) {
     toast(err.powod === "blad_danych" ? "Sprawdź tytuł i termin." : "Nie udało się dodać. Spróbuj jeszcze raz.");
   } finally {
@@ -587,6 +627,7 @@ document.addEventListener("click", (e) => {
   else if (b.id === "add" || b.id === "fab") openAdd();
   else if (b.id === "cancel" || b.id === "cancel-x") $("dlg").close();
   else if (b.id === "show-done") { state.showDone = true; render(); }
+  else if (b.dataset.filtr !== undefined) { state.filtr = b.dataset.filtr; store("filtr", state.filtr); render(); }
 });
 addEventListener("scroll", () => $("hdr").classList.toggle("scrolled", scrollY > 4), { passive: true });
 addEventListener("resize", () => { clearTimeout(render.t); render.t = setTimeout(() => state.loaded && render(), 150); });
@@ -601,19 +642,20 @@ $("today").textContent = fmtToday.format(new Date()).replace(/^./, (c) => c.toUp
 function demoCall(akcja, id, extra = {}) {
   const now = Date.now(), iso = (h) => new Date(now + h * H).toISOString();
   if (akcja === "dodaj") {
-    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj,
+    const z = { id: "d" + now, fields: { "Tytuł": extra.tytul, "Opis": extra.opis, "Termin": extra.termin, "Rodzaj": extra.rodzaj, "Kategoria": extra.kategoria,
       "Kwota": extra.kwota ? Number(extra.kwota) : undefined, "Status": "Nowe", "Utworzono": iso(0) } };
     demoCall.data.push(z);
     return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
   }
   if (akcja === "lista") {
     demoCall.data ||= [
-      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Rodzaj": "W dniu", "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
-      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Nowe", "Utworzono": iso(-1) } },
-      { id: "d3", fields: { "Tytuł": "Strój na WF", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Rodzaj": "W dniu", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
-      { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Termin": iso(100), "Rodzaj": "Do dnia", "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
-      { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Termin": iso(-48), "Rodzaj": "W dniu", "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
-      { id: "d6", fields: { "Tytuł": "Zgoda na basen", "Termin": iso(-30), "Rodzaj": "Do dnia", "Status": "Zrobione", "Osoba imię": "Ewa", "Zrobiono": iso(-32), "Utworzono": iso(-90) } },
+      { id: "d1", fields: { "Tytuł": "Wycieczka do Krakowa", "Kategoria": "Dominik", "Opis": "Przynieść 40 zł i podpisaną zgodę", "Termin": iso(40), "Rodzaj": "W dniu", "Kwota": 40, "Status": "Nowe", "Utworzono": iso(-6) } },
+      { id: "d2", fields: { "Tytuł": "Zebranie z wychowawczynią", "Kategoria": "Dominik", "Termin": iso(20), "Rodzaj": "Wydarzenie", "Status": "Nowe", "Utworzono": iso(-1) } },
+      { id: "d3", fields: { "Tytuł": "Strój na WF", "Kategoria": "Dominik", "Opis": "Biała koszulka, granatowe spodenki", "Termin": iso(-3), "Rodzaj": "W dniu", "Status": "Przypisane", "Osoba imię": "Ewa", "Utworzono": iso(-30) } },
+      { id: "d4", fields: { "Tytuł": "Opłata za obiady", "Kategoria": "Mateusz", "Termin": iso(100), "Rodzaj": "Do dnia", "Kwota": 182.5, "Status": "Przypisane", "Osoba imię": "Dawid", "Utworzono": iso(-20) } },
+      { id: "d5", fields: { "Tytuł": "Kredki na plastykę", "Kategoria": "Mateusz", "Termin": iso(-48), "Rodzaj": "W dniu", "Status": "Zrobione", "Osoba imię": "Dawid", "Zrobiono": iso(-50), "Utworzono": iso(-80) } },
+      { id: "d7", fields: { "Tytuł": "Rachunek za prąd", "Termin": iso(70), "Rodzaj": "Do dnia", "Kwota": 214.3, "Kategoria": "Dom", "Status": "Nowe", "Utworzono": iso(-2) } },
+      { id: "d6", fields: { "Tytuł": "Zgoda na basen", "Kategoria": "Dominik", "Termin": iso(-30), "Rodzaj": "Do dnia", "Status": "Zrobione", "Osoba imię": "Ewa", "Zrobiono": iso(-32), "Utworzono": iso(-90) } },
     ];
     return new Promise((r) => setTimeout(() => r({ ok: true, ja: "Ewa", zadania: structuredClone(demoCall.data) }), 300));
   }
@@ -623,6 +665,7 @@ function demoCall(akcja, id, extra = {}) {
   else if (akcja === "done") { f["Status"] = "Zrobione"; f["Zrobiono"] = new Date().toISOString(); f["Osoba imię"] ||= "Ewa"; }
   else if (akcja === "release") { f["Status"] = "Nowe"; f["Osoba imię"] = ""; }
   else if (akcja === "przejmij") { f["Osoba imię"] = "Ewa"; }
+  else if (akcja === "przypisz") { f["Status"] = "Przypisane"; f["Osoba imię"] = "Dawid"; }
   demoCall.data[demoCall.data.findIndex((x) => x.id === id)] = z;
   return new Promise((r) => setTimeout(() => r({ ok: true, zadanie: structuredClone(z) }), 500));
 }

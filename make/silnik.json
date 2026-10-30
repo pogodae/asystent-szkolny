@@ -72,6 +72,18 @@
            "b": "^rec[A-Za-z0-9]{14}$",
            "o": "text:pattern"
           }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "przypisz",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.id}}",
+           "b": "^rec[A-Za-z0-9]{14}$",
+           "o": "text:pattern"
+          }
          ]
         ]
        },
@@ -133,7 +145,7 @@
         "qs": [
          {
           "key": "filterByFormula",
-          "value": "AND({Aktywny}, {Klucz}!='{{1.klucz}}')"
+          "value": "AND({Aktywny}, {Klucz}!='{{1.klucz}}', {Powiadomienia}!='Tylko przypisane')"
          },
          {
           "key": "returnFieldsByFieldId",
@@ -282,12 +294,23 @@
           },
           {
            "id": 23,
+           "filter": {
+            "name": "Drugi rodzic chce maile",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
            "mapper": {
             "to": [
              "{{4.body.records[1].fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze tę sprawę – nic nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze tę sprawę – nic nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} bierze: {{2.body.fields.fldbqEXa4YxsfbBun}}{{2.body.fields.fldxSYFWbjmQVQPtE}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
@@ -832,12 +855,23 @@
           },
           {
            "id": 83,
+           "filter": {
+            "name": "Drugi rodzic chce maile",
+            "conditions": [
+             [
+              {
+               "a": "{{4.body.records[1].id}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
            "mapper": {
             "to": [
              "{{4.body.records[1].fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} oddał(a) sprawę – jest znowu wolna</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=take&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=done&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} oddał(a) sprawę – jest znowu wolna</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=take&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=done&amp;p={{4.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "Wolne: {{2.body.fields.fldbqEXa4YxsfbBun}}{{2.body.fields.fldxSYFWbjmQVQPtE}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
@@ -1058,12 +1092,24 @@
           },
           {
            "id": 94,
+           "filter": {
+            "name": "Poprzednia osoba chce maile",
+            "conditions": [
+             [
+              {
+               "a": "{{90.body.fields.fldCoxoqHYQ48oijo}}",
+               "b": "Tylko przypisane",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
            "mapper": {
             "to": [
              "{{90.body.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje Twoją sprawę – nic już nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje Twoją sprawę – nic już nie musisz robić</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę bierze: {{3.body.records[1].fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przejmuje: {{2.body.fields.fldbqEXa4YxsfbBun}}{{2.body.fields.fldxSYFWbjmQVQPtE}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
@@ -1171,6 +1217,260 @@
            "parameters": {}
           }
          ]
+        },
+        {
+         "flow": [
+          {
+           "id": 110,
+           "filter": {
+            "name": "Przypisz: można",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przypisz",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Nowe",
+               "o": "text:equal"
+              }
+             ],
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przypisz",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:equal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND({Aktywny}, {Klucz}='{{1.dla}}')"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ],
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": []
+           },
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 3000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 111,
+           "filter": {
+            "name": "Jest taka osoba",
+            "conditions": [
+             [
+              {
+               "a": "{{110.body.records[1].id}}",
+               "o": "exist"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "id": "{{2.body.id}}",
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "record": {
+             "fld0r2CTQAV8kjHQL": "{{now}}",
+             "fldB3iQHvOIUgYn1I": "Przypisane",
+             "fldKNoba8yEYeFS17": [
+              "{{110.body.records[1].id}}"
+             ]
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2100,
+             "y": 3000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 112,
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tbl6hsMK7nuHuO3hS",
+            "record": {
+             "fld2krcNBe6Wi76hy": [
+              "{{3.body.records[1].id}}"
+             ],
+             "fld3gFPcPMANbP3NH": [
+              "{{2.body.id}}"
+             ],
+             "fldXk11pEacYX8Waq": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przypisuje {{110.body.records[1].fields.fldNY2MTdN0GPOVdx}}: {{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "fldyY0Iv9loL9L34q": "Przypisano"
+            },
+            "typecast": false,
+            "useColumnId": false
+           },
+           "module": "airtable:ActionCreateRecord",
+           "version": 3,
+           "metadata": {
+            "designer": {
+             "x": 2400,
+             "y": 3000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707783
+           }
+          },
+          {
+           "id": 113,
+           "filter": {
+            "name": "Nie sobie",
+            "conditions": [
+             [
+              {
+               "a": "{{110.body.records[1].id}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "to": [
+             "{{110.body.records[1].fields.fld7fIY9UIo72dIrT}}"
+            ],
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przypisuje Ci: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przypisał(a) Ci tę sprawę</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{2.body.id}}&amp;a=done&amp;p={{110.body.records[1].fields.fld0U6X7hMhOxLv4a}}&amp;k={{2.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawa jest teraz Twoja.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "{{3.body.records[1].fields.fldNY2MTdN0GPOVdx}} przypisuje Ci: {{2.body.fields.fldbqEXa4YxsfbBun}}{{2.body.fields.fldxSYFWbjmQVQPtE}}",
+            "bodyType": "rawHtml"
+           },
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "metadata": {
+            "designer": {
+             "x": 2700,
+             "y": 3000
+            }
+           },
+           "parameters": {
+            "__IMTCONN__": 14707789
+           }
+          },
+          {
+           "id": 114,
+           "mapper": {
+            "data": {
+             "ok": true,
+             "kto": "{{110.body.records[1].fields.fldNY2MTdN0GPOVdx}}",
+             "powod": "",
+             "tresc": "{{2.body.fields.fldbqEXa4YxsfbBun}} ma teraz {{110.body.records[1].fields.fldNY2MTdN0GPOVdx}}.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "Przypisane",
+             "naglowek": "Przypisane"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 3000,
+             "y": 3000
+            }
+           },
+           "parameters": {}
+          }
+         ]
+        },
+        {
+         "flow": [
+          {
+           "id": 115,
+           "filter": {
+            "name": "Przypisz: cudze",
+            "conditions": [
+             [
+              {
+               "a": "{{3.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przypisz",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "b": "Przypisane",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "b": "{{3.body.records[1].id}}",
+               "o": "text:notequal"
+              }
+             ]
+            ]
+           },
+           "mapper": {
+            "data": {
+             "ok": false,
+             "kto": "{{2.body.fields.fldy9rjTgd8OpBuWt}}",
+             "powod": "przejete",
+             "tresc": "Przypisać można wolne albo swoje zadanie.",
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "status": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+             "naglowek": "Już przejęte przez {{2.body.fields.fldy9rjTgd8OpBuWt}}"
+            }
+           },
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 3250
+            }
+           },
+           "parameters": {}
+          }
+         ]
         }
        ],
        "version": 1,
@@ -1236,6 +1536,18 @@
            "b": "^(Do dnia|W dniu|Wydarzenie)?$",
            "o": "text:notpattern"
           }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "b": "^(Dominik|Mateusz|Dom)?$",
+           "o": "text:notpattern"
+          }
          ]
         ]
        },
@@ -1286,6 +1598,11 @@
           {
            "a": "{{1.rodzaj}}",
            "b": "^(Do dnia|W dniu|Wydarzenie)?$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "b": "^(Dominik|Mateusz|Dom)?$",
            "o": "text:pattern"
           }
          ]
@@ -1381,6 +1698,7 @@
             "record": {
              "fld0QJqw2alYIYa7r": 0,
              "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
+             "fld8vsAsghJeur5pA": "{{1.kategoria}}",
              "fldB3iQHvOIUgYn1I": "Nowe",
              "fldKAZSVzA0x1ynuN": "{{uuid}}",
              "fldaNenMnWwuRivka": "{{1.opis}}",
@@ -1463,7 +1781,7 @@
             "qs": [
              {
               "key": "filterByFormula",
-              "value": "{Aktywny}"
+              "value": "AND({Aktywny}, {Powiadomienia}!='Tylko przypisane')"
              },
              {
               "key": "returnFieldsByFieldId",
@@ -1507,8 +1825,8 @@
             "to": [
              "{{225.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – {{222.body.fields.fldbNvim8WRqbd2yT}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nowa sprawa ze szkoły</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{222.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{222.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{222.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{222.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=take&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=done&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – {{222.body.fields.fldbNvim8WRqbd2yT}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – {{222.body.fields.fldbNvim8WRqbd2yT}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nowa sprawa</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{222.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{222.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{222.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{222.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=take&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{222.body.id}}&amp;a=done&amp;p={{225.fields.fld0U6X7hMhOxLv4a}}&amp;k={{222.body.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "Nowe: {{222.body.fields.fldbqEXa4YxsfbBun}} – {{222.body.fields.fldbNvim8WRqbd2yT}}{{222.body.fields.fldxSYFWbjmQVQPtE}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",

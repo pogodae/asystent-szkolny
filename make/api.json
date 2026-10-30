@@ -307,7 +307,7 @@
             ]
            },
            "mapper": {
-            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Zadanie zamknięte</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Zadanie zamknięte</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
             "status": 200,
             "headers": [
              {
@@ -367,7 +367,7 @@
             ]
            },
            "mapper": {
-            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Już przejęte przez {{4.body.records[1].fields.fldy9rjTgd8OpBuWt}}</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">Już przejęte przez {{4.body.records[1].fields.fldy9rjTgd8OpBuWt}}</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
             "status": 200,
             "headers": [
              {
@@ -427,7 +427,7 @@
             ]
            },
            "mapper": {
-            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">To już Twoje</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<p style=\"font-size:18px;font-weight:600\">To już Twoje</p>\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
             "status": 200,
             "headers": [
              {
@@ -482,7 +482,7 @@
             ]
            },
            "mapper": {
-            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"take\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"\">Biorę to</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"take\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"\">Biorę to</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
             "status": 200,
             "headers": [
              {
@@ -561,7 +561,7 @@
             ]
            },
            "mapper": {
-            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa ze szkoły</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"done\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"done\">Zrobione</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
+            "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<p class=\"muted\">Sprawa</p>\n<h1>{{4.body.records[1].fields.fldbqEXa4YxsfbBun}}</h1>\n<p><strong>Termin:</strong> {{4.body.records[1].fields.fldeO5RW1DJwB8NX3}}</p>\n<p>{{4.body.records[1].fields.fldKKVlpmXuVza9c9}}</p>\n<p class=\"opis\">{{4.body.records[1].fields.fldaNenMnWwuRivka}}</p>\n<form method=\"post\" action=\"__S2_WEBHOOK_URL__\">\n<input type=\"hidden\" name=\"t\" value=\"{{1.t}}\"><input type=\"hidden\" name=\"a\" value=\"done\">\n<input type=\"hidden\" name=\"p\" value=\"{{1.p}}\"><input type=\"hidden\" name=\"k\" value=\"{{1.k}}\">\n<input type=\"hidden\" name=\"ok\" value=\"1\">\n<button type=\"submit\" class=\"done\">Zrobione</button>\n</form>\n\n<p class=\"muted\" style=\"margin-top:16px\"><a href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a></p>\n</div></main></body></html>\n",
             "status": 200,
             "headers": [
              {
@@ -1076,6 +1076,23 @@
            "b": "^(Do dnia|W dniu|Wydarzenie)?$",
            "o": "text:notpattern"
           }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "b": "dodaj",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "b": "__S1W_API_KEY__",
+           "o": "text:equal"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "b": "^(Dominik|Mateusz|Dom)?$",
+           "o": "text:notpattern"
+          }
          ]
         ]
        },
@@ -1135,6 +1152,11 @@
           {
            "a": "{{1.rodzaj}}",
            "b": "^(Do dnia|W dniu|Wydarzenie)?$",
+           "o": "text:pattern"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "b": "^(Dominik|Mateusz|Dom)?$",
            "o": "text:pattern"
           }
          ]
@@ -1237,7 +1259,8 @@
              "rodzaj": "{{1.rodzaj}}",
              "termin": "{{1.termin}}",
              "zrodlo": "{{ifempty(1.zrodlo; \"Webhook\")}}",
-             "id_zrodla": "{{1.id_zrodla}}"
+             "id_zrodla": "{{1.id_zrodla}}",
+             "kategoria": "{{1.kategoria}}"
             }
            },
            "module": "scenario-service:CallSubscenario",
@@ -1587,6 +1610,11 @@
                "a": "{{1.id}}",
                "b": "^rec[A-Za-z0-9]{14}$",
                "o": "text:pattern"
+              },
+              {
+               "a": "{{1.dla}}",
+               "b": "^[a-z0-9_-]{0,30}$",
+               "o": "text:pattern"
               }
              ],
              [
@@ -1602,6 +1630,11 @@
               {
                "a": "{{1.id}}",
                "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              },
+              {
+               "a": "{{1.dla}}",
+               "b": "^[a-z0-9_-]{0,30}$",
                "o": "text:pattern"
               }
              ],
@@ -1619,6 +1652,11 @@
                "a": "{{1.id}}",
                "b": "^rec[A-Za-z0-9]{14}$",
                "o": "text:pattern"
+              },
+              {
+               "a": "{{1.dla}}",
+               "b": "^[a-z0-9_-]{0,30}$",
+               "o": "text:pattern"
               }
              ],
              [
@@ -1635,6 +1673,32 @@
                "a": "{{1.id}}",
                "b": "^rec[A-Za-z0-9]{14}$",
                "o": "text:pattern"
+              },
+              {
+               "a": "{{1.dla}}",
+               "b": "^[a-z0-9_-]{0,30}$",
+               "o": "text:pattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przypisz",
+               "o": "text:equal"
+              },
+              {
+               "a": "{{1.id}}",
+               "b": "^rec[A-Za-z0-9]{14}$",
+               "o": "text:pattern"
+              },
+              {
+               "a": "{{1.dla}}",
+               "b": "^[a-z0-9_-]{0,30}$",
+               "o": "text:pattern"
               }
              ]
             ]
@@ -1642,6 +1706,7 @@
            "mapper": {
             "data": {
              "id": "{{1.id}}",
+             "dla": "{{1.dla}}",
              "akcja": "{{1.akcja}}",
              "klucz": "{{1.u}}"
             }
@@ -1792,6 +1857,22 @@
                "o": "text:equal"
               },
               {
+               "a": "{{1.kategoria}}",
+               "b": "^(Dominik|Mateusz|Dom)?$",
+               "o": "text:notpattern"
+              }
+             ],
+             [
+              {
+               "a": "{{401.body.records[1].id}}",
+               "o": "exist"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "dodaj",
+               "o": "text:equal"
+              },
+              {
                "a": "{{1.termin}}",
                "b": "{{now}}",
                "o": "date:lessorequal"
@@ -1857,6 +1938,11 @@
                "o": "text:pattern"
               },
               {
+               "a": "{{1.kategoria}}",
+               "b": "^(Dominik|Mateusz|Dom)?$",
+               "o": "text:pattern"
+              },
+              {
                "a": "{{1.termin}}",
                "b": "{{now}}",
                "o": "date:greater"
@@ -1873,7 +1959,8 @@
              "rodzaj": "{{1.rodzaj}}",
              "termin": "{{1.termin}}",
              "zrodlo": "Dashboard",
-             "id_zrodla": "{{1.id_zrodla}}"
+             "id_zrodla": "{{1.id_zrodla}}",
+             "kategoria": "{{1.kategoria}}"
             }
            },
            "module": "scenario-service:CallSubscenario",
@@ -1997,6 +2084,11 @@
               {
                "a": "{{1.akcja}}",
                "b": "przejmij",
+               "o": "text:notequal"
+              },
+              {
+               "a": "{{1.akcja}}",
+               "b": "przypisz",
                "o": "text:notequal"
               }
              ]
@@ -2241,7 +2333,7 @@
             "qs": [
              {
               "key": "filterByFormula",
-              "value": "{Aktywny}"
+              "value": "AND({Aktywny}, {Powiadomienia}!='Tylko przypisane')"
              },
              {
               "key": "returnFieldsByFieldId",
@@ -2285,8 +2377,8 @@
             "to": [
              "{{513.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldy2D2ty28uZDEBB}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nikt jeszcze nie wziął tej sprawy</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{511.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{511.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{511.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{511.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=take&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=done&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldy2D2ty28uZDEBB}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldy2D2ty28uZDEBB}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nikt jeszcze nie wziął tej sprawy</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{511.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{511.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{511.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{511.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#2563eb;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=take&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Biorę to</a>\n  </td>\n  <td width=\"12\"></td>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{511.id}}&amp;a=done&amp;p={{513.fields.fld0U6X7hMhOxLv4a}}&amp;k={{511.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "Nikt jeszcze nie wziął: {{511.fields.fldbqEXa4YxsfbBun}}{{511.fields.fldxSYFWbjmQVQPtE}}{{511.fields.fldy2D2ty28uZDEBB}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
@@ -2431,8 +2523,8 @@
             "to": [
              "{{524.body.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Jutro: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Przypomnienie: to Twoja sprawa na jutro</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{521.id}}&amp;a=done&amp;p={{524.body.fields.fld0U6X7hMhOxLv4a}}&amp;k={{521.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę masz Ty – {{524.body.fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] Jutro: {{521.fields.fldbqEXa4YxsfbBun}}",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Jutro: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Przypomnienie: to Twoja sprawa na jutro</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{521.id}}&amp;a=done&amp;p={{524.body.fields.fld0U6X7hMhOxLv4a}}&amp;k={{521.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę masz Ty – {{524.body.fields.fldNY2MTdN0GPOVdx}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "Jutro: {{521.fields.fldbqEXa4YxsfbBun}}{{521.fields.fldxSYFWbjmQVQPtE}}",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
@@ -2552,7 +2644,7 @@
             "qs": [
              {
               "key": "filterByFormula",
-              "value": "{Aktywny}"
+              "value": "AND({Aktywny}, OR({Powiadomienia}!='Tylko przypisane', RECORD_ID()='{{531.fields.fldKNoba8yEYeFS17[1]}}'))"
              },
              {
               "key": "returnFieldsByFieldId",
@@ -2596,8 +2688,8 @@
             "to": [
              "{{535.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>[Szkoła] Po terminie: {{531.fields.fldbqEXa4YxsfbBun}} – zrobione?</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Termin minął. Czy sprawa jest zrobiona?</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{531.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{531.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{531.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{531.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{531.id}}&amp;a=done&amp;p={{535.fields.fld0U6X7hMhOxLv4a}}&amp;k={{531.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Przypisane do: {{531.fields.fldy9rjTgd8OpBuWt}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
-            "subject": "[Szkoła] Po terminie: {{531.fields.fldbqEXa4YxsfbBun}} – zrobione?",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Po terminie: {{531.fields.fldbqEXa4YxsfbBun}} – zrobione?</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Termin minął. Czy sprawa jest zrobiona?</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{531.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{531.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{531.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{531.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#16a34a;\">\n    <a href=\"__S2_WEBHOOK_URL__?t={{531.id}}&amp;a=done&amp;p={{535.fields.fld0U6X7hMhOxLv4a}}&amp;k={{531.fields.fldKAZSVzA0x1ynuN}}\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Zrobione</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Przypisane do: {{531.fields.fldy9rjTgd8OpBuWt}}</p>\n<p style=\"margin:0;font-size:13px;\"><a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"color:#2563eb;\">Zobacz wszystkie sprawy</a></p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
+            "subject": "Po terminie: {{531.fields.fldbqEXa4YxsfbBun}}{{531.fields.fldxSYFWbjmQVQPtE}} – zrobione?",
             "bodyType": "rawHtml"
            },
            "module": "google-email:sendAnEmail",
