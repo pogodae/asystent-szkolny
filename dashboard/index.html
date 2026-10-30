@@ -379,7 +379,8 @@ async function call(akcja, id, extra = {}) {
   const body = new URLSearchParams({ u: auth.u || "", s: auth.s || "", akcja, ...extra });
   if (id) body.set("id", id);
   const r = await fetch(CONFIG.api, { method: "POST", body });
-  const j = await r.json().catch(() => ({ ok: false, powod: "blad" }));
+  // „Accepted” zamiast JSON = Make przyjął żądanie do kolejki, bo scenariusz jest wstrzymany
+  const j = await r.json().catch(() => ({ ok: false, powod: "niedostepne" }));
   if (!r.ok || !j.ok) throw Object.assign(new Error(j.powod || "blad"), { powod: j.powod });
   return j;
 }
@@ -514,6 +515,12 @@ function toast(msg) {
   const t = $("toast"); t.textContent = msg; t.classList.add("show");
   clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("show"), 3200);
 }
+function niedostepne() {
+  $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("filters").innerHTML = "";
+  $("main").innerHTML = `<div class="notice"><div class="ico">${I.alert}</div><h2>Lista chwilowo niedostępna</h2>
+    <p>Serwer z zadaniami (Make) nie odpowiada – najczęściej dlatego, że skończył się miesięczny limit operacji.
+    Spróbuj później przyciskiem odświeżania u góry.</p></div>`;
+}
 function noAccess() {
   $("summary").innerHTML = ""; $("tabs").innerHTML = ""; $("filters").innerHTML = ""; $("fab").hidden = true; $("add").hidden = true;
   $("main").innerHTML = `<div class="notice"><div class="ico">${I.lock}</div><h2>Brak dostępu</h2>
@@ -551,7 +558,8 @@ async function load(wymus = false) {
     render();
   } catch (e) {
     if (e.powod === "brak_dostepu") return noAccess();
-    toast("Nie udało się pobrać listy. Spróbuj odświeżyć.");
+    if (!state.loaded) return niedostepne();
+    toast(pobrano ? `Brak połączenia – lista z ${fmtTime.format(new Date(pobrano))}` : "Nie udało się pobrać listy.");
   } finally {
     $("refresh").classList.remove("spin");
   }
