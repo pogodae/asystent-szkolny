@@ -6,17 +6,7 @@
 
 Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki, wizyty) giną między dwojgiem rodziców, bo każde zakłada, że drugie się tym zajmie. Asystent zamienia każdą sprawę w **zadanie z właścicielem**: nowa sprawa należy do jednej osoby, która może ją oznaczyć jako zrobioną albo przekazać drugiej (ta dostaje wtedy maila), a dzień przed terminem właściciel dostaje przypomnienie.
 
-To ten sam mechanizm, który działa w obsłudze zgłoszeń, rekrutacji czy sprzedaży:
-
-| W domu | W firmie |
-| --- | --- |
-| sprawa ze szkoły lub domu | zgłoszenie, kandydat, lead |
-| wiadomość z dziennika, zdanie do Claude, formularz | formularz na stronie, portal z ogłoszeniami, mail, CRM |
-| przekazanie drugiemu rodzicowi z mailem | przypisanie rekrutera lub handlowca z powiadomieniem |
-| przypomnienie dzień przed terminem | follow-up, przypomnienie o rozmowie lub ofercie |
-| deduplikacja po `id_zrodla` | ten sam kandydat lub lead z dwóch źródeł |
-
-## Dla rekrutera
+## W skrócie
 
 **Jaki problem rozwiązuje?** Sprawy dzieci i domu nie mają właściciela, więc umykają terminy i nikt nie wie, kto się czymś zajmuje. Każda sprawa ma tu jedną osobę odpowiedzialną, termin i status. Sprawę można dodać na trzy sposoby: zdaniem w Claude, formularzem albo webhookiem z innego systemu.
 
