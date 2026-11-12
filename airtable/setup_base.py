@@ -6,6 +6,7 @@ Na końcu odczytuje schemat i wypisuje, czego API nie potrafi zrobić
 
 Użycie:  python airtable/setup_base.py
 """
+import os
 import sys
 
 from common import Airtable, load_env, require
@@ -31,8 +32,13 @@ ZRODLA = ("Claude", "Webhook", "Scraper", "Dashboard")
 # Do dnia – zrobić najpóźniej tego dnia; W dniu – tego konkretnego dnia (np. przynieść 20 zł);
 # Wydarzenie – o konkretnej godzinie (np. zebranie). Godzina wyświetla się tylko dla wydarzeń.
 RODZAJE = ("Do dnia", "W dniu", "Wydarzenie")
-# czego dotyczy sprawa: dzieci i dom
-KATEGORIE = ("Szymon", "Michał", "Dom")
+
+
+def kategorie():
+    """Czego dotyczy sprawa (dzieci i dom) – z .env, np. KATEGORIE=Ola,Kuba,Dom."""
+    return [k.strip() for k in os.environ.get("KATEGORIE", "Szymon,Michał,Dom").split(",") if k.strip()]
+
+
 # Wszystkie – każdy mail; Tylko przypisane – tylko maile o sprawach przypisanych do tej osoby
 POWIADOMIENIA = ("Wszystkie", "Tylko przypisane")
 TYPY_ZDARZEN = ("Utworzono", "Przypisano", "Zrobione", "Przypomnienie", "Eskalacja",
@@ -56,7 +62,7 @@ def zadania_fields(rodzice_id):
         {"name": "Opis", "type": "multilineText"},
         {"name": "Termin", **DATETIME, "description": "Do dnia: 20:00 tego dnia, W dniu: 7:30 – godzina tylko do przypomnień"},
         {"name": "Rodzaj", **select(*RODZAJE)},
-        {"name": "Kategoria", **select(*KATEGORIE)},
+        {"name": "Kategoria", **select(*kategorie())},
         {"name": "Kwota", "type": "currency", "options": {"precision": 2, "symbol": "zł"}},
         {"name": "Status", **select(*STATUSY)},
         {"name": "Osoba", **link(rodzice_id), "description": "max 1 osoba"},

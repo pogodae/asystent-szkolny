@@ -1,30 +1,58 @@
 {
+ "name": "Asystent – API (maile, webhook, dashboard, przypomnienia)",
  "flow": [
   {
    "id": 1,
-   "mapper": {},
    "module": "gateway:CustomWebHook",
    "version": 1,
+   "parameters": {
+    "hook": 4476401,
+    "maxResults": 1
+   },
+   "mapper": {},
    "metadata": {
     "designer": {
      "x": 0,
      "y": 0
     }
-   },
-   "parameters": {
-    "hook": 4476401,
-    "maxResults": 1
    }
   },
   {
    "id": 2,
-   "mapper": null,
    "module": "builtin:BasicRouter",
+   "version": 1,
+   "parameters": {},
+   "mapper": null,
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   },
    "routes": [
     {
      "flow": [
       {
        "id": 3,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
+       "mapper": {
+        "status": 200,
+        "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Sprawy są na liście</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Sprawy są na liście</h1>\n<p>Przyciski w mailach już nie działają – wszystko zrobisz na liście spraw.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
+        "headers": [
+         {
+          "key": "Content-Type",
+          "value": "text/html; charset=utf-8"
+         }
+        ]
+       },
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 0
+        }
+       },
        "filter": {
         "name": "Stary link z maila",
         "conditions": [
@@ -35,26 +63,7 @@
           }
          ]
         ]
-       },
-       "mapper": {
-        "body": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"robots\" content=\"noindex\"><title>Sprawy są na liście</title>\n<style>\n:root{color-scheme:light dark;--bg:#f4f4f5;--card:#fff;--fg:#18181b;--muted:#71717a;--btn:#2563eb}\n@media (prefers-color-scheme:dark){:root{--bg:#18181b;--card:#27272a;--fg:#fafafa;--muted:#a1a1aa}}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}\nmain{max-width:480px;margin:0 auto;padding:24px 16px}.card{background:var(--card);border-radius:14px;padding:24px}\nh1{font-size:22px;line-height:1.3;margin:0 0 12px}p{margin:0 0 12px}.muted{color:var(--muted);font-size:14px}\n.opis{white-space:pre-line}button,.btn{display:block;width:100%;padding:16px;border:0;border-radius:10px;background:var(--btn);color:#fff;font-size:18px;font-weight:600;text-align:center;text-decoration:none;cursor:pointer;margin-top:8px}\n.done{--btn:#16a34a}a{color:var(--btn)}\n</style>\n</head><body><main><div class=\"card\">\n<h1>Sprawy są na liście</h1>\n<p>Przyciski w mailach już nie działają – wszystko zrobisz na liście spraw.</p>\n<a class=\"btn\" href=\"https://pogodae.github.io/asystent-szkolny/\">Zobacz wszystkie sprawy</a>\n</div></main></body></html>\n",
-        "status": 200,
-        "headers": [
-         {
-          "key": "Content-Type",
-          "value": "text/html; charset=utf-8"
-         }
-        ]
-       },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
-       "metadata": {
-        "designer": {
-         "x": 600,
-         "y": 0
-        }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -62,26 +71,12 @@
      "flow": [
       {
        "id": 300,
-       "filter": {
-        "name": "S1-W: zły klucz",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:notequal"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"status\":\"blad\",\"komunikat\":\"Brak lub zły nagłówek X-Api-Key\"}",
         "status": 401,
+        "body": "{\"status\":\"blad\",\"komunikat\":\"Brak lub zły nagłówek X-Api-Key\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -93,15 +88,29 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 250
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "S1-W: zły klucz",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:notequal",
+           "b": "__S1W_API_KEY__"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -109,97 +118,12 @@
      "flow": [
       {
        "id": 301,
-       "filter": {
-        "name": "S1-W: błąd danych",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "notexist"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.termin}}",
-           "o": "notexist"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:lessorequal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:notpattern"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"status\":\"blad\",\"komunikat\":\"Brak tytułu albo termin nie jest datą w przyszłości.\"}",
         "status": 400,
+        "body": "{\"status\": \"blad\", \"komunikat\": \"Nie dodano. Wymagane: tytuł, termin w przyszłości (ISO 8601), rodzaj: Do dnia / W dniu / Wydarzenie, kategoria: Szymon / Michał / Dom (albo pusta), id_zrodla: litery, cyfry, _ . : - (maks. 100).\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -211,15 +135,117 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 500
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "S1-W: błąd danych",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:lessorequal",
+           "b": "{{now}}"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:notpattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:notpattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:notpattern",
+           "b": "^[A-Za-z0-9_.:-]{0,100}$"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -227,43 +253,15 @@
      "flow": [
       {
        "id": 310,
-       "filter": {
-        "name": "S1-W: dane OK",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "exist"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:greater"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:pattern"
-          }
-         ]
-        ]
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": [],
         "qs": [
          {
           "key": "filterByFormula",
@@ -273,32 +271,96 @@
           "key": "returnFieldsByFieldId",
           "value": "true"
          }
-        ],
-        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
-        "method": "GET",
-        "headers": []
+        ]
        },
-       "module": "airtable:makeApiCall",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 750
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "S1-W: dane OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:greater",
+           "b": "{{now}}"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:pattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:pattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:pattern",
+           "b": "^[A-Za-z0-9_.:-]{0,100}$"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 311,
-       "mapper": null,
        "module": "builtin:BasicRouter",
+       "version": 1,
+       "parameters": {},
+       "mapper": null,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 750
+        }
+       },
        "routes": [
         {
          "flow": [
           {
            "id": 312,
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "parameters": {},
+           "mapper": {
+            "status": 200,
+            "body": "{\"status\":\"duplikat\",\"id\":\"{{310.body.records[1].id}}\"}",
+            "headers": [
+             {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+             },
+             {
+              "key": "Access-Control-Allow-Origin",
+              "value": "https://pogodae.github.io"
+             }
+            ]
+           },
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 750
+            }
+           },
            "filter": {
             "name": "Duplikat",
             "conditions": [
@@ -309,30 +371,7 @@
               }
              ]
             ]
-           },
-           "mapper": {
-            "body": "{\"status\":\"duplikat\",\"id\":\"{{310.body.records[1].id}}\"}",
-            "status": 200,
-            "headers": [
-             {
-              "key": "Content-Type",
-              "value": "application/json; charset=utf-8"
-             },
-             {
-              "key": "Access-Control-Allow-Origin",
-              "value": "https://pogodae.github.io"
-             }
-            ]
-           },
-           "module": "gateway:WebhookRespond",
-           "version": 1,
-           "metadata": {
-            "designer": {
-             "x": 1200,
-             "y": 750
-            }
-           },
-           "parameters": {}
+           }
           }
          ]
         },
@@ -340,6 +379,31 @@
          "flow": [
           {
            "id": 320,
+           "module": "scenario-service:CallSubscenario",
+           "version": 2,
+           "parameters": {
+            "scenario": "SCN_10071371",
+            "shouldWaitForExecutionEnd": true
+           },
+           "mapper": {
+            "data": {
+             "akcja": "dodaj",
+             "tytul": "{{1.tytul}}",
+             "termin": "{{1.termin}}",
+             "opis": "{{1.opis}}",
+             "kwota": "{{1.kwota}}",
+             "zrodlo": "{{ifempty(1.zrodlo; \"Webhook\")}}",
+             "id_zrodla": "{{1.id_zrodla}}",
+             "rodzaj": "{{1.rodzaj}}",
+             "kategoria": "{{1.kategoria}}"
+            }
+           },
+           "metadata": {
+            "designer": {
+             "x": 1200,
+             "y": 1000
+            }
+           },
            "filter": {
             "name": "Nowe",
             "conditions": [
@@ -350,36 +414,19 @@
               }
              ]
             ]
-           },
-           "mapper": {
-            "data": {
-             "opis": "{{1.opis}}",
-             "akcja": "dodaj",
-             "kwota": "{{1.kwota}}",
-             "tytul": "{{1.tytul}}",
-             "rodzaj": "{{1.rodzaj}}",
-             "termin": "{{1.termin}}",
-             "zrodlo": "{{ifempty(1.zrodlo; \"Webhook\")}}",
-             "id_zrodla": "{{1.id_zrodla}}",
-             "kategoria": "{{1.kategoria}}"
-            }
-           },
-           "module": "scenario-service:CallSubscenario",
-           "version": 2,
-           "metadata": {
-            "designer": {
-             "x": 1200,
-             "y": 1000
-            }
-           },
-           "parameters": {
-            "scenario": "SCN_10071371",
-            "shouldWaitForExecutionEnd": true
            }
           },
           {
            "id": 321,
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
+           },
            "mapper": {
+            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+            "method": "GET",
+            "headers": [],
             "qs": [
              {
               "key": "filterByFormula",
@@ -389,28 +436,23 @@
               "key": "returnFieldsByFieldId",
               "value": "true"
              }
-            ],
-            "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
-            "method": "GET",
-            "headers": []
+            ]
            },
-           "module": "airtable:makeApiCall",
-           "version": 3,
            "metadata": {
             "designer": {
              "x": 1500,
              "y": 1000
             }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
            }
           },
           {
            "id": 322,
+           "module": "gateway:WebhookRespond",
+           "version": 1,
+           "parameters": {},
            "mapper": {
-            "body": "{\"status\":\"utworzono\",\"id\":\"{{321.body.records[1].id}}\",\"termin\":\"{{1.termin}}\"}",
             "status": 200,
+            "body": "{\"status\":\"utworzono\",\"id\":\"{{321.body.records[1].id}}\",\"termin\":\"{{1.termin}}\"}",
             "headers": [
              {
               "key": "Content-Type",
@@ -422,27 +464,16 @@
              }
             ]
            },
-           "module": "gateway:WebhookRespond",
-           "version": 1,
            "metadata": {
             "designer": {
              "x": 1800,
              "y": 1000
             }
-           },
-           "parameters": {}
+           }
           }
          ]
         }
-       ],
-       "version": 1,
-       "metadata": {
-        "designer": {
-         "x": 900,
-         "y": 750
-        }
-       },
-       "parameters": {}
+       ]
       }
      ]
     },
@@ -450,65 +481,12 @@
      "flow": [
       {
        "id": 400,
-       "filter": {
-        "name": "API: brak dostępu",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:notequal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:notequal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:notequal"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":false,\"powod\":\"brak_dostepu\"}",
         "status": 403,
+        "body": "{\"ok\":false,\"powod\":\"brak_dostepu\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -520,15 +498,68 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 1000
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "API: brak dostępu",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:notequal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:notequal",
+           "b": "adam"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:notequal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:notequal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -536,98 +567,101 @@
      "flow": [
       {
        "id": 410,
-       "filter": {
-        "name": "Lista",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "lista",
-           "o": "text:equal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "lista",
-           "o": "text:equal"
-          }
-         ]
-        ]
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": [],
         "qs": [
          {
           "key": "filterByFormula",
           "value": "OR({Status}='Nowe', {Status}='Przypisane', AND({Status}='Zrobione', DATETIME_DIFF(NOW(), {Zrobiono}, 'days') < 7))"
          }
-        ],
-        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
-        "method": "GET",
-        "headers": []
+        ]
        },
-       "module": "airtable:makeApiCall",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 1250
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "Lista",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "lista"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "lista"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 411,
+       "module": "json:TransformToJSON",
+       "version": 1,
+       "parameters": {},
        "mapper": {
         "object": "{{410.body.records}}"
        },
-       "module": "json:TransformToJSON",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 900,
          "y": 1250
         }
-       },
-       "parameters": {}
+       }
       },
       {
        "id": 412,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":true,\"ja\":\"{{switch(1.u; \"ewa\"; \"Ewa\"; \"adam\"; \"Adam\")}}\",\"zadania\":{{411.json}}}",
         "status": 200,
+        "body": "{\"ok\":true,\"ja\":\"{{switch(1.u; \"ewa\"; \"Ewa\"; \"adam\"; \"Adam\")}}\",\"rodzice\":[{\"imie\": \"Ewa\", \"klucz\": \"ewa\"}, {\"imie\": \"Adam\", \"klucz\": \"adam\"}],\"kategorie\":[\"Szymon\", \"Michał\", \"Dom\"],\"zadania\":{{411.json}}}",
         "headers": [
          {
           "key": "Content-Type",
@@ -639,15 +673,12 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 1200,
          "y": 1250
         }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -655,166 +686,169 @@
      "flow": [
       {
        "id": 420,
-       "filter": {
-        "name": "Zmiana statusu",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przypisz",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przypisz",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.dla}}",
-           "b": "^[a-z0-9_-]{0,30}$",
-           "o": "text:pattern"
-          }
-         ]
-        ]
+       "module": "scenario-service:CallSubscenario",
+       "version": 2,
+       "parameters": {
+        "scenario": "SCN_10071371",
+        "shouldWaitForExecutionEnd": true
        },
        "mapper": {
         "data": {
-         "id": "{{1.id}}",
-         "dla": "{{1.dla}}",
-         "kto": "{{switch(1.u; \"ewa\"; \"recebgsSkREMJn62G\"; \"adam\"; \"recOnhgnemNYoLSeX\")}}",
          "akcja": "{{1.akcja}}",
-         "kto_imie": "{{switch(1.u; \"ewa\"; \"Ewa\"; \"adam\"; \"Adam\")}}"
+         "id": "{{1.id}}",
+         "kto": "{{switch(1.u; \"ewa\"; \"recebgsSkREMJn62G\"; \"adam\"; \"recOnhgnemNYoLSeX\")}}",
+         "kto_imie": "{{switch(1.u; \"ewa\"; \"Ewa\"; \"adam\"; \"Adam\")}}",
+         "dla": "{{1.dla}}"
         }
        },
-       "module": "scenario-service:CallSubscenario",
-       "version": 2,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 1500
         }
        },
-       "parameters": {
-        "scenario": "SCN_10071371",
-        "shouldWaitForExecutionEnd": true
+       "filter": {
+        "name": "Zmiana statusu",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "done"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.dla}}",
+           "o": "text:pattern",
+           "b": "^[a-z0-9_-]{0,30}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "przypisz"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.dla}}",
+           "o": "text:pattern",
+           "b": "^[a-z0-9_-]{0,30}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "done"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.dla}}",
+           "o": "text:pattern",
+           "b": "^[a-z0-9_-]{0,30}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "przypisz"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.dla}}",
+           "o": "text:pattern",
+           "b": "^[a-z0-9_-]{0,30}$"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 423,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":true}",
         "status": 200,
+        "body": "{\"ok\":true}",
         "headers": [
          {
           "key": "Content-Type",
@@ -826,15 +860,12 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 900,
          "y": 1500
         }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -842,282 +873,12 @@
      "flow": [
       {
        "id": 440,
-       "filter": {
-        "name": "Dodaj: błąd danych",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "notexist"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id_zrodla}}",
-           "b": "^dash-[a-f0-9-]{8,40}$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:lessorequal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "notexist"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id_zrodla}}",
-           "b": "^dash-[a-f0-9-]{8,40}$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:notpattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:lessorequal"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":false,\"powod\":\"blad_danych\"}",
         "status": 400,
+        "body": "{\"ok\":false,\"powod\":\"blad_danych\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -1129,15 +890,285 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 1750
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "Dodaj: błąd danych",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:notpattern",
+           "b": "^dash-[a-f0-9-]{8,40}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:notpattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:notpattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:lessorequal",
+           "b": "{{now}}"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "notexist"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:notpattern",
+           "b": "^dash-[a-f0-9-]{8,40}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:notpattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:notpattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:lessorequal",
+           "b": "{{now}}"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -1145,142 +1176,145 @@
      "flow": [
       {
        "id": 441,
-       "filter": {
-        "name": "Dodaj: dane OK",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "exist"
-          },
-          {
-           "a": "{{1.id_zrodla}}",
-           "b": "^dash-[a-f0-9-]{8,40}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:greater"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "exist"
-          },
-          {
-           "a": "{{1.id_zrodla}}",
-           "b": "^dash-[a-f0-9-]{8,40}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:greater"
-          }
-         ]
-        ]
+       "module": "airtable:ActionCreateRecord",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
         "base": "appBSubdL1R6lgjY8",
         "table": "tblrnPwEGqiGYxSbd",
+        "typecast": false,
+        "useColumnId": false,
         "record": {
-         "fld0QJqw2alYIYa7r": 0,
-         "fld0r2CTQAV8kjHQL": "{{now}}",
-         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
-         "fld8vsAsghJeur5pA": "{{1.kategoria}}",
+         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
+         "fldaNenMnWwuRivka": "{{1.opis}}",
+         "fldxwYvIR2e1Kx14D": "{{1.termin}}",
+         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
          "fldB3iQHvOIUgYn1I": "Przypisane",
          "fldKNoba8yEYeFS17": [
           "recebgsSkREMJn62G"
          ],
-         "fldaNenMnWwuRivka": "{{1.opis}}",
-         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
-         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
-         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
+         "fld0r2CTQAV8kjHQL": "{{now}}",
          "fldrzdtN10bDZTdX1": "Dashboard",
-         "fldxwYvIR2e1Kx14D": "{{1.termin}}"
-        },
-        "typecast": false,
-        "useColumnId": false
+         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
+         "fld0QJqw2alYIYa7r": 0,
+         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
+         "fld8vsAsghJeur5pA": "{{1.kategoria}}"
+        }
        },
-       "module": "airtable:ActionCreateRecord",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 2000
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "Dodaj: dane OK",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:pattern",
+           "b": "^dash-[a-f0-9-]{8,40}$"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:pattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:pattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:greater",
+           "b": "{{now}}"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:pattern",
+           "b": "^dash-[a-f0-9-]{8,40}$"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:pattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:pattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:greater",
+           "b": "{{now}}"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 444,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":true,\"id\":\"{{441.id}}\"}",
         "status": 200,
+        "body": "{\"ok\":true,\"id\":\"{{441.id}}\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -1292,15 +1326,12 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 900,
          "y": 2000
         }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -1308,92 +1339,95 @@
      "flow": [
       {
        "id": 450,
-       "filter": {
-        "name": "Usuń",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "usun",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "usun",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ]
-        ]
-       },
-       "mapper": {
-        "id": "{{1.id}}",
-        "base": "appBSubdL1R6lgjY8",
-        "table": "tblrnPwEGqiGYxSbd",
-        "record": {
-         "fldB3iQHvOIUgYn1I": "Anulowane"
-        },
-        "typecast": false,
-        "useColumnId": false
-       },
        "module": "airtable:ActionUpdateRecords",
        "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
+       },
+       "mapper": {
+        "base": "appBSubdL1R6lgjY8",
+        "table": "tblrnPwEGqiGYxSbd",
+        "id": "{{1.id}}",
+        "typecast": false,
+        "useColumnId": false,
+        "record": {
+         "fldB3iQHvOIUgYn1I": "Anulowane"
+        }
+       },
        "metadata": {
         "designer": {
          "x": 600,
          "y": 2250
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "Usuń",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "usun"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "usun"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 451,
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":true}",
         "status": 200,
+        "body": "{\"ok\":true}",
         "headers": [
          {
           "key": "Content-Type",
@@ -1405,15 +1439,12 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 900,
          "y": 2250
         }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -1421,98 +1452,12 @@
      "flow": [
       {
        "id": 430,
-       "filter": {
-        "name": "Nieznana akcja",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "ewa",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC1_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "lista",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "usun",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "done",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przypisz",
-           "o": "text:notequal"
-          }
-         ],
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "api",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.u}}",
-           "b": "adam",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.s}}",
-           "b": "__RODZIC2_KLUCZ_DOSTEPU__",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "lista",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "usun",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "done",
-           "o": "text:notequal"
-          },
-          {
-           "a": "{{1.akcja}}",
-           "b": "przypisz",
-           "o": "text:notequal"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":false,\"powod\":\"nieznana_akcja\"}",
         "status": 400,
+        "body": "{\"ok\":false,\"powod\":\"nieznana_akcja\"}",
         "headers": [
          {
           "key": "Content-Type",
@@ -1524,15 +1469,101 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 2500
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "Nieznana akcja",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "ewa"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC1_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "lista"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "usun"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "done"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "przypisz"
+          }
+         ],
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "api"
+          },
+          {
+           "a": "{{1.u}}",
+           "o": "text:equal",
+           "b": "adam"
+          },
+          {
+           "a": "{{1.s}}",
+           "o": "text:equal",
+           "b": "__RODZIC2_KLUCZ_DOSTEPU__"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "lista"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "usun"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "done"
+          },
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:notequal",
+           "b": "przypisz"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -1540,26 +1571,12 @@
      "flow": [
       {
        "id": 500,
-       "filter": {
-        "name": "S3: zły klucz",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "przypomnienia",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:notequal"
-          }
-         ]
-        ]
-       },
+       "module": "gateway:WebhookRespond",
+       "version": 1,
+       "parameters": {},
        "mapper": {
-        "body": "{\"ok\":false}",
         "status": 401,
+        "body": "{\"ok\":false}",
         "headers": [
          {
           "key": "Content-Type",
@@ -1571,15 +1588,29 @@
          }
         ]
        },
-       "module": "gateway:WebhookRespond",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 2750
         }
        },
-       "parameters": {}
+       "filter": {
+        "name": "S3: zły klucz",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "przypomnienia"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:notequal",
+           "b": "__S1W_API_KEY__"
+          }
+         ]
+        ]
+       }
       }
      ]
     },
@@ -1587,24 +1618,15 @@
      "flow": [
       {
        "id": 520,
-       "filter": {
-        "name": "S3: start",
-        "conditions": [
-         [
-          {
-           "a": "{{1.cel}}",
-           "b": "przypomnienia",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
-           "b": "__S1W_API_KEY__",
-           "o": "text:equal"
-          }
-         ]
-        ]
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": [],
         "qs": [
          {
           "key": "filterByFormula",
@@ -1614,73 +1636,112 @@
           "key": "returnFieldsByFieldId",
           "value": "true"
          }
-        ],
-        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
-        "method": "GET",
-        "headers": []
+        ]
        },
-       "module": "airtable:makeApiCall",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 3000
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "S3: start",
+        "conditions": [
+         [
+          {
+           "a": "{{1.cel}}",
+           "o": "text:equal",
+           "b": "przypomnienia"
+          },
+          {
+           "a": "{{first(map(1.__IMTHEADERS__; \"value\"; \"name\"; \"x-api-key\"))}}",
+           "o": "text:equal",
+           "b": "__S1W_API_KEY__"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 521,
+       "module": "builtin:BasicFeeder",
+       "version": 1,
+       "parameters": {},
        "mapper": {
         "array": "{{520.body.records}}"
        },
-       "module": "builtin:BasicFeeder",
-       "version": 1,
        "metadata": {
         "designer": {
          "x": 900,
          "y": 3000
         }
-       },
-       "parameters": {}
+       }
       },
       {
        "id": 522,
-       "mapper": {
-        "id": "{{521.id}}",
-        "base": "appBSubdL1R6lgjY8",
-        "table": "tblrnPwEGqiGYxSbd",
-        "record": {
-         "fld0QJqw2alYIYa7r": "{{ifempty(521.fields.fld0QJqw2alYIYa7r; 0) + 1}}",
-         "fldEaRdxdBntiaWV7": true,
-         "fldOIYTKituV1TBjR": "{{now}}"
-        },
-        "typecast": false,
-        "useColumnId": false
-       },
        "module": "airtable:ActionUpdateRecords",
        "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
+       },
+       "mapper": {
+        "base": "appBSubdL1R6lgjY8",
+        "table": "tblrnPwEGqiGYxSbd",
+        "id": "{{521.id}}",
+        "typecast": false,
+        "useColumnId": false,
+        "record": {
+         "fldEaRdxdBntiaWV7": true,
+         "fld0QJqw2alYIYa7r": "{{ifempty(521.fields.fld0QJqw2alYIYa7r; 0) + 1}}",
+         "fldOIYTKituV1TBjR": "{{now}}"
+        }
+       },
        "metadata": {
         "designer": {
          "x": 1200,
          "y": 3000
         }
-       },
-       "parameters": {
-        "__IMTCONN__": 14707783
        }
       },
       {
        "id": 523,
-       "mapper": null,
        "module": "builtin:BasicRouter",
+       "version": 1,
+       "parameters": {},
+       "mapper": null,
+       "metadata": {
+        "designer": {
+         "x": 1500,
+         "y": 3000
+        }
+       },
        "routes": [
         {
          "flow": [
           {
            "id": 524,
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
+           },
+           "mapper": {
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV/{{521.fields.fldKNoba8yEYeFS17[1]}}",
+            "method": "GET",
+            "headers": [],
+            "qs": [
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ]
+           },
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 3000
+            }
+           },
            "filter": {
             "name": "Przypisana",
             "conditions": [
@@ -1691,50 +1752,28 @@
               }
              ]
             ]
-           },
-           "mapper": {
-            "qs": [
-             {
-              "key": "returnFieldsByFieldId",
-              "value": "true"
-             }
-            ],
-            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV/{{521.fields.fldKNoba8yEYeFS17[1]}}",
-            "method": "GET",
-            "headers": []
-           },
-           "module": "airtable:makeApiCall",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1800,
-             "y": 3000
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
            }
           },
           {
            "id": 525,
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "parameters": {
+            "__IMTCONN__": 14707789
+           },
            "mapper": {
             "to": [
              "{{524.body.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Jutro: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Przypomnienie: to Twoja sprawa na jutro</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę masz Ty – {{524.body.fields.fldNY2MTdN0GPOVdx}}</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
             "subject": "Jutro: {{521.fields.fldbqEXa4YxsfbBun}}{{521.fields.fldxSYFWbjmQVQPtE}}",
-            "bodyType": "rawHtml"
+            "bodyType": "rawHtml",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Jutro: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Przypomnienie: to Twoja sprawa na jutro</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawę masz Ty – {{524.body.fields.fldNY2MTdN0GPOVdx}}</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n"
            },
-           "module": "google-email:sendAnEmail",
-           "version": 4,
            "metadata": {
             "designer": {
              "x": 2100,
              "y": 3000
             }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707789
            }
           }
          ]
@@ -1743,6 +1782,32 @@
          "flow": [
           {
            "id": 526,
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
+           },
+           "mapper": {
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": [],
+            "qs": [
+             {
+              "key": "filterByFormula",
+              "value": "AND({Aktywny}, {Powiadomienia}!='Tylko przypisane')"
+             },
+             {
+              "key": "returnFieldsByFieldId",
+              "value": "true"
+             }
+            ]
+           },
+           "metadata": {
+            "designer": {
+             "x": 1800,
+             "y": 3250
+            }
+           },
            "filter": {
             "name": "Wolna",
             "conditions": [
@@ -1753,113 +1818,69 @@
               }
              ]
             ]
-           },
-           "mapper": {
-            "qs": [
-             {
-              "key": "filterByFormula",
-              "value": "AND({Aktywny}, {Powiadomienia}!='Tylko przypisane')"
-             },
-             {
-              "key": "returnFieldsByFieldId",
-              "value": "true"
-             }
-            ],
-            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
-            "method": "GET",
-            "headers": []
-           },
-           "module": "airtable:makeApiCall",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1800,
-             "y": 3250
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
            }
           },
           {
            "id": 527,
+           "module": "builtin:BasicFeeder",
+           "version": 1,
+           "parameters": {},
            "mapper": {
             "array": "{{526.body.records}}"
            },
-           "module": "builtin:BasicFeeder",
-           "version": 1,
            "metadata": {
             "designer": {
              "x": 2100,
              "y": 3250
             }
-           },
-           "parameters": {}
+           }
           },
           {
            "id": 528,
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "parameters": {
+            "__IMTCONN__": 14707789
+           },
            "mapper": {
             "to": [
              "{{527.fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Nikt jeszcze nie wziął: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nikt jeszcze nie wziął tej sprawy</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
             "subject": "Jutro: {{521.fields.fldbqEXa4YxsfbBun}}{{521.fields.fldxSYFWbjmQVQPtE}} – nikt jeszcze nie wziął",
-            "bodyType": "rawHtml"
+            "bodyType": "rawHtml",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Nikt jeszcze nie wziął: {{521.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">Nikt jeszcze nie wziął tej sprawy</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{521.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{521.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{521.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{521.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Nikt jeszcze nie wziął tej sprawy.</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n"
            },
-           "module": "google-email:sendAnEmail",
-           "version": 4,
            "metadata": {
             "designer": {
              "x": 2400,
              "y": 3250
             }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707789
            }
           }
          ]
         }
-       ],
-       "version": 1,
-       "metadata": {
-        "designer": {
-         "x": 1500,
-         "y": 3000
-        }
-       },
-       "parameters": {}
+       ]
       }
      ]
     }
-   ],
-   "version": 1,
-   "metadata": {
-    "designer": {
-     "x": 300,
-     "y": 0
-    }
-   },
-   "parameters": {}
+   ]
   }
  ],
- "name": "Asystent – API (maile, webhook, dashboard, przypomnienia)",
  "metadata": {
-  "instant": true,
   "version": 1,
-  "designer": {
-   "orphans": []
-  },
   "scenario": {
-   "dlq": true,
-   "dataloss": false,
+   "roundtrips": 1,
    "maxErrors": 3,
    "autoCommit": true,
-   "roundtrips": 1,
+   "autoCommitTriggerLast": true,
    "sequential": false,
    "confidential": false,
-   "freshVariables": false,
-   "autoCommitTriggerLast": true
+   "dataloss": false,
+   "dlq": true,
+   "freshVariables": false
+  },
+  "designer": {
+   "orphans": []
   }
  }
 }

@@ -1,175 +1,192 @@
 {
+ "name": "Asystent – Silnik (dodaj i zmień status)",
  "flow": [
   {
    "id": 1,
-   "mapper": {},
    "module": "scenario-service:StartSubscenario",
    "version": 2,
+   "parameters": {},
+   "mapper": {},
    "metadata": {
     "designer": {
      "x": 0,
      "y": 0
     }
-   },
-   "parameters": {}
+   }
   },
   {
    "id": 100,
-   "mapper": null,
    "module": "builtin:BasicRouter",
+   "version": 1,
+   "parameters": {},
+   "mapper": null,
+   "metadata": {
+    "designer": {
+     "x": 300,
+     "y": 0
+    }
+   },
    "routes": [
     {
      "flow": [
       {
        "id": 2,
-       "filter": {
-        "name": "Zmiana statusu",
-        "conditions": [
-         [
-          {
-           "a": "{{1.akcja}}",
-           "b": "done",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kto}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ],
-         [
-          {
-           "a": "{{1.akcja}}",
-           "b": "przypisz",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.id}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kto}}",
-           "b": "^rec[A-Za-z0-9]{14}$",
-           "o": "text:pattern"
-          }
-         ]
-        ]
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd/{{1.id}}",
+        "method": "GET",
+        "headers": [],
         "qs": [
          {
           "key": "returnFieldsByFieldId",
           "value": "true"
          }
-        ],
-        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd/{{1.id}}",
-        "method": "GET",
-        "headers": []
+        ]
        },
-       "module": "airtable:makeApiCall",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 0
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "Zmiana statusu",
+        "conditions": [
+         [
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "done"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.kto}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "przypisz"
+          },
+          {
+           "a": "{{1.id}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          },
+          {
+           "a": "{{1.kto}}",
+           "o": "text:pattern",
+           "b": "^rec[A-Za-z0-9]{14}$"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 5,
-       "mapper": null,
        "module": "builtin:BasicRouter",
+       "version": 1,
+       "parameters": {},
+       "mapper": null,
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 0
+        }
+       },
        "routes": [
         {
          "flow": [
           {
            "id": 70,
-           "filter": {
-            "name": "Zrobione: otwarte",
-            "conditions": [
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "done",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Nowe",
-               "o": "text:equal"
-              }
-             ],
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "done",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Przypisane",
-               "o": "text:equal"
-              }
-             ]
-            ]
-           },
-           "mapper": {
-            "id": "{{2.body.id}}",
-            "base": "appBSubdL1R6lgjY8",
-            "table": "tblrnPwEGqiGYxSbd",
-            "record": {
-             "fldB3iQHvOIUgYn1I": "Zrobione",
-             "fldKNoba8yEYeFS17": [
-              "{{ifempty(2.body.fields.fldKNoba8yEYeFS17[1]; 1.kto)}}"
-             ],
-             "fldS2iH28sZy2mgd4": "{{now}}"
-            },
-            "typecast": false,
-            "useColumnId": false
-           },
            "module": "airtable:ActionUpdateRecords",
            "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
+           },
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "id": "{{2.body.id}}",
+            "typecast": false,
+            "useColumnId": false,
+            "record": {
+             "fldB3iQHvOIUgYn1I": "Zrobione",
+             "fldS2iH28sZy2mgd4": "{{now}}",
+             "fldKNoba8yEYeFS17": [
+              "{{ifempty(2.body.fields.fldKNoba8yEYeFS17[1]; 1.kto)}}"
+             ]
+            }
+           },
            "metadata": {
             "designer": {
              "x": 1200,
              "y": 0
             }
            },
-           "parameters": {
-            "__IMTCONN__": 14707783
+           "filter": {
+            "name": "Zrobione: otwarte",
+            "conditions": [
+             [
+              {
+               "a": "{{1.akcja}}",
+               "o": "text:equal",
+               "b": "done"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "o": "text:equal",
+               "b": "Nowe"
+              }
+             ],
+             [
+              {
+               "a": "{{1.akcja}}",
+               "o": "text:equal",
+               "b": "done"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "o": "text:equal",
+               "b": "Przypisane"
+              }
+             ]
+            ]
            }
           },
           {
            "id": 72,
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "parameters": {},
            "mapper": {
             "data": {
              "ok": true,
-             "kto": "{{1.kto_imie}}",
              "powod": "",
-             "tresc": "",
-             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "kto": "{{1.kto_imie}}",
              "status": "Zrobione",
-             "naglowek": ""
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "naglowek": "",
+             "tresc": ""
             }
            },
-           "module": "scenario-service:ReturnData",
-           "version": 2,
            "metadata": {
             "designer": {
              "x": 1500,
              "y": 0
             }
-           },
-           "parameters": {}
+           }
           }
          ]
         },
@@ -177,41 +194,15 @@
          "flow": [
           {
            "id": 110,
-           "filter": {
-            "name": "Przypisz: można",
-            "conditions": [
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "przypisz",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Nowe",
-               "o": "text:equal"
-              }
-             ],
-             [
-              {
-               "a": "{{1.akcja}}",
-               "b": "przypisz",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
-               "b": "Przypisane",
-               "o": "text:equal"
-              },
-              {
-               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
-               "b": "{{1.kto}}",
-               "o": "text:equal"
-              }
-             ]
-            ]
+           "module": "airtable:makeApiCall",
+           "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
            },
            "mapper": {
+            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
+            "method": "GET",
+            "headers": [],
             "qs": [
              {
               "key": "filterByFormula",
@@ -221,25 +212,86 @@
               "key": "returnFieldsByFieldId",
               "value": "true"
              }
-            ],
-            "url": "v0/appBSubdL1R6lgjY8/tblDFvDbDjwhHYJkV",
-            "method": "GET",
-            "headers": []
+            ]
            },
-           "module": "airtable:makeApiCall",
-           "version": 3,
            "metadata": {
             "designer": {
              "x": 1200,
              "y": 250
             }
            },
-           "parameters": {
-            "__IMTCONN__": 14707783
+           "filter": {
+            "name": "Przypisz: można",
+            "conditions": [
+             [
+              {
+               "a": "{{1.akcja}}",
+               "o": "text:equal",
+               "b": "przypisz"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "o": "text:equal",
+               "b": "Nowe"
+              },
+              {
+               "a": "{{1.dla}}",
+               "o": "text:pattern",
+               "b": "^[a-z0-9_-]{1,30}$"
+              }
+             ],
+             [
+              {
+               "a": "{{1.akcja}}",
+               "o": "text:equal",
+               "b": "przypisz"
+              },
+              {
+               "a": "{{2.body.fields.fldB3iQHvOIUgYn1I}}",
+               "o": "text:equal",
+               "b": "Przypisane"
+              },
+              {
+               "a": "{{2.body.fields.fldKNoba8yEYeFS17[1]}}",
+               "o": "text:equal",
+               "b": "{{1.kto}}"
+              },
+              {
+               "a": "{{1.dla}}",
+               "o": "text:pattern",
+               "b": "^[a-z0-9_-]{1,30}$"
+              }
+             ]
+            ]
            }
           },
           {
            "id": 111,
+           "module": "airtable:ActionUpdateRecords",
+           "version": 3,
+           "parameters": {
+            "__IMTCONN__": 14707783
+           },
+           "mapper": {
+            "base": "appBSubdL1R6lgjY8",
+            "table": "tblrnPwEGqiGYxSbd",
+            "id": "{{2.body.id}}",
+            "typecast": false,
+            "useColumnId": false,
+            "record": {
+             "fldB3iQHvOIUgYn1I": "Przypisane",
+             "fldKNoba8yEYeFS17": [
+              "{{110.body.records[1].id}}"
+             ],
+             "fld0r2CTQAV8kjHQL": "{{now}}"
+            }
+           },
+           "metadata": {
+            "designer": {
+             "x": 1500,
+             "y": 250
+            }
+           },
            "filter": {
             "name": "Jest taka osoba",
             "conditions": [
@@ -250,106 +302,73 @@
               }
              ]
             ]
-           },
-           "mapper": {
-            "id": "{{2.body.id}}",
-            "base": "appBSubdL1R6lgjY8",
-            "table": "tblrnPwEGqiGYxSbd",
-            "record": {
-             "fld0r2CTQAV8kjHQL": "{{now}}",
-             "fldB3iQHvOIUgYn1I": "Przypisane",
-             "fldKNoba8yEYeFS17": [
-              "{{110.body.records[1].id}}"
-             ]
-            },
-            "typecast": false,
-            "useColumnId": false
-           },
-           "module": "airtable:ActionUpdateRecords",
-           "version": 3,
-           "metadata": {
-            "designer": {
-             "x": 1500,
-             "y": 250
-            }
-           },
-           "parameters": {
-            "__IMTCONN__": 14707783
            }
           },
           {
            "id": 113,
-           "filter": {
-            "name": "Nie sobie, chce maila",
-            "conditions": [
-             [
-              {
-               "a": "{{110.body.records[1].id}}",
-               "b": "{{1.kto}}",
-               "o": "text:notequal"
-              },
-              {
-               "a": "{{110.body.records[1].fields.fldCoxoqHYQ48oijo}}",
-               "b": "Tylko przypisane",
-               "o": "text:equal"
-              }
-             ]
-            ]
+           "module": "google-email:sendAnEmail",
+           "version": 4,
+           "parameters": {
+            "__IMTCONN__": 14707789
            },
            "mapper": {
             "to": [
              "{{110.body.records[1].fields.fld7fIY9UIo72dIrT}}"
             ],
-            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{{1.kto_imie}} przypisuje Ci: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{1.kto_imie}} przypisał(a) Ci tę sprawę</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawa jest teraz Twoja.</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n",
             "subject": "{{1.kto_imie}} przypisuje Ci: {{2.body.fields.fldbqEXa4YxsfbBun}}{{2.body.fields.fldxSYFWbjmQVQPtE}}",
-            "bodyType": "rawHtml"
+            "bodyType": "rawHtml",
+            "content": "<!doctype html>\n<html lang=\"pl\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>{{1.kto_imie}} przypisuje Ci: {{2.body.fields.fldbqEXa4YxsfbBun}}</title></head>\n<body style=\"margin:0;padding:0;background:#f4f4f5;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:#f4f4f5;\"><tr><td align=\"center\" style=\"padding:24px 12px;\">\n<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"max-width:560px;background:#ffffff;border-radius:12px;\">\n<tr><td style=\"padding:24px;font-family:Arial,sans-serif;color:#18181b;\">\n<p style=\"margin:0 0 4px;font-size:13px;color:#71717a;\">{{1.kto_imie}} przypisał(a) Ci tę sprawę</p>\n<h1 style=\"margin:0 0 12px;font-size:22px;line-height:1.3;\">{{2.body.fields.fldbqEXa4YxsfbBun}}</h1>\n<p style=\"margin:0 0 8px;font-size:16px;\"><strong>Termin:</strong> {{2.body.fields.fldeO5RW1DJwB8NX3}}</p>\n<p style=\"margin:0 0 8px;font-size:16px;\">{{2.body.fields.fldKKVlpmXuVza9c9}}</p>\n<p style=\"margin:0 0 20px;font-size:15px;line-height:1.5;white-space:pre-line;\">{{2.body.fields.fldaNenMnWwuRivka}}</p>\n<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\"><tr>\n  <td style=\"border-radius:8px;background:#4f46e5;\">\n    <a href=\"https://pogodae.github.io/asystent-szkolny/\" style=\"display:inline-block;padding:12px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;text-decoration:none;\">Otwórz listę spraw</a>\n  </td>\n</tr></table>\n<hr style=\"border:none;border-top:1px solid #e4e4e7;margin:24px 0 12px;\">\n<p style=\"margin:0 0 6px;font-size:13px;color:#52525b;\">Sprawa jest teraz Twoja.</p>\n</td></tr></table>\n</td></tr></table>\n</body></html>\n"
            },
-           "module": "google-email:sendAnEmail",
-           "version": 4,
            "metadata": {
             "designer": {
              "x": 1800,
              "y": 250
             }
            },
-           "parameters": {
-            "__IMTCONN__": 14707789
+           "filter": {
+            "name": "Nie sobie, chce maila",
+            "conditions": [
+             [
+              {
+               "a": "{{110.body.records[1].id}}",
+               "o": "text:notequal",
+               "b": "{{1.kto}}"
+              },
+              {
+               "a": "{{110.body.records[1].fields.fldCoxoqHYQ48oijo}}",
+               "o": "text:equal",
+               "b": "Tylko przypisane"
+              }
+             ]
+            ]
            }
           },
           {
            "id": 114,
+           "module": "scenario-service:ReturnData",
+           "version": 2,
+           "parameters": {},
            "mapper": {
             "data": {
              "ok": true,
-             "kto": "{{1.kto_imie}}",
              "powod": "",
-             "tresc": "",
-             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "kto": "{{1.kto_imie}}",
              "status": "Przypisane",
-             "naglowek": ""
+             "tytul": "{{2.body.fields.fldbqEXa4YxsfbBun}}",
+             "naglowek": "",
+             "tresc": ""
             }
            },
-           "module": "scenario-service:ReturnData",
-           "version": 2,
            "metadata": {
             "designer": {
              "x": 2100,
              "y": 250
             }
-           },
-           "parameters": {}
+           }
           }
          ]
         }
-       ],
-       "version": 1,
-       "metadata": {
-        "designer": {
-         "x": 900,
-         "y": 0
-        }
-       },
-       "parameters": {}
+       ]
       }
      ]
     },
@@ -357,14 +376,33 @@
      "flow": [
       {
        "id": 201,
+       "module": "scenario-service:ReturnData",
+       "version": 2,
+       "parameters": {},
+       "mapper": {
+        "data": {
+         "ok": false,
+         "powod": "blad",
+         "status": "blad",
+         "tytul": "{{1.tytul}}",
+         "naglowek": "Nie dodano",
+         "tresc": "Nie dodano. Wymagane: tytuł, termin w przyszłości (ISO 8601), rodzaj: Do dnia / W dniu / Wydarzenie, kategoria: Szymon / Michał / Dom (albo pusta), id_zrodla: litery, cyfry, _ . : - (maks. 100)."
+        }
+       },
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 250
+        }
+       },
        "filter": {
         "name": "Dodaj: błąd danych",
         "conditions": [
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.tytul}}",
@@ -374,8 +412,8 @@
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.termin}}",
@@ -385,60 +423,53 @@
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:lessorequal"
+           "o": "date:lessorequal",
+           "b": "{{now}}"
           }
          ],
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:notpattern"
+           "o": "text:notpattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
           }
          ],
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:notpattern"
+           "o": "text:notpattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          }
+         ],
+         [
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:notpattern",
+           "b": "^[A-Za-z0-9_.:-]{0,100}$"
           }
          ]
         ]
-       },
-       "mapper": {
-        "data": {
-         "ok": false,
-         "powod": "blad",
-         "tresc": "Brak tytułu albo termin nie jest w przyszłości.",
-         "tytul": "{{1.tytul}}",
-         "status": "blad",
-         "naglowek": "Nie dodano"
-        }
-       },
-       "module": "scenario-service:ReturnData",
-       "version": 2,
-       "metadata": {
-        "designer": {
-         "x": 600,
-         "y": 250
-        }
-       },
-       "parameters": {}
+       }
       }
      ]
     },
@@ -446,14 +477,47 @@
      "flow": [
       {
        "id": 230,
+       "module": "airtable:ActionCreateRecord",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
+       },
+       "mapper": {
+        "base": "appBSubdL1R6lgjY8",
+        "table": "tblrnPwEGqiGYxSbd",
+        "typecast": false,
+        "useColumnId": false,
+        "record": {
+         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
+         "fldaNenMnWwuRivka": "{{1.opis}}",
+         "fldxwYvIR2e1Kx14D": "{{1.termin}}",
+         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
+         "fldB3iQHvOIUgYn1I": "Przypisane",
+         "fldKNoba8yEYeFS17": [
+          "recebgsSkREMJn62G"
+         ],
+         "fld0r2CTQAV8kjHQL": "{{now}}",
+         "fldrzdtN10bDZTdX1": "{{ifempty(1.zrodlo; \"Claude\")}}",
+         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
+         "fld0QJqw2alYIYa7r": 0,
+         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
+         "fld8vsAsghJeur5pA": "{{1.kategoria}}"
+        }
+       },
+       "metadata": {
+        "designer": {
+         "x": 600,
+         "y": 500
+        }
+       },
        "filter": {
         "name": "Dodaj: bez id_zrodla",
         "conditions": [
          [
           {
            "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
+           "o": "text:equal",
+           "b": "dodaj"
           },
           {
            "a": "{{1.tytul}}",
@@ -461,18 +525,23 @@
           },
           {
            "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:greater"
+           "o": "date:greater",
+           "b": "{{now}}"
           },
           {
            "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:pattern"
+           "o": "text:pattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
           },
           {
            "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:pattern"
+           "o": "text:pattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:pattern",
+           "b": "^[A-Za-z0-9_.:-]{0,100}$"
           },
           {
            "a": "{{1.id_zrodla}}",
@@ -480,39 +549,6 @@
           }
          ]
         ]
-       },
-       "mapper": {
-        "base": "appBSubdL1R6lgjY8",
-        "table": "tblrnPwEGqiGYxSbd",
-        "record": {
-         "fld0QJqw2alYIYa7r": 0,
-         "fld0r2CTQAV8kjHQL": "{{now}}",
-         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
-         "fld8vsAsghJeur5pA": "{{1.kategoria}}",
-         "fldB3iQHvOIUgYn1I": "Przypisane",
-         "fldKNoba8yEYeFS17": [
-          "recebgsSkREMJn62G"
-         ],
-         "fldaNenMnWwuRivka": "{{1.opis}}",
-         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
-         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
-         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
-         "fldrzdtN10bDZTdX1": "{{ifempty(1.zrodlo; \"Claude\")}}",
-         "fldxwYvIR2e1Kx14D": "{{1.termin}}"
-        },
-        "typecast": false,
-        "useColumnId": false
-       },
-       "module": "airtable:ActionCreateRecord",
-       "version": 3,
-       "metadata": {
-        "designer": {
-         "x": 600,
-         "y": 500
-        }
-       },
-       "parameters": {
-        "__IMTCONN__": 14707783
        }
       }
      ]
@@ -521,42 +557,15 @@
      "flow": [
       {
        "id": 210,
-       "filter": {
-        "name": "Dodaj: z id_zrodla",
-        "conditions": [
-         [
-          {
-           "a": "{{1.akcja}}",
-           "b": "dodaj",
-           "o": "text:equal"
-          },
-          {
-           "a": "{{1.tytul}}",
-           "o": "exist"
-          },
-          {
-           "a": "{{1.termin}}",
-           "b": "{{now}}",
-           "o": "date:greater"
-          },
-          {
-           "a": "{{1.rodzaj}}",
-           "b": "^(Do dnia|W dniu|Wydarzenie)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.kategoria}}",
-           "b": "^(Szymon|Michał|Dom)?$",
-           "o": "text:pattern"
-          },
-          {
-           "a": "{{1.id_zrodla}}",
-           "o": "exist"
-          }
-         ]
-        ]
+       "module": "airtable:makeApiCall",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
        },
        "mapper": {
+        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
+        "method": "GET",
+        "headers": [],
         "qs": [
          {
           "key": "filterByFormula",
@@ -566,25 +575,90 @@
           "key": "returnFieldsByFieldId",
           "value": "true"
          }
-        ],
-        "url": "v0/appBSubdL1R6lgjY8/tblrnPwEGqiGYxSbd",
-        "method": "GET",
-        "headers": []
+        ]
        },
-       "module": "airtable:makeApiCall",
-       "version": 3,
        "metadata": {
         "designer": {
          "x": 600,
          "y": 750
         }
        },
-       "parameters": {
-        "__IMTCONN__": 14707783
+       "filter": {
+        "name": "Dodaj: z id_zrodla",
+        "conditions": [
+         [
+          {
+           "a": "{{1.akcja}}",
+           "o": "text:equal",
+           "b": "dodaj"
+          },
+          {
+           "a": "{{1.tytul}}",
+           "o": "exist"
+          },
+          {
+           "a": "{{1.termin}}",
+           "o": "date:greater",
+           "b": "{{now}}"
+          },
+          {
+           "a": "{{1.rodzaj}}",
+           "o": "text:pattern",
+           "b": "^(Do dnia|W dniu|Wydarzenie)?$"
+          },
+          {
+           "a": "{{1.kategoria}}",
+           "o": "text:pattern",
+           "b": "^(Szymon|Michał|Dom)?$"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "text:pattern",
+           "b": "^[A-Za-z0-9_.:-]{0,100}$"
+          },
+          {
+           "a": "{{1.id_zrodla}}",
+           "o": "exist"
+          }
+         ]
+        ]
        }
       },
       {
        "id": 220,
+       "module": "airtable:ActionCreateRecord",
+       "version": 3,
+       "parameters": {
+        "__IMTCONN__": 14707783
+       },
+       "mapper": {
+        "base": "appBSubdL1R6lgjY8",
+        "table": "tblrnPwEGqiGYxSbd",
+        "typecast": false,
+        "useColumnId": false,
+        "record": {
+         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
+         "fldaNenMnWwuRivka": "{{1.opis}}",
+         "fldxwYvIR2e1Kx14D": "{{1.termin}}",
+         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
+         "fldB3iQHvOIUgYn1I": "Przypisane",
+         "fldKNoba8yEYeFS17": [
+          "recebgsSkREMJn62G"
+         ],
+         "fld0r2CTQAV8kjHQL": "{{now}}",
+         "fldrzdtN10bDZTdX1": "{{ifempty(1.zrodlo; \"Claude\")}}",
+         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
+         "fld0QJqw2alYIYa7r": 0,
+         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
+         "fld8vsAsghJeur5pA": "{{1.kategoria}}"
+        }
+       },
+       "metadata": {
+        "designer": {
+         "x": 900,
+         "y": 750
+        }
+       },
        "filter": {
         "name": "Nie duplikat",
         "conditions": [
@@ -595,71 +669,28 @@
           }
          ]
         ]
-       },
-       "mapper": {
-        "base": "appBSubdL1R6lgjY8",
-        "table": "tblrnPwEGqiGYxSbd",
-        "record": {
-         "fld0QJqw2alYIYa7r": 0,
-         "fld0r2CTQAV8kjHQL": "{{now}}",
-         "fld3kIWBzleIZ7K7P": "{{ifempty(1.rodzaj; \"Wydarzenie\")}}",
-         "fld8vsAsghJeur5pA": "{{1.kategoria}}",
-         "fldB3iQHvOIUgYn1I": "Przypisane",
-         "fldKNoba8yEYeFS17": [
-          "recebgsSkREMJn62G"
-         ],
-         "fldaNenMnWwuRivka": "{{1.opis}}",
-         "fldbIWPFOkkWU2ned": "{{1.kwota}}",
-         "fldbqEXa4YxsfbBun": "{{1.tytul}}",
-         "fldo6qbBMUzIbqqMr": "{{1.id_zrodla}}",
-         "fldrzdtN10bDZTdX1": "{{ifempty(1.zrodlo; \"Claude\")}}",
-         "fldxwYvIR2e1Kx14D": "{{1.termin}}"
-        },
-        "typecast": false,
-        "useColumnId": false
-       },
-       "module": "airtable:ActionCreateRecord",
-       "version": 3,
-       "metadata": {
-        "designer": {
-         "x": 900,
-         "y": 750
-        }
-       },
-       "parameters": {
-        "__IMTCONN__": 14707783
        }
       }
      ]
     }
-   ],
-   "version": 1,
-   "metadata": {
-    "designer": {
-     "x": 300,
-     "y": 0
-    }
-   },
-   "parameters": {}
+   ]
   }
  ],
- "name": "Asystent – Silnik (dodaj i zmień status)",
  "metadata": {
-  "instant": false,
   "version": 1,
-  "designer": {
-   "orphans": []
-  },
   "scenario": {
-   "dlq": true,
-   "dataloss": false,
+   "roundtrips": 1,
    "maxErrors": 3,
    "autoCommit": true,
-   "roundtrips": 1,
+   "autoCommitTriggerLast": true,
    "sequential": true,
    "confidential": false,
-   "freshVariables": false,
-   "autoCommitTriggerLast": true
+   "dataloss": false,
+   "dlq": true,
+   "freshVariables": false
+  },
+  "designer": {
+   "orphans": []
   }
  }
 }

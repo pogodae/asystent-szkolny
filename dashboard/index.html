@@ -412,10 +412,22 @@ const CONFIG = {
   api: "https://hook.eu2.make.com/wpcm5vpf5m75aeb84hk2ukxvcc7sky5v?cel=api",
   // odczyt listy przez Google Apps Script (apps-script/lista.gs) – bez operacji Make; pusty = lista z Make
   lista: "https://script.google.com/macros/s/AKfycbwaBpd7UpIlvPCi8e4nDQ1t1hJSQrr7OUoQy72I7xufYyEMc5lMMKYLomFKodU8Skx3/exec",
-  // imię jak w Airtable + klucz rodzica (do przypisywania zadań)
-  rodzice: [{ imie: "Ewa", klucz: "ewa", kolor: "#6d5efc" }, { imie: "Adam", klucz: "adam", kolor: "#d4467e" }],
-  kategorie: [{ nazwa: "Szymon", kolor: "#2f7fd6" }, { nazwa: "Michał", kolor: "#0d9488" }, { nazwa: "Dom", kolor: "#e07b24" }],
+  // przykładowi domownicy i kategorie (tryb demo); po zalogowaniu zastępują je prawdziwe z API –
+  // dzięki temu publiczny kod strony nie zawiera imion domowników
+  rodzice: [{ imie: "Ewa", klucz: "ewa" }, { imie: "Adam", klucz: "adam" }],
+  kategorie: ["Szymon", "Michał", "Dom"],
 };
+const KOLORY_RODZICOW = ["#6d5efc", "#d4467e", "#0891b2", "#65a30d"];
+const KOLORY_KATEGORII = ["#2f7fd6", "#0d9488", "#e07b24", "#9333ea", "#db2777", "#4d7c0f"];
+// konfiguracja z odpowiedzi API (rodzice: [{imie, klucz}], kategorie: [nazwa]) – kolory wg kolejności
+function ustawKonfig(j) {
+  if (Array.isArray(j.rodzice) && j.rodzice.length) CONFIG.rodzice = j.rodzice;
+  if (Array.isArray(j.kategorie) && j.kategorie.length) CONFIG.kategorie = j.kategorie;
+  CONFIG.rodzice = CONFIG.rodzice.map((r, i) => ({ ...r, kolor: KOLORY_RODZICOW[i % KOLORY_RODZICOW.length] }));
+  CONFIG.kategorie = CONFIG.kategorie.map((k, i) =>
+    ({ nazwa: k.nazwa || k, kolor: KOLORY_KATEGORII[i % KOLORY_KATEGORII.length] }));
+  if ($("kategorie")) renderKategorie();
+}
 
 const H = 3600e3;
 const state = { ja: "", zadania: [], tab: "moje", busy: new Set(), loaded: false, showDone: false, filtr: "" };
@@ -651,9 +663,8 @@ function noAccess(blad = "") {
     <form class="login-card" id="login" autocomplete="on">
       <h3>Zaloguj się</h3>
       <p class="sub-l">Dla domowników. Pozostałych zapraszam do wersji demo.</p>
-      <label class="field"><span>Kto</span>
-        <select class="input" name="u" id="login-u">${CONFIG.rodzice.map((r) =>
-          `<option value="${esc(r.klucz)}">${esc(r.imie)}</option>`).join("")}</select></label>
+      <label class="field"><span>Login</span>
+        <input class="input" name="u" id="login-u" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
       <label class="field"><span>Hasło</span>
         <input class="input" name="s" id="login-s" type="password" autocomplete="current-password" required></label>
       <p class="err" id="login-err">${esc(blad)}</p>
@@ -671,12 +682,14 @@ const cacheKey = () => `lista:${auth.demo ? "demo" : auth.u}`;
 let pobrano = 0;
 function zapiszCache() {
   pobrano = pobrano || Date.now();
-  if (!auth.demo) store(cacheKey(), JSON.stringify({ t: pobrano, ja: state.ja, zadania: state.zadania }));
+  if (!auth.demo) store(cacheKey(), JSON.stringify({ t: pobrano, ja: state.ja, zadania: state.zadania,
+    rodzice: CONFIG.rodzice.map(({ imie, klucz }) => ({ imie, klucz })), kategorie: CONFIG.kategorie.map((k) => k.nazwa) }));
 }
 function zCache() {
   try {
     const c = JSON.parse(store(cacheKey()) || "null");
     if (!c || !Array.isArray(c.zadania)) return false;
+    ustawKonfig(c);
     state.ja = c.ja; state.zadania = c.zadania; state.loaded = true; pobrano = c.t;
     render();
     return true;
@@ -689,6 +702,7 @@ async function load(wymus = false) {
   $("refresh").classList.add("spin");
   try {
     const j = await call("lista");
+    ustawKonfig(j);
     state.ja = j.ja; state.zadania = j.zadania || []; state.loaded = true;
     pobrano = Date.now(); zapiszCache();
     render();
@@ -763,12 +777,16 @@ function syncRodzaj() {
   f.godzina.required = r === "Wydarzenie";
   $("rodzaj-hint").textContent = OPIS_RODZAJU[r];
 }
-$("kategorie").innerHTML = '<legend hidden>Czego dotyczy</legend>' + CONFIG.kategorie.map((k) =>
-  `<label><input type="radio" name="kategoria" value="${esc(k.nazwa)}" required><span><span class="dot" style="--kat:${k.kolor}"></span>${esc(k.nazwa)}</span></label>`).join("");
+function renderKategorie() {
+  $("kategorie").innerHTML = '<legend hidden>Czego dotyczy</legend>' + CONFIG.kategorie.map((k) =>
+    `<label><input type="radio" name="kategoria" value="${esc(k.nazwa)}" required><span><span class="dot" style="--kat:${k.kolor}"></span>${esc(k.nazwa)}</span></label>`).join("");
+}
+ustawKonfig({});
 function openAdd() {
   if (!auth.demo && (!auth.u || !auth.s)) return noAccess();
   const f = $("form"); f.reset();
-  if (state.filtr) f.querySelector(`input[name=kategoria][value="${state.filtr}"]`).checked = true;
+  const wybrana = state.filtr && [...f.querySelectorAll("input[name=kategoria]")].find((x) => x.value === state.filtr);
+  if (wybrana) wybrana.checked = true;
   const jutro = new Date(); jutro.setDate(jutro.getDate() + 1);
   const pad = (n) => String(n).padStart(2, "0");
   f.dzien.value = `${jutro.getFullYear()}-${pad(jutro.getMonth() + 1)}-${pad(jutro.getDate())}`;
@@ -816,6 +834,7 @@ async function zaloguj(u, s) {
   try {
     const j = await call("lista");
     store("u", auth.u); store("s", auth.s);
+    ustawKonfig(j);
     state.ja = j.ja; state.zadania = j.zadania || []; state.loaded = true; pobrano = Date.now(); zapiszCache();
     pokazAplikacje(); render();
   } catch (e) {
@@ -830,7 +849,7 @@ function wyloguj() {
 document.addEventListener("submit", (e) => {
   if (e.target.id !== "login") return;
   e.preventDefault();
-  zaloguj($("login-u").value, $("login-s").value);
+  zaloguj($("login-u").value.trim().toLowerCase(), $("login-s").value);
 });
 
 document.addEventListener("click", (e) => {

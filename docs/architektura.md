@@ -1,21 +1,21 @@
 # Architektura
 
 ```
- Claude („dodaj …”) ──► konektor Make ──────────────┐
-                                                    ▼
- Webhook S1-W (POST JSON, X-Api-Key) ─┐   ┌──────────────────────────────┐
- Kliknięcia z maili (GET / POST)  ────┤   │ Asystent – Silnik            │
- Dashboard (POST form, u + s)     ────┼──►│ na żądanie, kolejka          │──► Airtable
- GitHub Actions cron (3× dziennie) ───┘   │ dodaj · take · done ·        │    (Zadania,
-          │                               │ release · przejmij           │     Rodzice,
-          ▼                               └──────────────────────────────┘     Zdarzenia)
- ┌──────────────────────────────────┐                   │
- │ Asystent – API (jeden webhook)   │── odczyty ────────┘
- │ ?cel=  (brak) → S2 kliknięcia    │                   │
- │        dodaj  → S1-W             │                   ▼
- │        api    → S5 dashboard     │                 Gmail
- │        przypomnienia → S3        │      (Nowe, Przejęte, Wolne, Przypomnienie,
- └──────────────────────────────────┘       Jutro, Po terminie)
+ Claude („dodaj …”) ──► konektor Make ────────────────┐
+                                                      ▼
+ Webhook S1-W (POST JSON, X-Api-Key) ─┐     ┌────────────────────────────┐
+ Dashboard (POST form, u + s)     ────┤     │ Asystent – Silnik          │
+ GitHub Actions (raz dziennie)    ────┤     │ na żądanie, kolejka        │──► Airtable
+ Stare linki z maili (GET)        ────┤     │ dodaj · done · przypisz    │    (Zadania,
+                                      ▼     └────────────────────────────┘     Rodzice)
+ ┌──────────────────────────────────────┐          ▲            │                ▲
+ │ Asystent – API (jeden webhook)       │──────────┘            ▼                │
+ │ ?cel=dodaj         → S1-W            │                     Gmail              │
+ │      api           → S5 dashboard    │──── lista, dodaj z formularza, usuń ───┤
+ │      przypomnienia → S3              │──── przypomnienia dzień przed ─────────┤
+ │ (brak)             → strona z linkiem│                                        │
+ └──────────────────────────────────────┘                                        │
+ Dashboard – odczyt listy ──► Google Apps Script (0 operacji Make) ──────────────┘
 ```
 
 ## Dlaczego 2 scenariusze zamiast 7
@@ -24,18 +24,18 @@ Darmowy plan Make pozwala na 2 aktywne scenariusze. Role ze SPEC (S1, S1-W, S2, 
 
 | Scenariusz | Wyzwalacz | Odpowiada za |
 | --- | --- | --- |
-| **Asystent – Silnik** | na żądanie (Claude, Call a scenario), kolejka | S1 dodaj zadanie (właściciel: Ewa); zmiany: done, przypisz (→ Adam) |
+| **Asystent – Silnik** | na żądanie (Claude, Call a scenario), kolejka | S1 dodaj zadanie (właściciel: pierwsza osoba z `Rodzice`); zmiany: done, przypisz (przekazanie drugiej osobie) |
 | **Asystent – API** | jeden Custom webhook, trasa po `?cel=` | S1-W, S5 API dashboardu, S3 przypomnienia (dawne S2 – kliknięcia z maili – usunięte) |
 
-Wszystkie zmiany stanu z kliknięć i z dashboardu przechodzą przez Silnik, więc mail i dashboard stosują te same reguły. S3 aktualizuje tylko pola przypomnień, dlatego działa bezpośrednio w API.
+Zmiany statusu (Zrobione, przekazanie) i dodawanie spraw z Claude oraz S1-W przechodzą przez Silnik, który działa w kolejce – dwie jednoczesne zmiany tej samej sprawy nie nadpiszą się nawzajem. Dodanie z formularza dashboardu, „miękkie” usunięcie i przypomnienia (S3) zapisują bezpośrednio w API: nie konkurują z innymi zmianami, a każde wywołanie Silnika to dodatkowe operacje Make.
 
 ## Adresy
 
 | Wejście | Adres |
 | --- | --- |
 | Stary link z maila | `S2_WEBHOOK_URL?t=…` – strona z odnośnikiem do listy spraw |
-| S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key`; JSON: `tytul`, `termin`, `rodzaj` (Do dnia / W dniu / Wydarzenie), `opis`, `kwota`, `id_zrodla` |
-| Dashboard | `S2_WEBHOOK_URL?cel=api` (pola formularza `u`, `s`, `akcja`, `id`) |
+| S1-W | `S2_WEBHOOK_URL?cel=dodaj` + nagłówek `X-Api-Key`; JSON: `tytul`, `termin`, `rodzaj` (Do dnia / W dniu / Wydarzenie), `kategoria`, `opis`, `kwota`, `id_zrodla` (litery, cyfry, `_ . : -`) |
+| Dashboard | `S2_WEBHOOK_URL?cel=api` (pola formularza `u`, `s`, `akcja`, `id`, `dla`); odczyt listy zwykle przez Apps Script |
 | S3 | `S2_WEBHOOK_URL?cel=przypomnienia` + `X-Api-Key` (raz dziennie rano z GitHub Actions) |
 
 ## Budżet operacji
@@ -47,7 +47,7 @@ Darmowy plan Make ma około 1000 operacji miesięcznie, a po jego wyczerpaniu Ma
 | Przypomnienia (S3) | 3 + 2–3 na każdą sprawę na jutro | raz dziennie rano (GitHub Actions) |
 | Lista na dashboardzie | 0 z Google Apps Script ([apps-script/](../apps-script/)); 4 z Make, gdy skrypt nie jest podłączony | Apps Script: co minutę przy powrocie do karty i co 5 min; Make: co 30 min |
 | Zrobione | 4 (API 2 + Silnik 2) | na kliknięcie |
-| → Adam (przekazanie z mailem) | 6 | na kliknięcie |
+| Przekazanie drugiej osobie (z mailem) | 6 | na kliknięcie |
 | Usuń (kosz; status Anulowane, sprawa zostaje w Airtable) | 3 | na kliknięcie |
 | Dodanie sprawy z dashboardu | 3 | na sprawę |
 | Dodanie sprawy przez Claude | 1–2 | na sprawę |

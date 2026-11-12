@@ -1,6 +1,6 @@
 # Lista spraw bez Make (Google Apps Script)
 
-`lista.gs` to mała aplikacja internetowa Google, która czyta listę spraw prosto z Airtable. Dashboard pobiera z niej listę zamiast z Make, więc odświeżanie listy **nie zużywa operacji Make** i może być częste (co minutę przy powrocie do karty, co 5 minut, gdy strona jest otwarta). Akcje (Zrobione, → Adam), dodawanie spraw i maile dalej idą przez Make.
+`lista.gs` to mała aplikacja internetowa Google, która czyta listę spraw prosto z Airtable. Dashboard pobiera z niej listę zamiast z Make, więc odświeżanie listy **nie zużywa operacji Make** i może być częste (co minutę przy powrocie do karty, co 5 minut, gdy strona jest otwarta). Akcje (Zrobione, przekazanie drugiej osobie), dodawanie spraw i maile dalej idą przez Make.
 
 ## Wdrożenie (jednorazowo, ok. 10 minut)
 
@@ -8,7 +8,7 @@
 1. Wejdź na **airtable.com/create/tokens** → **Create new token**.
 2. Nazwa: `Kto to ogarnia – lista (Apps Script)`.
 3. Scope: tylko **`data.records:read`**.
-4. Access: baza **„Asystent szkolny”**.
+4. Access: baza z projektem (ta z `AIRTABLE_BASE_ID`).
 5. **Create token** i skopiuj go (pokazuje się raz).
 
 ### 2. Projekt Apps Script
@@ -19,9 +19,10 @@
 
 ### 3. Właściwości skryptu (sekrety)
 1. Po lewej **⚙ Ustawienia projektu** → na dole **Właściwości skryptu** → **Dodaj właściwość skryptu**.
-2. Dodaj dwie:
+2. Dodaj trzy:
    - `AIRTABLE_TOKEN` – token z kroku 1,
-   - `AIRTABLE_BASE_ID` – `appBSubdL1R6lgjY8`.
+   - `AIRTABLE_BASE_ID` – ID bazy (`app…` z adresu bazy w Airtable),
+   - `KATEGORIE` – kategorie spraw po przecinku, tak samo jak `KATEGORIE` w `.env` (np. `Ola,Kuba,Dom`).
 3. **Zapisz właściwości skryptu**.
 
 ### 4. Wdrożenie jako aplikacja internetowa
@@ -35,3 +36,5 @@
 
 ### 5. Podłączenie do dashboardu
 Adres `/exec` wpisuje się w `dashboard/index.html` w `CONFIG.lista`. Po zmianie kodu skryptu trzeba zrobić **Wdróż → Zarządzaj wdrożeniami → edytuj → Nowa wersja**, żeby adres pokazywał nową wersję.
+
+Skrypt zwraca zalogowanej osobie także imiona domowników i kategorie (`rodzice`, `kategorie`). Dzięki temu publiczny kod strony i repozytorium zawierają tylko przykładowe dane, a prawdziwe imiona widać dopiero po zalogowaniu.

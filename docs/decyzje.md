@@ -2,7 +2,7 @@
 
 ## Każda sprawa ma właściciela
 
-Nie ma już „wolnych” spraw ani przycisków Biorę to / Oddaj / Przejmij. Nowa sprawa od razu należy do Ewy (RODZIC1), która może ją zamknąć (Zrobione) albo przekazać Adamowi (→ Adam, mail od razu). Przypomnienie dzień przed zawsze trafia do właściciela. To prostsze i tańsze (mniej tras i operacji), a odpowiada temu, jak naprawdę dzielimy sprawy.
+Nie ma już „wolnych” spraw ani przycisków Biorę to / Oddaj / Przejmij. Nowa sprawa od razu należy do pierwszej osoby (RODZIC1), która może ją zamknąć (Zrobione) albo przekazać drugiej osobie (→ imię, mail od razu). Przypomnienie dzień przed zawsze trafia do właściciela. To prostsze i tańsze (mniej tras i operacji), a odpowiada temu, jak naprawdę dzielimy sprawy.
 
 ## Oszczędzanie operacji Make
 
@@ -47,3 +47,11 @@ Blueprinty adresują pola przez ID (`make/schema_ids.json`), a odczyty idą prze
 ## Dashboard bez sekretów Airtable
 
 Strona zna tylko adres webhooka API. Każde żądanie niesie parę `u` + `s` (klucz rodzica i losowy klucz dostępu z tabeli `Rodzice`), którą API sprawdza w Airtable. Żądania są „prostymi” POST-ami (`application/x-www-form-urlencoded`), więc przeglądarka nie wysyła preflightu, a odpowiedź ma `Access-Control-Allow-Origin` ustawione na adres GitHub Pages. Adres webhooka jest w kodzie strony jawny, podobnie jak w każdym mailu. Chronią go token zadania, para u + s albo `X-Api-Key`.
+
+## Prywatne dane poza repozytorium
+
+Repozytorium i strona na GitHub Pages są publiczne, a system działa na prawdziwych danych rodziny. Dlatego imiona domowników i kategorie (imiona dzieci) są tylko w `.env`, w Airtable i we Właściwościach skryptu Apps Script. `make/build.py` buduje dwie wersje blueprintów: do Make z prawdziwymi wartościami i do repo z przykładowymi (Ewa, Adam, Szymon, Michał) – i przerywa budowę, jeśli w publicznej wersji znajdzie prawdziwą wartość. Dashboard ma w kodzie tylko dane przykładowe (tryb demo), a prawdziwe imiona i kategorie dostaje z API dopiero po zalogowaniu. Logowanie to pole „Login”, a nie lista imion.
+
+## Walidacja przed formułą Airtable
+
+Wyszukiwanie w Airtable idzie przez `filterByFormula`, do którego Make wkleja dane z żądania – np. `{ID źródła} = '{{1.id_zrodla}}'`. Apostrof w danych zmieniłby formułę (to samo zjawisko co SQL injection). Każde takie pole jest więc najpierw sprawdzane wyrażeniem regularnym w filtrze tej samej trasy (`id_zrodla`: litery, cyfry, `_ . : -`; klucz osoby: `[a-z0-9_-]`). Pilnuje tego test `tests/test_build.py`, który przechodzi po wszystkich trasach blueprintów – to on znalazł brak walidacji pola `dla` w Silniku (było sprawdzane tylko w API, a Silnik można wywołać bezpośrednio przez konektor Make).

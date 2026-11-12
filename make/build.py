@@ -1,7 +1,8 @@
 """Generator blueprintów Make dla asystenta „Kto to ogarnia” (sprawy dzieci i domu).
 
 Scenariusze są opisane tutaj w Pythonie, a skrypt zapisuje dwie wersje każdego blueprintu:
-  make/<nazwa>.json          – do repo: sekrety (URL-e webhooków, klucz API) zastąpione znacznikami __NAZWA__
+  make/<nazwa>.json          – do repo (publiczna): zbudowana z przykładowymi danymi (PUBLICZNE niżej) –
+                               sekrety jako znaczniki __NAZWA__, przykładowe imiona i kategorie
   make/_deploy/<nazwa>.json  – do wgrania do Make (gitignored), z prawdziwymi wartościami z .env
 
 Pola Airtable są adresowane po ID (make/schema_ids.json), bo nazwy z polskimi znakami
@@ -25,6 +26,13 @@ SCHEMA = json.loads((MAKE / "schema_ids.json").read_text(encoding="utf-8"))
 
 # wartości wstawiane tylko do wersji _deploy
 SECRETS = ("S2_WEBHOOK_URL", "S5_WEBHOOK_URL", "S1W_API_KEY", "RODZIC1_KLUCZ_DOSTEPU", "RODZIC2_KLUCZ_DOSTEPU")
+# dane prywatne (imiona domowników, kategorie) – w wersji do repo zastąpione przykładowymi
+PRYWATNE = ("RODZIC1_IMIE", "RODZIC1_KLUCZ", "RODZIC2_IMIE", "RODZIC2_KLUCZ", "KATEGORIE")
+PUBLICZNE = {
+    **{name: f"__{name}__" for name in SECRETS},
+    "RODZIC1_IMIE": "Ewa", "RODZIC1_KLUCZ": "ewa", "RODZIC2_IMIE": "Adam", "RODZIC2_KLUCZ": "adam",
+    "KATEGORIE": "Szymon,Michał,Dom",
+}
 
 
 def env(name, default=""):
@@ -239,10 +247,29 @@ def metadata(sequential=False, interface=None):
     return md
 
 
-# każda sprawa ma właściciela (domyślnie RODZIC1 – Ewa); można ją tylko zamknąć albo przekazać
+# każda sprawa ma właściciela (domyślnie RODZIC1); można ją tylko zamknąć albo przekazać
 STATUS_AKCJE = ("done", "przypisz")
-# kategoria: czego dotyczy sprawa (pusta = bez kategorii)
-KATEGORIA_PAT = "^(Szymon|Michał|Dom)?$"
+
+
+def kategorie():
+    """Kategorie spraw (czego dotyczy sprawa) z .env, np. KATEGORIE=Ola,Kuba,Dom."""
+    return [k.strip() for k in env("KATEGORIE", PUBLICZNE["KATEGORIE"]).split(",") if k.strip()]
+
+
+def kategoria_pat():
+    """Dozwolona kategoria albo pusta (= bez kategorii)."""
+    return "^(" + "|".join(kategorie()) + ")?$"
+
+
+# id_zrodla trafia do formuły Airtable (deduplikacja), więc dopuszczamy tylko bezpieczne znaki – inaczej
+# apostrof w id_zrodla mógłby zmienić formułę (wstrzyknięcie, jak SQL injection); pusty = bez deduplikacji
+ID_ZRODLA_PAT = "^[A-Za-z0-9_.:-]{0,100}$"
+# klucz osoby (Rodzice.Klucz), np. „ewa”
+KLUCZ_PAT = "^[a-z0-9_-]{1,30}$"
+# komunikat przy odrzuceniu – wymienia wszystkie warunki, bo filtr Make nie mówi, który nie przeszedł
+def blad_danych():
+    return ("Nie dodano. Wymagane: tytuł, termin w przyszłości (ISO 8601), rodzaj: Do dnia / W dniu / Wydarzenie, "
+            f"kategoria: {' / '.join(kategorie())} (albo pusta), id_zrodla: litery, cyfry, _ . : - (maks. 100).")
 # rodzice z powiadomieniami „Tylko przypisane” nie dostają maili o sprawach, które ich nie dotyczą
 DO_WSZYSTKICH = "{Powiadomienia}!='Tylko przypisane'"
 # rodzaj terminu; pusty = Wydarzenie (data z godziną)
@@ -295,9 +322,10 @@ def status_routes():
                            [eq(akcja, "done"), eq(st, "Przypisane")])),
              ok(72, "Zrobione")],
             # --- przypisz: wolne albo własne zadanie dostaje wskazana osoba (dla = jej klucz)
+            # dla trafia do formuły – sprawdzane także tutaj, bo Silnik można wywołać z pominięciem API
             [at_find(110, "Rodzice", f"AND({{Aktywny}}, {{Klucz}}='{{{{1.dla}}}}')",
-                     flt("Przypisz: można", [eq(akcja, "przypisz"), eq(st, "Nowe")],
-                         [eq(akcja, "przypisz"), eq(st, "Przypisane"), eq(z.osoba, kto)])),
+                     flt("Przypisz: można", [eq(akcja, "przypisz"), eq(st, "Nowe"), match("{{1.dla}}", KLUCZ_PAT)],
+                         [eq(akcja, "przypisz"), eq(st, "Przypisane"), eq(z.osoba, kto), match("{{1.dla}}", KLUCZ_PAT)])),
              at_update(111, "Zadania", z.id, {F("Zadania", "Status"): "Przypisane", F("Zadania", "Osoba"): [t.id],
                                              F("Zadania", "Przypisano"): now},
                        flt("Jest taka osoba", [exists(t.id)])),
@@ -315,15 +343,16 @@ def dodaj_routes():
     i = {k: "{{1." + k + "}}" for k in ("tytul", "termin", "opis", "kwota", "zrodlo", "id_zrodla", "rodzaj", "kategoria")}
     jest = eq("{{1.akcja}}", "dodaj")
     dane_ok = [jest, exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"},
-               match(i["rodzaj"], RODZAJ_PAT), match(i["kategoria"], KATEGORIA_PAT)]
+               match(i["rodzaj"], RODZAJ_PAT), match(i["kategoria"], kategoria_pat()), match(i["id_zrodla"], ID_ZRODLA_PAT)]
     zrodlo = '{{ifempty(1.zrodlo; "Claude")}}'
     dup = "{{210.body.records[1].id}}"
     return [
         [ret(201, {"ok": False, "powod": "blad", "status": "blad", "tytul": i["tytul"],
-                   "naglowek": "Nie dodano", "tresc": "Brak tytułu albo termin nie jest w przyszłości."},
+                   "naglowek": "Nie dodano", "tresc": blad_danych()},
              flt("Dodaj: błąd danych", [jest, missing(i["tytul"])], [jest, missing(i["termin"])],
                  [jest, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
-                 [jest, nomatch(i["rodzaj"], RODZAJ_PAT)], [jest, nomatch(i["kategoria"], KATEGORIA_PAT)]))],
+                 [jest, nomatch(i["rodzaj"], RODZAJ_PAT)], [jest, nomatch(i["kategoria"], kategoria_pat())],
+                 [jest, nomatch(i["id_zrodla"], ID_ZRODLA_PAT)]))],
         # bez id_zrodla (Claude) – od razu zapis, bez zapytania o duplikat
         [at_create(230, "Zadania", rekord_zadania(i, zrodlo), flt("Dodaj: bez id_zrodla", [*dane_ok, missing(i["id_zrodla"])]))],
         [at_find(210, "Zadania", f"{{ID źródła}} = '{i['id_zrodla']}'",
@@ -336,14 +365,16 @@ def silnik():
     """Silnik (na żądanie, kolejka): jedyne miejsce, które zmienia stan zadań.
 
     Wołają go: Claude (konektor Make, akcja=dodaj), webhook S1-W i dashboard (zmiany statusu).
-    Kolejka (przetwarzanie sekwencyjne) chroni przed dwoma jednoczesnymi „Biorę to”.
+    Kolejka (przetwarzanie sekwencyjne) chroni przed dwoma jednoczesnymi zmianami tej samej sprawy.
     """
     return {"name": "Asystent – Silnik (dodaj i zmień status)",
             "flow": [start(1), router(100, status_routes(), *dodaj_routes())],
             "metadata": metadata(sequential=True)}
 
 
-SILNIK_INTERFACE = {
+def silnik_interface():
+    """Wejścia i wyjścia Silnika – opisy pól czyta Claude, wywołując scenariusz przez konektor Make."""
+    return {
     "input": [
         {"name": "akcja", "type": "text", "required": True,
          "label": "dodaj – nowa sprawa (dzieci albo dom); done / przypisz – zmiana statusu"},
@@ -356,8 +387,9 @@ SILNIK_INTERFACE = {
         {"name": "rodzaj", "type": "text", "required": False,
          "label": "Do dnia (zrobić najpóźniej tego dnia, termin T20:00), W dniu (tego dnia, np. przynieść coś, termin T07:30) albo Wydarzenie (o konkretnej godzinie); domyślnie Wydarzenie"},
         {"name": "kategoria", "type": "text", "required": False,
-         "label": "Czego dotyczy sprawa: Szymon, Michał albo Dom (puste = bez kategorii)"},
-        {"name": "id_zrodla", "type": "text", "required": False, "label": "Identyfikator do deduplikacji"},
+         "label": f"Czego dotyczy sprawa: {', '.join(kategorie())} (puste = bez kategorii)"},
+        {"name": "id_zrodla", "type": "text", "required": False,
+         "label": "Identyfikator do deduplikacji: litery, cyfry, _ . : - (maks. 100 znaków)"},
         {"name": "id", "type": "text", "required": False, "label": "ID zadania (dla zmiany statusu)"},
         {"name": "kto", "type": "text", "required": False, "label": "ID rekordu rodzica, który zmienia status (Rodzice)"},
         {"name": "kto_imie", "type": "text", "required": False, "label": "Imię rodzica, który zmienia status"},
@@ -372,7 +404,7 @@ SILNIK_INTERFACE = {
         {"name": "naglowek", "type": "text", "label": "Nagłówek strony"},
         {"name": "tresc", "type": "text", "label": "Treść strony"},
     ],
-}
+    }
 
 
 def stare_linki_routes(bez_celu):
@@ -401,15 +433,16 @@ def s1w_routes(cel_eq):
     cel = cel_eq("dodaj")
     klucz_ok = eq(API_KEY, env("S1W_API_KEY"))
     dane_ok = [exists(i["tytul"]), {"a": i["termin"], "o": "date:greater", "b": "{{now}}"}, match(i["rodzaj"], RODZAJ_PAT),
-               match(i["kategoria"], KATEGORIA_PAT)]
+               match(i["kategoria"], kategoria_pat()), match(i["id_zrodla"], ID_ZRODLA_PAT)]
     dup = "{{310.body.records[1].id}}"
     return [
         [jresp(300, 401, '{"status":"blad","komunikat":"Brak lub zły nagłówek X-Api-Key"}',
                flt("S1-W: zły klucz", [cel, ne(API_KEY, env("S1W_API_KEY"))]))],
-        [jresp(301, 400, '{"status":"blad","komunikat":"Brak tytułu albo termin nie jest datą w przyszłości."}',
+        [jresp(301, 400, json.dumps({"status": "blad", "komunikat": blad_danych()}, ensure_ascii=False),
                flt("S1-W: błąd danych", [cel, klucz_ok, missing(i["tytul"])], [cel, klucz_ok, missing(i["termin"])],
                    [cel, klucz_ok, {"a": i["termin"], "o": "date:lessorequal", "b": "{{now}}"}],
-                   [cel, klucz_ok, nomatch(i["rodzaj"], RODZAJ_PAT)], [cel, klucz_ok, nomatch(i["kategoria"], KATEGORIA_PAT)]))],
+                   [cel, klucz_ok, nomatch(i["rodzaj"], RODZAJ_PAT)], [cel, klucz_ok, nomatch(i["kategoria"], kategoria_pat())],
+                   [cel, klucz_ok, nomatch(i["id_zrodla"], ID_ZRODLA_PAT)]))],
         [at_find(310, "Zadania", f"AND('{i['id_zrodla']}' != '', {{ID źródła}} = '{i['id_zrodla']}')",
                  flt("S1-W: dane OK", [cel, klucz_ok, *dane_ok])),
          router(
@@ -437,6 +470,8 @@ def s5_routes(cel_eq):
     rodzice = [(env(f"RODZIC{i}_KLUCZ"), env(f"RODZIC{i}_KLUCZ_DOSTEPU"), env(f"RODZIC{i}_IMIE")) for i in (1, 2)]
     ja = "{{switch(1.u; " + "; ".join(f'"{k}"; "{imie}"' for k, _, imie in rodzice) + ")}}"
     ja_rec = "{{switch(1.u; " + "; ".join(f'"{env(f"RODZIC{i}_KLUCZ")}"; "{env(f"RODZIC{i}_REC")}"' for i in (1, 2)) + ")}}"
+    rodzice_json = json.dumps([{"imie": imie, "klucz": k} for k, _, imie in rodzice], ensure_ascii=False)
+    kategorie_json = json.dumps(kategorie(), ensure_ascii=False)
 
     def zalogowany(*grupy):
         """Iloczyn: (dowolna poprawna para u + s) AND (dowolna z grup warunków)."""
@@ -463,7 +498,9 @@ def s5_routes(cel_eq):
         [jresp(400, 403, '{"ok":false,"powod":"brak_dostepu"}', flt("API: brak dostępu", *bez_dostepu))],
         [find_names(410, otwarte, flt("Lista", *zalogowany([eq(q["akcja"], "lista")]))),
          tojson(411, "{{410.body.records}}"),
-         jresp(412, 200, '{"ok":true,"ja":"' + ja + '","zadania":{{411.json}}}')],
+         # konfiguracja domowników i kategorii dopiero po zalogowaniu – publiczna strona jej nie zawiera
+         jresp(412, 200, '{"ok":true,"ja":"' + ja + '","rodzice":' + rodzice_json + ',"kategorie":' + kategorie_json
+               + ',"zadania":{{411.json}}}')],
         # zmiana statusu: Silnik w kolejce; bez ponownego odczytu zadania (dashboard zmienia kartę sam)
         [call(420, "MAKE_ID_SILNIK", {"akcja": q["akcja"], "id": q["id"], "kto": ja_rec, "kto_imie": ja, "dla": q["dla"]},
               flt("Zmiana statusu", *zalogowany(*zmiana))),
@@ -472,12 +509,12 @@ def s5_routes(cel_eq):
         [jresp(440, 400, '{"ok":false,"powod":"blad_danych"}',
                flt("Dodaj: błąd danych", *zalogowany(
                    [dodaj, missing(n["tytul"])], [dodaj, nomatch(n["id_zrodla"], PD)],
-                   [dodaj, nomatch(n["rodzaj"], RODZAJ_PAT)], [dodaj, nomatch(n["kategoria"], KATEGORIA_PAT)],
+                   [dodaj, nomatch(n["rodzaj"], RODZAJ_PAT)], [dodaj, nomatch(n["kategoria"], kategoria_pat())],
                    [dodaj, {"a": n["termin"], "o": "date:lessorequal", "b": "{{now}}"}])))],
         # dodaj z formularza: zapis od razu (identyfikator dash-… jest unikalny, nie trzeba sprawdzać duplikatu)
         [at_create(441, "Zadania", rekord_zadania(n, "Dashboard"),
                    flt("Dodaj: dane OK", *zalogowany([dodaj, exists(n["tytul"]), match(n["id_zrodla"], PD),
-                                                      match(n["rodzaj"], RODZAJ_PAT), match(n["kategoria"], KATEGORIA_PAT),
+                                                      match(n["rodzaj"], RODZAJ_PAT), match(n["kategoria"], kategoria_pat()),
                                                       {"a": n["termin"], "o": "date:greater", "b": "{{now}}"}]))),
          jresp(444, 200, '{"ok":true,"id":"{{441.id}}"}')],
         # usuń: „miękko” – status Anulowane (znika z listy, zostaje w Airtable, da się przywrócić); bez Silnika
@@ -564,6 +601,8 @@ def layout(flow, x=0, y=0):
 
 
 def redact(text):
+    """Zastępuje sekrety znacznikami (np. w blueprincie pobranym z Make). Danych prywatnych nie zmienia –
+    dlatego publiczna wersja w repo jest budowana od nowa z PUBLICZNE, a nie redagowana."""
     for name in SECRETS:
         val = env(name)
         if val:
@@ -571,15 +610,35 @@ def redact(text):
     return text
 
 
-def main(names):
-    load_env()
-    DEPLOY.mkdir(exist_ok=True)
-    for name in names or SCENARIOS:
+def build(name, overrides=None):
+    """Blueprint scenariusza jako tekst JSON; overrides tymczasowo podmieniają zmienne środowiska."""
+    saved = {k: os.environ.get(k) for k in overrides or {}}
+    os.environ.update(overrides or {})
+    try:
         bp = SCENARIOS[name]()
         layout(bp["flow"])
-        real = json.dumps(bp, ensure_ascii=False, indent=1)
-        (DEPLOY / f"{name}.json").write_text(real, encoding="utf-8")
-        (MAKE / f"{name}.json").write_text(redact(real), encoding="utf-8")
+        return json.dumps(bp, ensure_ascii=False, indent=1)
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
+def main(names, out=MAKE, deploy=DEPLOY):
+    load_env()
+    deploy.mkdir(parents=True, exist_ok=True)
+    for name in names or SCENARIOS:
+        real = build(name)
+        public = build(name, PUBLICZNE)
+        przykladowe = PUBLICZNE["KATEGORIE"].split(",")
+        leaks = [k for k in SECRETS + PRYWATNE if k != "KATEGORIE" and env(k) and env(k) != PUBLICZNE[k] and env(k) in public]
+        leaks += [k for k in kategorie() if k not in przykladowe and k in public]
+        if leaks:
+            raise ValueError(f"{name}: publiczna wersja zawiera prawdziwe wartości {leaks}")
+        (deploy / f"{name}.json").write_text(real, encoding="utf-8")
+        (out / f"{name}.json").write_text(public, encoding="utf-8")
         print(f"{name}: {len(real)} B")
 
 

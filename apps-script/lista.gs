@@ -3,12 +3,14 @@
  *
  * Dashboard wysyła POST (text/plain, JSON {u, s, akcja: "lista"}). Skrypt sprawdza parę
  * klucz rodzica + klucz dostępu w tabeli Rodzice i zwraca otwarte sprawy oraz zrobione
- * w ostatnich 7 dniach – w tym samym formacie co API w Make ({ok, ja, zadania}).
+ * w ostatnich 7 dniach – w tym samym formacie co API w Make ({ok, ja, rodzice, kategorie, zadania}).
+ * Imiona domowników i kategorie dostaje dopiero zalogowana osoba, więc publiczna strona ich nie zawiera.
  * Nie zużywa operacji Make. Token Airtable jest tylko we Właściwościach skryptu.
  *
  * Właściwości skryptu (Ustawienia projektu → Właściwości skryptu):
  *   AIRTABLE_TOKEN    – token Airtable tylko do odczytu (data.records:read) dla tej bazy
  *   AIRTABLE_BASE_ID  – ID bazy (app…)
+ *   KATEGORIE         – kategorie spraw po przecinku, jak KATEGORIE w .env (np. Ola,Kuba,Dom)
  */
 
 // takie same jak w API Make (make/build.py)
@@ -46,7 +48,13 @@ function obsluz_(req) {
     const zadania = airtable_("Zadania", OTWARTE).map(function (r) {
       return { id: r.id, fields: wybierz_(r.fields) };
     });
-    return json_({ ok: true, ja: rodzic.fields["Imię"], zadania: zadania });
+    // domownicy do przypisywania spraw – tylko imię i klucz (bez maili i kluczy dostępu)
+    const rodzice = airtable_("Rodzice", "{Aktywny}").map(function (r) {
+      return { imie: r.fields["Imię"], klucz: r.fields["Klucz"] };
+    });
+    const kategorie = String(PropertiesService.getScriptProperties().getProperty("KATEGORIE") || "")
+      .split(",").map(function (k) { return k.trim(); }).filter(String);
+    return json_({ ok: true, ja: rodzic.fields["Imię"], rodzice: rodzice, kategorie: kategorie, zadania: zadania });
   } catch (err) {
     console.error(err);
     return json_({ ok: false, powod: "blad" });

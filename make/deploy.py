@@ -2,7 +2,8 @@
 
 Pierwsze uruchomienie tworzy scenariusz i zapisuje jego ID w .env (MAKE_ID_<NAZWA>),
 kolejne aktualizują blueprint w miejscu. Po zapisie blueprint jest pobierany z Make
-i zapisywany do make/<nazwa>.json (z sekretami zastąpionymi znacznikami).
+i zapisywany do make/_export/<nazwa>.json (gitignored, sekrety zastąpione znacznikami) – do porównania
+z tym, co wgrano. Do repo trafia publiczna wersja z build.py (przykładowe imiona i kategorie).
 
 Użycie:  python make/deploy.py <nazwa> [--activate]
 """
@@ -25,7 +26,7 @@ SCHEDULING = {
     "api": {"type": "immediately"},
 }
 INTERFACES = {
-    "silnik": build.SILNIK_INTERFACE,
+    "silnik": build.silnik_interface,
 }
 
 
@@ -80,15 +81,17 @@ def main(argv):
             set_env_value(id_var, sid)
             print(f"+ {name}: utworzono scenariusz {sid} ({id_var} w .env)")
         if name in INTERFACES:
-            mk.set_interface(sid, INTERFACES[name])
+            mk.set_interface(sid, INTERFACES[name]())
             print("  interfejs wejść/wyjść ustawiony")
         if activate:
             mk.activate(sid)
             print("  aktywowano")
-        # eksport stanu z Make do repo
+        # eksport stanu z Make (poza repo – zawiera prawdziwe imiona i kategorie)
+        export = build.MAKE / "_export"
+        export.mkdir(exist_ok=True)
         exported = json.dumps(mk.blueprint(sid), ensure_ascii=False, indent=1)
-        (build.MAKE / f"{name}.json").write_text(build.redact(exported), encoding="utf-8")
-        print(f"  eksport: make/{name}.json")
+        (export / f"{name}.json").write_text(build.redact(exported), encoding="utf-8")
+        print(f"  eksport: make/_export/{name}.json")
 
 
 if __name__ == "__main__":
