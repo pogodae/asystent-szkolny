@@ -72,18 +72,6 @@ Więcej: [architektura](docs/architektura.md) · [decyzje projektowe](docs/decyz
 
 Prawdziwe imiona domowników i kategorie są tylko w `.env`, w Airtable i w Apps Script. Repozytorium i kod strony zawierają przykładowe dane ([dlaczego i jak](docs/decyzje.md#prywatne-dane-poza-repozytorium)).
 
-### Uruchomienie od zera
-
-```bash
-pip install -r requirements.txt
-cp .env.example .env          # uzupełnij Airtable, rodziców, kategorie, MAKE_API_TOKEN, połączenia Make
-python airtable/setup_base.py
-python airtable/seed_rodzice.py
-python make/deploy.py silnik api --activate
-python -m unittest discover -s tests -t .   # testy offline
-python tests/smoke_test.py                  # testy na żywo (~25 operacji Make)
-```
-
 ### Dodawanie zadań
 
 - **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły) – dla osób, które nie używają Claude. Każda nowa sprawa należy do pierwszej osoby z `.env` (RODZIC1). Przycisk **→ imię** przekazuje ją drugiej osobie (dostaje maila), a **kosz** usuwa ją po potwierdzeniu: status „Anulowane”, sprawa znika z listy, ale zostaje w Airtable i można ją przywrócić, zmieniając status.
