@@ -2,39 +2,52 @@
 
 [![Testy](https://github.com/pogodae/asystent-szkolny/actions/workflows/testy.yml/badge.svg)](https://github.com/pogodae/asystent-szkolny/actions/workflows/testy.yml)
 
-**Demo:** [pogodae.github.io/asystent-szkolny/?demo=1](https://pogodae.github.io/asystent-szkolny/?demo=1) – przykładowe dane, bez logowania.
+**👉 [Zobacz demo](https://pogodae.github.io/asystent-szkolny/?demo=1)** – działa w przeglądarce, bez logowania, na przykładowych danych.
 
-Sprawy dzieci i domu (zgody, wpłaty, zebrania w szkole i przedszkolu, rachunki, wizyty) giną między dwojgiem rodziców, bo każde zakłada, że drugie się tym zajmie. Asystent zamienia każdą sprawę w **zadanie z właścicielem**: nowa sprawa należy do jednej osoby, która może ją oznaczyć jako zrobioną albo przekazać drugiej (ta dostaje wtedy maila), a dzień przed terminem właściciel dostaje przypomnienie.
+## Problem
 
-## W skrócie
+Zgoda na wycieczkę, 20 zł na teatr, zebranie w przedszkolu, rachunek za prąd. W domu z dwojgiem rodziców takie sprawy łatwo giną, bo każde z nas zakłada, że drugie już się tym zajęło. O terminie przypominamy sobie wieczorem dzień po nim.
 
-**Jaki problem rozwiązuje?** Sprawy dzieci i domu nie mają właściciela, więc umykają terminy i nikt nie wie, kto się czymś zajmuje. Każda sprawa ma tu jedną osobę odpowiedzialną, termin i status. Sprawę można dodać na trzy sposoby: zdaniem w Claude, formularzem albo webhookiem z innego systemu.
+## Rozwiązanie
 
-**Za co odpowiadałam?** Za całość: analizę potrzeb i specyfikację ([SPEC.md](SPEC.md)), model danych w Airtable, oba scenariusze Make, API dla dashboardu, maile, dashboard, Apps Script, testy i wdrożenie (GitHub Pages, GitHub Actions). Projekt działa w moim domu na prawdziwych danych.
+**Każda sprawa ma jedną osobę, która ją „ogarnia”.** Widać, co jest moje, co należy do drugiej osoby i co już jest zrobione.
 
-**Technologie:** Make (webhook, router, podscenariusz, kolejka), Airtable (REST API, formuły), Python (generator blueprintów, wdrażanie przez API Make, testy), JavaScript (dashboard bez frameworka), Google Apps Script, Gmail, GitHub Pages i Actions. W integracjach: webhooki, JSON, uwierzytelnianie kluczem API (`X-Api-Key`) i parą klucz + hasło, CORS, deduplikacja, walidacja danych wejściowych.
+- **Dodanie sprawy zajmuje kilka sekund:** wystarczy napisać zdanie do asystenta AI, np. *„dodaj: wycieczka do Krakowa w piątek, 40 zł i zgoda”*, albo wypełnić krótki formularz na stronie.
+- **Jedno kliknięcie przekazuje sprawę** drugiej osobie, a ona od razu dostaje maila.
+- **Dzień przed terminem rano** właściciel sprawy dostaje jedno przypomnienie. Bez zasypywania skrzynki.
+- **Lista działa na telefonie.** Sprawy są podzielone na moje, drugiej osoby i zrobione, a kolory pokazują, czego dotyczą (dziecko albo dom).
 
-**Jak korzystałam z AI?**
-- *W produkcie:* Claude przez konektor Make zamienia zdanie „dodaj: zebranie w czwartek 17:00” na wywołanie Silnika z polami `tytul`, `termin` (ISO 8601), `rodzaj` i `kategoria`. Opisy pól w interfejsie scenariusza są jednocześnie instrukcją dla modelu. Dane od modelu przechodzą tę samą walidację co z każdego innego źródła.
-- *Przy budowie:* Claude Code był moim asystentem programowania. Najpierw napisałam specyfikację z planem testów, a potem budowałam małymi krokami: scenariusz, test, poprawka. Scenariusze Make są opisane w Pythonie ([make/build.py](make/build.py)), więc każdą zmianę od AI widzę jako diff w kodzie, a nie jako klikanie w edytorze.
-- *Weryfikacja:* kodu od AI nie przyjmowałam na słowo. Kilka założeń z pierwszej wersji okazało się błędnych dopiero w testach na żywo. Na przykład sekwencyjny webhook w Make odpowiada od razu `Accepted`, a podscenariusz utworzony przez API nie zwraca wyjść. Opisałam to w [docs/decyzje.md](docs/decyzje.md).
+System działa w moim domu na co dzień.
 
-**Jak testowałam i jaki był efekt?**
-- [tests/test_build.py](tests/test_build.py) – testy offline w GitHub Actions. Sprawdzają m.in., że do publicznej wersji nie wyciekają sekrety ani imiona, że każde pole z zewnątrz jest sprawdzone wyrażeniem regularnym, zanim trafi do formuły Airtable, i że każda trasa webhooka zwraca odpowiedź. Test na wstrzyknięcie formuły znalazł prawdziwą lukę: brak walidacji pola `dla` w Silniku.
-- [tests/smoke_test.py](tests/smoke_test.py) – test na żywo prawdziwego webhooka i Airtable: brak klucza API, dane z przeszłości, próba wstrzyknięcia, duplikaty, dodaj, przekaż, zrobione, usuń.
-- Ręcznie: dwa jednoczesne kliknięcia (kolejka Silnika dała jedną zmianę zamiast dwóch), maile w Gmailu, dashboard na telefonie.
-- Efekt: dwa scenariusze zamiast siedmiu z pierwszej specyfikacji, bo darmowy plan Make pozwala na 2 aktywne scenariusze. Odczyt listy na dashboardzie nie zużywa operacji Make (Apps Script), a akcja kosztuje 3–6 operacji, więc system mieści się w ok. 1000 operacji miesięcznie darmowego planu ([budżet operacji](docs/architektura.md#budżet-operacji)).
+## Jak powstał
 
-## Jak to działa
+Zaprojektowałam i zbudowałam go samodzielnie: od rozpisania potrzeb i specyfikacji ([SPEC.md](SPEC.md)), przez bazę danych i automatyzacje, po stronę, maile i testy.
 
-1. Sprawę dodajesz przyciskiem **+ Dodaj** na dashboardzie, zdaniem „dodaj: wycieczka do Krakowa 14.11, 40 zł i zgoda” w Claude (konektor Make) albo webhookiem S1-W (np. z przyszłego scrapera dziennika szkolnego).
-2. Rano dzień przed terminem przychodzi jeden mail z przypomnieniem do właściciela sprawy. Druga osoba dostaje też maila od razu, gdy ktoś przekaże jej sprawę. W mailu jest tylko przycisk **Otwórz listę spraw** – akcje (Zrobione, przekazanie) robi się na dashboardzie.
-3. Innych maili nie ma – to oszczędza limit operacji darmowego planu Make (szczegóły: [docs/architektura.md](docs/architektura.md#budżet-operacji)).
-4. Dashboard **„Kto to ogarnia”** pokazuje moje sprawy (osobno wydarzenia z godziną i zadania), sprawy drugiej osoby i ostatnio zrobione, z filtrem kategorii. Strona główna to wizytówka z opisem, **wersją demo** (`?demo=1`) i logowaniem dla domowników.
+**Jak korzystałam z AI:**
+- **W samym produkcie** asystent AI (Claude) rozumie zwykłe zdania i zamienia je na uporządkowaną sprawę z datą, kwotą i rodzajem terminu. Wie, że „do piątku” znaczy coś innego niż „w piątek o 17:00”, a gdy czegoś brakuje, dopytuje.
+- **Przy budowie** pracowałam z Claude Code jak z asystentem programisty. Najpierw pisałam, co ma powstać i jak to sprawdzę, a potem budowałam małymi krokami. Nie przyjmowałam niczego na słowo: kilka pomysłów, które na papierze wyglądały dobrze, nie zadziałało w praktyce i trzeba było je przeprojektować ([decyzje](docs/decyzje.md)).
 
-Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decyzje.md](docs/decyzje.md) · specyfikacja: [SPEC.md](SPEC.md)
+## Jak sprawdziłam, że działa
 
-## Stos
+- **Automatyczne testy** uruchamiają się przy każdej zmianie w kodzie. Jeden z nich wykrył realną lukę bezpieczeństwa, zanim mogła komukolwiek zaszkodzić.
+- **Testy na żywo** sprawdzają prawdziwy system: próby dodania sprawy bez uprawnień, z datą z przeszłości albo dwa razy tej samej.
+- **Testy ręczne:** dwie osoby klikające tę samą sprawę w tej samej sekundzie, maile w skrzynce, strona na telefonie.
+
+## Kilka technicznych niuansów
+
+- **Mieści się w darmowych planach.** Narzędzie do automatyzacji (Make) pozwala za darmo na 2 scenariusze i ok. 1000 operacji miesięcznie. Pierwszy projekt zakładał 7 scenariuszy. Połączyłam je w 2, a odczyt listy przeniosłam do Google Apps Script, więc przeglądanie spraw nic nie kosztuje.
+- **Dwa kliknięcia naraz nie robią bałaganu.** Zmiany trafiają do kolejki i są wykonywane po kolei, tak jak w systemach rezerwacji.
+- **Ta sama sprawa nie pojawi się dwa razy.** Gdy przychodzi z innego systemu (np. z dziennika szkolnego), ma swój identyfikator i duplikat jest odrzucany.
+- **Prywatność.** Kod i strona są publiczne, a system działa na prawdziwych danych mojej rodziny. Imiona domowników są więc tylko w bazie i w konfiguracji, a w kodzie i w demo są przykładowe. Pilnuje tego test, który zatrzymuje publikację, gdyby prawdziwe dane miały trafić do repozytorium.
+- **Automatyzacje zapisane jako kod.** Scenariusze w Make zwykle się „wyklikuje”. Tutaj są opisane w Pythonie i wgrywane przez API Make, więc każdą zmianę widać w historii, da się ją przetestować i cofnąć.
+
+**Narzędzia:** Make · Airtable · Python · JavaScript · Google Apps Script · Gmail · GitHub Pages i Actions · Claude / Claude Code
+
+Więcej: [architektura](docs/architektura.md) · [decyzje projektowe](docs/decyzje.md) · [specyfikacja](SPEC.md)
+
+## Szczegóły techniczne
+
+### Stos
 
 - **Airtable** – jedyne źródło stanu (`Zadania`, `Rodzice`, `Zdarzenia`) z formułami pomocniczymi.
 - **Make** – 2 scenariusze: *Silnik* (zmiany stanu, kolejka) i *API* (jeden webhook dla S1-W, dashboardu i przypomnień).
@@ -44,7 +57,7 @@ Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decy
 - **Google Apps Script** – odczyt listy dla dashboardu bez operacji Make ([apps-script/](apps-script/README.md)).
 - **GitHub Actions** – harmonogram przypomnień ([przypomnienia.yml](.github/workflows/przypomnienia.yml)) i testy ([testy.yml](.github/workflows/testy.yml)).
 
-## Struktura
+### Struktura
 
 | Ścieżka | Zawartość |
 | --- | --- |
@@ -59,7 +72,7 @@ Szczegóły: [docs/architektura.md](docs/architektura.md) · decyzje: [docs/decy
 
 Prawdziwe imiona domowników i kategorie są tylko w `.env`, w Airtable i w Apps Script. Repozytorium i kod strony zawierają przykładowe dane ([dlaczego i jak](docs/decyzje.md#prywatne-dane-poza-repozytorium)).
 
-## Uruchomienie od zera
+### Uruchomienie od zera
 
 ```bash
 pip install -r requirements.txt
@@ -71,7 +84,7 @@ python -m unittest discover -s tests -t .   # testy offline
 python tests/smoke_test.py                  # testy na żywo (~25 operacji Make)
 ```
 
-## Dodawanie zadań
+### Dodawanie zadań
 
 - **Dashboard:** przycisk **+ Dodaj** (tytuł, kategoria, rodzaj, dzień, godzina tylko dla wydarzeń, kwota, szczegóły) – dla osób, które nie używają Claude. Każda nowa sprawa należy do pierwszej osoby z `.env` (RODZIC1). Przycisk **→ imię** przekazuje ją drugiej osobie (dostaje maila), a **kosz** usuwa ją po potwierdzeniu: status „Anulowane”, sprawa znika z listy, ale zostaje w Airtable i można ją przywrócić, zmieniając status.
 - **Claude:** zdanie „dodaj …” w projekcie Claude z włączonym konektorem Make (instrukcje niżej).
@@ -83,7 +96,7 @@ Każda sprawa ma **kategorię** (z `KATEGORIE` w `.env`, np. dzieci i *Dom*: kol
 
 Nie dodawaj zadań ręcznie w Airtable: taki rekord nie przejdzie walidacji ani nie dostanie właściciela.
 
-### Instrukcje dla projektu Claude „Kto to ogarnia”
+#### Instrukcje dla projektu Claude „Kto to ogarnia”
 
 Wklej do instrukcji projektu w claude.ai (konektor Make musi być włączony). Kategorie wpisz takie jak w `KATEGORIE`:
 
@@ -113,7 +126,7 @@ albo data jest niejednoznaczna, zapytaj jednym krótkim pytaniem, zanim uruchomi
   Gdy uruchomienie się nie powiedzie, powiedz to wprost.
 ```
 
-## Status
+### Status
 
 - [x] Airtable: schemat, rodzice, formuły
 - [x] Make: Silnik + API, walidacja danych wejściowych, deduplikacja, kolejka
